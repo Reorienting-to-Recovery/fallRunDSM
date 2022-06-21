@@ -62,7 +62,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # SIT METRICS
     spawners = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juvenile_biomass = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    proportion_natural = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20))
+    proportion_natural = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    returning_adults = tibble::tibble()
   )
 
 
@@ -101,6 +102,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     } else {
       round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
     }
+
+    # returning adults are here: round(adults)
 
     spawners <- get_spawning_adults(year, round(adults), hatch_adults, mode = mode,
                                     month_return_proportions = ..params$month_return_proportions,
@@ -610,7 +613,17 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       }
     }))
 
-
+    output$returning_adults <-
+      dplyr::bind_rows(
+        output$returning_adults,
+        tibble::tibble(
+          watershed = rep(fallRunDSM::watershed_labels, 3),
+          adults_at_this_year = rep(adults[, year], 3),
+          year = rep(year, 31 * 3),
+          adults = c(adults_returning[, 1], adults_returning[, 2], adults_returning[, 3]),
+          year_return = rep(c(2, 3, 4), each = 31)
+        )
+      )
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {

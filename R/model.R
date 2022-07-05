@@ -63,7 +63,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     spawners = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juvenile_biomass = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     proportion_natural = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    returning_adults = tibble::tibble()
+    returning_adults = tibble::tibble(),
+
+    # R2R
+    crr = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20))
   )
 
 

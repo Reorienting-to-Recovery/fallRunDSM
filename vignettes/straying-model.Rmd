@@ -5,7 +5,7 @@ output:
     theme: flatly
     code_folding: hide
 vignette: >
-  %\VignetteIndexEntry{temperature-model}
+  %\VignetteIndexEntry{straying-model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

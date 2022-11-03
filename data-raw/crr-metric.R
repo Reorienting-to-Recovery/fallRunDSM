@@ -1,33 +1,27 @@
 library(tidyverse)
-library(zoo)
-class(f$spawners)
+library(fallRunDSM)
 
-f <- fall_run_model(seeds = s, mode = "simulate")
+s <- fall_run_model(mode = "seed")
+sim <- fall_run_model(seeds = s, mode = "simulate")
 
-raw_adults <- f$raw_adults
+sim$adults_in_ocean[, 1]
+10577 * c(.25, .5, .25)
 
-adults <- raw_adults |>
+natural_spawners <- (sim$proportion_natural * sim$spawners) |>
   as_tibble() |>
   mutate(watershed = fallRunDSM::watershed_labels) |>
-  pivot_longer(names_to = "year", values_to = "adults", V1:V25) |>
-  mutate(year = readr::parse_number(year),
-         cal_year = year + 1979)
+  pivot_longer(names_to = "year", values_to = "natural_spawners", -watershed)
 
-zoo::rollapply()
+in_river_spawners <- sim$spawners |>
+  as_tibble() |>
+  mutate(watershed = fallRunDSM::watershed_labels) |>
+  pivot_longer(names_to = "year", values_to = "total_spawners", -watershed)
 
-adults |>
-  filter(watershed == "Upper Sacramento River") |>
-  mutate(l2 = lag(adults * .25, 2),
-         l3 = lag(adults * .50, 3),
-         l4 = lag(adults * .25, 4),
-         lag_sums = l2 + l3 + l4,
-         crr = adults/lag_sums) |>
-  View()
+
+sim_spawners <- in_river_spawners |>
+  left_join(natural_spawners) |>
+  mutate(lag_total = lag(total_spawners, 3),
+         metric = natural_spawners / lag_total)
 
 
 
-ret_adults <- f$returning_adults
-
-ret_adults |>
-  mutate(return_year = year + year_return) |>
-  filter(watershed == "Upper Sacramento River")

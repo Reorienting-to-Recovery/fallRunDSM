@@ -66,7 +66,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     returning_adults = tibble::tibble(),
 
     # R2R
-    crr = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20))
+    adults_in_ocean = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    juveniles = data.frame()
   )
 
 
@@ -167,6 +168,14 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                redd_size = ..params$spawn_success_redd_size,
                                fecundity = ..params$spawn_success_fecundity,
                                stochastic = stochastic)
+
+    # For use in the r2r metrics
+    d <- data.frame(juveniles)
+    colnames(d) <- c("s", "m", "l", "vl")
+    d$watershed <- fallRunDSM::watershed_labels
+    d <- d |> tidyr::pivot_longer(names_to = "size", values_to = "juveniles", -watershed)
+    d$year <- year
+    output$juveniles <- dplyr::bind_rows(output$juveniles, d)
 
     for (month in 1:8) {
       habitat <- get_habitat(year, month,
@@ -616,17 +625,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       }
     }))
 
-    output$returning_adults <-
-      dplyr::bind_rows(
-        output$returning_adults,
-        tibble::tibble(
-          watershed = rep(fallRunDSM::watershed_labels, 3),
-          adults_at_this_year = rep(adults[, year], 3),
-          year = rep(year, 31 * 3),
-          adults = c(adults_returning[, 1], adults_returning[, 2], adults_returning[, 3]),
-          year_return = rep(c(2, 3, 4), each = 31)
-        )
-      )
+    output$adults_in_ocean[,year] <- adults_in_ocean
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {

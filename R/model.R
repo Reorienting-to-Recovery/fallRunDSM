@@ -625,6 +625,20 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       }
     }))
 
+    output$returning_adults <- bind_rows(
+      output$returning_adults,
+      adults_returning |>
+        as_tibble() |>
+        mutate(watershed = watershed_labels,
+               sim_year = year,
+               natural_adults = init_adults * spawners$proportion_natural) |>
+        pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
+        mutate(return_year = readr::parse_number(return_year)) |>
+        group_by(watershed) |>
+        mutate(return_total_nat = return_total * spawners$proportion_natural[watershed])
+
+    )
+
     output$adults_in_ocean[,year] <- adults_in_ocean
 
     # distribute returning adults for future spawning

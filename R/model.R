@@ -169,7 +169,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                fecundity = ..params$spawn_success_fecundity,
                                stochastic = stochastic)
 
-    # For use in the r2r metrics
+    # # For use in the r2r metrics
     d <- data.frame(juveniles)
     colnames(d) <- c("s", "m", "l", "vl")
     d$watershed <- fallRunDSM::watershed_labels
@@ -257,6 +257,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       migrants <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
 
       if (month == 8) {
+
         # all remaining fish outmigrate
         migrants <- juveniles
 

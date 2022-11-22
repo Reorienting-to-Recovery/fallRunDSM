@@ -17,7 +17,8 @@
 #' @export
 fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibrate"),
                            seeds = NULL, ..params = fallRunDSM::params,
-                           stochastic = FALSE){
+                           stochastic = FALSE, r_to_r_sensi = c("prespawn surv", "ocean surv"),
+                           survival_increase = c(5, 10, 20)){
 
   mode <- match.arg(mode)
 
@@ -151,6 +152,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     prespawn_survival <- surv_adult_prespawn(average_degree_days,
                                              ..surv_adult_prespawn_int = ..params$..surv_adult_prespawn_int,
                                              .deg_day = ..params$.adult_prespawn_deg_day)
+    if (r_to_r_sensi == "prespawn surv") {
+      prespawn_survival <- prespawn_survival * survival_increase
+    }
 
     juveniles <- spawn_success(escapement = init_adults,
                                adult_prespawn_survival = prespawn_survival,
@@ -590,13 +594,18 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
         juveniles_at_chipps <- delta_fish$juveniles_at_chipps
       }
 
-      adults_in_ocean <- adults_in_ocean + ocean_entry_success(migrants = migrants_at_golden_gate,
-                                                               month = month,
-                                                               avg_ocean_transition_month = avg_ocean_transition_month,
-                                                               .ocean_entry_success_length = ..params$.ocean_entry_success_length,
-                                                               ..ocean_entry_success_int = ..params$..ocean_entry_success_int,
-                                                               .ocean_entry_success_months = ..params$.ocean_entry_success_months,
-                                                               stochastic = stochastic)
+      ocean_entry_success <- ocean_entry_success(migrants = migrants_at_golden_gate,
+                                                 month = month,
+                                                 avg_ocean_transition_month = avg_ocean_transition_month,
+                                                 .ocean_entry_success_length = ..params$.ocean_entry_success_length,
+                                                 ..ocean_entry_success_int = ..params$..ocean_entry_success_int,
+                                                 .ocean_entry_success_months = ..params$.ocean_entry_success_months,
+                                                 stochastic = stochastic)
+
+      if (r_to_r_sensi = "ocean surv") {
+        ocean_entry_success <- ocean_entry_success * survival_increase
+      }
+      adults_in_ocean <- adults_in_ocean + ocean_entry_success
 
     } # end month loop
 

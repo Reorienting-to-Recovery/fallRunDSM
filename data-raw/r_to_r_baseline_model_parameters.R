@@ -4,7 +4,7 @@ library(tidyverse)
 calib_results <- read_rds("calibration/calibration-results.rds")
 solution <- calib_results@solution
 
-params <- list(
+r_to_r_baseline_params <- list(
 
   # Data from DSMscenarios
   spawn_decay_rate = DSMscenario::spawn_decay_rate,
@@ -111,12 +111,12 @@ params <- list(
   gates_overtopped = DSMflow::gates_overtopped$biop_itp_2018_2019,
 
   # DSMtemperature variables -----
-  vernalis_temps = DSMtemperature::vernalis_temperature$biop_itp_2018_2019,
-  prisoners_point_temps = DSMtemperature::prisoners_point_temperature$biop_itp_2018_2019,
+  vernalis_temps = DSMtemperature::vernalis_temperature,
+  prisoners_point_temps = DSMtemperature::prisoners_point_temperature,
   degree_days = DSMtemperature::degree_days$biop_itp_2018_2019,
   mean_egg_temp_effect = DSMtemperature::egg_temperature_effect$fall_run,
   avg_temp = DSMtemperature::stream_temperature$biop_itp_2018_2019,
-  avg_temp_delta = DSMtemperature::delta_temperature$biop_itp_2018_2019,
+  avg_temp_delta = DSMtemperature::delta_temperature,
   migratory_temperature_proportion_over_20 = DSMtemperature::migratory_temperature_proportion_over_20,
 
   # DSMhabitat variables -----

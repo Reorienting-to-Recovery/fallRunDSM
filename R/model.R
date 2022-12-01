@@ -63,7 +63,12 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # SIT METRICS
     spawners = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juvenile_biomass = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    proportion_natural = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20))
+    proportion_natural = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    returning_adults = tibble::tibble(),
+
+    # R2R
+    adults_in_ocean = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    juveniles = data.frame()
   )
 
 
@@ -102,6 +107,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     } else {
       round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
     }
+
+    # returning adults are here: round(adults)
 
     spawners <- get_spawning_adults(year, round(adults), hatch_adults, mode = mode,
                                     month_return_proportions = ..params$month_return_proportions,
@@ -165,6 +172,14 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                redd_size = ..params$spawn_success_redd_size,
                                fecundity = ..params$spawn_success_fecundity,
                                stochastic = stochastic)
+
+    # # For use in the r2r metrics
+    d <- data.frame(juveniles)
+    colnames(d) <- c("s", "m", "l", "vl")
+    d$watershed <- fallRunDSM::watershed_labels
+    d <- d |> tidyr::pivot_longer(names_to = "size", values_to = "juveniles", -watershed)
+    d$year <- year
+    output$juveniles <- dplyr::bind_rows(output$juveniles, d)
 
     for (month in 1:8) {
       habitat <- get_habitat(year, month,
@@ -246,6 +261,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       migrants <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
 
       if (month == 8) {
+
         # all remaining fish outmigrate
         migrants <- juveniles
 
@@ -619,7 +635,21 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       }
     }))
 
+    output$returning_adults <- bind_rows(
+      output$returning_adults,
+      adults_returning |>
+        as_tibble() |>
+        mutate(watershed = watershed_labels,
+               sim_year = year,
+               natural_adults = init_adults * spawners$proportion_natural) |>
+        pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
+        mutate(return_year = readr::parse_number(return_year)) |>
+        group_by(watershed) |>
+        mutate(return_total_nat = return_total * spawners$proportion_natural[watershed])
 
+    )
+
+    output$adults_in_ocean[,year] <- adults_in_ocean
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {

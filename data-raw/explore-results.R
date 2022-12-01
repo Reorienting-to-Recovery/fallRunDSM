@@ -20,7 +20,43 @@ r22_baseline_nat_spawn %>%
   theme_minimal() +
   labs(y = "Total Natural Spawners",
        x = "Year") +
-  scale_y_continuous(labels = scales::comma)
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks = 1:20) +
+  theme(text = element_text(size = 20))
+
+# CCR plot
+natural_spawners <- (r2r_model_results$proportion_natural * r2r_model_results$spawners) |>
+  as_tibble() |>
+  mutate(watershed = fallRunDSM::watershed_labels) |>
+  pivot_longer(names_to = "year", values_to = "natural_spawners", -watershed)
+
+juveniles <- r2r_model_results$juveniles |>
+  as_tibble() |>
+  mutate(year = as.numeric(year)) |>
+  group_by(year, watershed) |>
+  summarise(total_juveniles = sum(juveniles)) |>
+  ungroup() |>
+  left_join(natural_spawners |>
+              mutate(year = as.numeric(year))) |>
+  arrange(watershed, year) |>
+  group_by(watershed) |>
+  mutate(natural_spawners_lag = lead(natural_spawners, 3),
+         metric = total_juveniles / natural_spawners_lag,
+         metric_rev = natural_spawners_lag / total_juveniles) |>
+  ungroup()
+
+juv_plot <- juveniles |>
+  group_by(year) |>
+  summarize(mean_crr = mean(metric_rev, na.rm = T)) |>
+  ggplot(aes( year, mean_crr)) +
+  geom_line() +
+  scale_x_continuous(breaks = 1:20) +
+  ylab('Adult Returns Per Juveniles') +
+  xlab("Year") +
+  theme_minimal() +
+  theme(text = element_text(size = 20))
+
+juv_plot
 
 # OG model results
 set.seed(123119)

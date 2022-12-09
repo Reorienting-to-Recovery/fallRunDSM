@@ -198,6 +198,15 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                              yolo_habitat = ..params$yolo_habitat,
                              delta_habitat = ..params$delta_habitat)
 
+      if (grepl("rearing", r_to_r_sensi)) {
+        habitat$inchannel <- habitat$inchannel * sensi_increase
+        habitat$floodplain <- habitat$floodplain * sensi_increase
+        habitat$sutter <- habitat$sutter * sensi_increase
+        habitat$yolo <- habitat$yolo * sensi_increase
+        habitat$north_delta <- habitat$north_delta * sensi_increase
+        habitat$south_delta <- habitat$south_delta * sensi_increase
+      }
+
       rearing_survival <- get_rearing_survival(year, month,
                                                survival_adjustment = scenario_data$survival_adjustment,
                                                mode = mode,

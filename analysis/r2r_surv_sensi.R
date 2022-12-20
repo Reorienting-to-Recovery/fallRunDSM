@@ -25,7 +25,7 @@ sensi_model_run <- function(sensi_type, sensi_quantity) {
 }
 
 
-sensi_model_run(sensi_type = "rearing habitat", sensi_quantity = 1.05)
+res <- sensi_model_run(sensi_type = "rearing habitat", sensi_quantity = 1)
 
 sensi_types <- c(
   # "prespawn surv", "prespawn surv", "prespawn surv","prespawn surv",

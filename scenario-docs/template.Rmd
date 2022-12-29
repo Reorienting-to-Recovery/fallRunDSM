@@ -1,0 +1,33 @@
+---
+title: "Scenario Doc Template"
+output: html_document
+date: "2022-12-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(fallRunDSM)
+colors <- c("#9A8822", "#899DA4", "#C93312", "#F8AFA8", "#DC863B", "#FDDDA0", "#74A089", "#E1BD6D", "#FAEFD1", "#DC863B") 
+```
+
+# Scenario Title
+
+2 sentence description of scenario
+
+## Values
+
+## Actions
+
+## Model Updates
+
+### Overview of how model currently handles \_\_\_\_\_\_
+
+### Description of updates for scenario
+
+## Model Results / Performance Measures
+
+### Comparison to Baseline 
+#### Natural Spawners Comparison Plot  
+
+#### Cohort Replacement Rate Comparison Plot 

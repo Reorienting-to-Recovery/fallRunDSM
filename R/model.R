@@ -17,12 +17,7 @@
 #' @export
 fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibrate"),
                            seeds = NULL, ..params = fallRunDSM::params,
-                           stochastic = FALSE, r_to_r_sensi = c("prespawn surv",
-                                                                "ocean surv",
-                                                                "spawning habitat",
-                                                                "spawning and ocean",
-                                                                "prespawn and ocean"),
-                           sensi_increase = c(1.05, 1.10, 1.20)){
+                           stochastic = FALSE){
 
   mode <- match.arg(mode)
 
@@ -154,10 +149,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     min_spawn_habitat <- apply(..params$spawning_habitat[ , 10:12, year], 1, min)
 
-    if (grepl("spawning", r_to_r_sensi)) {
-      min_spawn_habitat <- min_spawn_habitat * sensi_increase
-    }
-
     accumulated_degree_days <- cbind(oct = rowSums(..params$degree_days[ , 10:12, year]),
                                      nov = rowSums(..params$degree_days[ , 11:12, year]),
                                      dec = ..params$degree_days[ , 12, year])
@@ -167,9 +158,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     prespawn_survival <- surv_adult_prespawn(average_degree_days,
                                              ..surv_adult_prespawn_int = ..params$..surv_adult_prespawn_int,
                                              .deg_day = ..params$.adult_prespawn_deg_day)
-    if (grepl("prespawn", r_to_r_sensi)) {
-      prespawn_survival <- prespawn_survival * sensi_increase
-    }
 
     juveniles <- spawn_success(escapement = init_adults,
                                adult_prespawn_survival = prespawn_survival,
@@ -197,15 +185,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                              sutter_habitat = ..params$sutter_habitat,
                              yolo_habitat = ..params$yolo_habitat,
                              delta_habitat = ..params$delta_habitat)
-
-      if (grepl("rearing", r_to_r_sensi)) {
-        habitat$inchannel <- habitat$inchannel * sensi_increase
-        habitat$floodplain <- habitat$floodplain * sensi_increase
-        habitat$sutter <- habitat$sutter * sensi_increase
-        habitat$yolo <- habitat$yolo * sensi_increase
-        habitat$north_delta <- habitat$north_delta * sensi_increase
-        habitat$south_delta <- habitat$south_delta * sensi_increase
-      }
 
       rearing_survival <- get_rearing_survival(year, month,
                                                survival_adjustment = scenario_data$survival_adjustment,
@@ -635,9 +614,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                  .ocean_entry_success_months = ..params$.ocean_entry_success_months,
                                                  stochastic = stochastic)
 
-      if (grepl("ocean", r_to_r_sensi)) {
-        ocean_entry_success <- ocean_entry_success * sensi_increase
-      }
       adults_in_ocean <- adults_in_ocean + ocean_entry_success
 
     } # end month loop

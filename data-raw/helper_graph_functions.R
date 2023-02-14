@@ -82,6 +82,8 @@ produce_habitat_ratios <- function(model_parameters, watershed) {
          title = paste0(watershed, ": Ratio of Habitat Types for Simulation Period"))
 }
 
+# Performance Metric: Wetted Acre Days -----------------------------------------
+
 
 # MODEL OUTPUT PERFORMANCE METRICS ---------------------------------------------
 # Performance Metric: Abundance - total spawners & natural spawners ------------
@@ -171,7 +173,7 @@ plot_single_watershed_natural_spawners <- function(model_results,
 # Performance Metric: Cohort Replacement Rate ----------------------------------
 # Juvenile
 plot_juv_crr <- function(model_results,
-                           result_type = c("Total Spawners", "Total Natural Spawners")){
+                         result_type = c("Total Spawners", "Total Natural Spawners")){
   if (result_type == "Total Natural Spawners")
     spawn <- dplyr::as_tibble(model_results$spawners * model_results$proportion_natural) |>
       dplyr::mutate(location = fallRunDSM::watershed_labels) |>
@@ -215,7 +217,7 @@ plot_juv_crr <- function(model_results,
 
 # Adult
 plot_adult_crr <- function(model_results,
-                         result_type = c("Total Spawners", "Total Natural Spawners")) {
+                           result_type = c("Total Spawners", "Total Natural Spawners")) {
   if (result_type == "Total Natural Spawners")
     spawn <- dplyr::as_tibble(model_results$spawners * model_results$proportion_natural) |>
       dplyr::mutate(location = fallRunDSM::watershed_labels) |>
@@ -250,7 +252,8 @@ plot_adult_crr <- function(model_results,
 # Performance Metric: Population Growth ----------------------------------------
 
 # Performance Metric: Juvenile Size Distribition -------------------------------
-#
+
+
 # TODO need model refactoring and enhancement
 # Performance Metric: Proportion Hatchery on Spawning Ground (PHOS)-------------
 # Performance Metric: Age Distribution of Spawning Adults ----------------------

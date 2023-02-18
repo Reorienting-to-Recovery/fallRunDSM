@@ -1,7 +1,7 @@
 library(tidyverse)
 library(DSMflow)
 library(DSMtemperature)
-library(DSMhabitat)
+library(DSMhabitat) # https://github.com/Reorienting-to-Recovery/DSMhabitat/tree/r2r_add_tmh_habitat
 
 # 2021
 calib_results <- read_rds("calibration/calibration-results.rds")

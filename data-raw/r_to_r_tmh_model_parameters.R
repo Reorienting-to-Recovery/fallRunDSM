@@ -1,6 +1,8 @@
 library(tidyverse)
 library(DSMflow)
 library(DSMtemperature)
+
+remotes::install_github("Reorienting-to-Recovery/DSMhabitat@r2r_add_tmh_habitat")
 library(DSMhabitat) # https://github.com/Reorienting-to-Recovery/DSMhabitat/tree/r2r_add_tmh_habitat
 
 # 2021
@@ -141,6 +143,9 @@ r_to_r_tmh_params <- list(
   prob_strand_early = DSMhabitat::prob_strand_early,
   prob_strand_late = DSMhabitat::prob_strand_late,
   prob_nest_scoured = DSMhabitat::prob_nest_scoured,
+
+  prey_density = fallRunDSM::prey_density,
+  prey_density_delta = fallRunDSM::prey_density_delta,
 
   # Calibration Variables (vary by run)
   ..surv_adult_enroute_int = solution[1],

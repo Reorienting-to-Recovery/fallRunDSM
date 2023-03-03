@@ -1,9 +1,18 @@
 library(tidyverse)
+remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# Reorientiy to recov
+# start with old params
+r_to_r_params_raw <- fallRunDSM::r_to_r_baseline_params[1:119]
+# add new decay multiplier
+# r_to_r_params_raw$spawn_decay_multiplier <- DSMhabitat::spawning_decay_multiplier
+# updates based on latest calibration
+source("calibration/update-params.R")
+calib_results_2022 <- readr::read_rds("calibration/calibration-results-2022.rds")@solution[1,]
+r_to_r_baseline_params <- update_params(x = calib_results_2022, params = r_to_r_params_raw)
 
-# 2021
-calib_results <- read_rds("calibration/calibration-results.rds")
-solution <- calib_results@solution
+usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)
 
+# initial params
 r_to_r_baseline_params <- list(
 
   # Data from DSMscenarios

@@ -5,6 +5,18 @@ library(DSMtemperature)
 remotes::install_github("Reorienting-to-Recovery/DSMhabitat@r2r_add_tmh_habitat")
 library(DSMhabitat) # https://github.com/Reorienting-to-Recovery/DSMhabitat/tree/r2r_add_tmh_habitat
 
+# updated params
+r_to_r_tmh_params_raw <- fallRunDSM::r_to_r_tmh_params
+# add new decay multiplier
+# r_to_r_params_raw$spawn_decay_multiplier <- DSMhabitat::spawning_decay_multiplier
+# updates based on latest calibration
+source("calibration/update-params.R")
+calib_results_2022 <- readr::read_rds("calibration/calibration-results-2022.rds")@solution[1,]
+r_to_r_tmh_params <- update_params(x = calib_results_2022, params = r_to_r_tmh_params_raw)
+
+usethis::use_data(r_to_r_tmh_params, overwrite = TRUE)
+
+# inital TMH params
 # 2021
 calib_results <- read_rds("calibration/calibration-results.rds")
 solution <- calib_results@solution

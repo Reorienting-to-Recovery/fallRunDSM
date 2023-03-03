@@ -117,15 +117,16 @@ usethis::use_data(bioenergetics_transitions, overwrite = TRUE)
 
 
 prey_density <- rep("med", 31) # NOTE this is to drive the new prey density dependent growth
+prey_density <- rep("hi", 31) # NOTE this is to drive the new prey density dependent growth
 usethis::use_data(prey_density, overwrite = TRUE)
-
 
 # should be moved to a data package?
 prey_density_delta <- c("med", "med")
 usethis::use_data(prey_density_delta, overwrite = TRUE)
 
-
-
+# watershed attributes
+watershed_attributes <- read_csv("data-raw/watershed-attributes.csv")
+usethis::use_data(watershed_attributes, overwrite = TRUE)
 
 
 

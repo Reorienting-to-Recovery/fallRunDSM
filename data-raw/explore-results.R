@@ -14,7 +14,7 @@ r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fa
 plot_total_spawners(r2r_model_results, "Total Natural Spawners")
 
 # Total Spawners (natural and hatchery )
-plot_total_natural_spawners(r2r_model_results, "Total Spawners")
+plot_total_spawners(r2r_model_results, "Total Spawners")
 
 # Single watershed total spawners
 plot_single_watershed_natural_spawners(model_results = r2r_model_results,

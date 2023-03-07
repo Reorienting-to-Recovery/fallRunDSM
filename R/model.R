@@ -81,7 +81,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # R2R
     adults_in_ocean = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juveniles = data.frame(),
-    juveniles_at_chipps = data.frame()
+    juveniles_at_chipps = data.frame(),
+    phos = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20))
   )
 
 
@@ -115,11 +116,34 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     avg_ocean_transition_month <- ocean_transition_month(stochastic = stochastic) # 2
 
-    hatch_adults <- if (stochastic) {
-      rmultinom(1, size = round(runif(1, 83097.01,532203.1)), prob = ..params$hatchery_allocation)[ , 1]
-    } else {
+    # hatch_adults <- if (stochastic) {
+    #   rmultinom(1, size = round(runif(1, 83097.01,532203.1)), prob = ..params$hatchery_allocation)[ , 1]
+    # } else {
+    #   round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
+    # }
+    hatch_adults <- if (year == 1) {
       round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
+    } else {
+      return_hatch <- output$returning_adults |>
+      filter(return_sim_year == year) |>
+      group_by(watershed) |>
+      summarise(hatchery_total = sum(return_total_hatch, na.rm = TRUE)) |>
+      deframe()
+
+      unname(return_hatch[order(match(names(return_hatch), watershed_labels))])
     }
+
+    # adults <-  hatch_adults <- if (year == 1) {
+    #   round(adults)
+    # } else {
+    #   return_adults <- output$returning_adults |>
+    #     filter(return_sim_year == year) |>
+    #     group_by(watershed) |>
+    #     summarise(nat_adults = sum(return_total_nat, na.rm = TRUE)) |>
+    #     deframe()
+    #
+    #   adults[, year] <- unname(return_adults[order(match(names(return_adults), watershed_labels))])
+    # }
 
     # returning adults are here: round(adults)
 
@@ -172,6 +196,19 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     prespawn_survival <- surv_adult_prespawn(average_degree_days,
                                              ..surv_adult_prespawn_int = ..params$..surv_adult_prespawn_int,
                                              .deg_day = ..params$.adult_prespawn_deg_day)
+    capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
+    if (all(capacity >= init_adults)) {
+      output$phos <- 1 - spawners$proportion_natural
+    } else {
+      # TODO figure out ruleset here
+     hatch_capacity <- capacity - (init_adults * spawners$proportion_natural)
+     hatch_capacity <- ifelse(hatch_capacity < 0, 0, hatch_capacity)
+     phos <- hatch_capacity / init_adults
+     corrected_phos <- case_when(is.nan(phos) ~ 0,
+                                 phos >= 1 ~ spawners$proportion_natural,
+                                 T ~ phos)
+     output$phos[ , year] <- corrected_phos
+    }
 
     juveniles <- spawn_success(escapement = init_adults,
                                adult_prespawn_survival = prespawn_survival,
@@ -683,11 +720,13 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
         as_tibble() |>
         mutate(watershed = watershed_labels,
                sim_year = year,
-               natural_adults = init_adults * spawners$proportion_natural) |>
+               natural_adults = init_adults * spawners$proportion_natural,
+               proportion_natural = spawners$proportion_natural) |>
         pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
-        mutate(return_year = readr::parse_number(return_year)) |>
-        group_by(watershed) |>
-        mutate(return_total_nat = return_total * spawners$proportion_natural[watershed])
+        mutate(return_year = readr::parse_number(return_year),
+               return_total_nat = return_total * proportion_natural,
+               return_total_hatch = return_total - return_total_nat,
+               return_sim_year = sim_year + return_year)
 
     )
 
@@ -695,9 +734,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
-      calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + adults_returning
+      calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + (adults_returning * spawners$proportion_natural)
     } else {
-      adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + adults_returning
+      adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + (adults_returning * spawners$proportion_natural)
     }
 
 

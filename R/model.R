@@ -125,9 +125,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
     } else {
       return_hatch <- output$returning_adults |>
-      filter(return_sim_year == year) |>
+      filter(return_sim_year == year, origin == "hatchery") |>
       group_by(watershed) |>
-      summarise(hatchery_total = sum(return_total_hatch, na.rm = TRUE)) |>
+      summarise(hatchery_total = sum(return_total, na.rm = TRUE)) |>
       deframe()
 
       unname(return_hatch[order(match(names(return_hatch), watershed_labels))])
@@ -706,26 +706,40 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     output$juvenile_biomass[ , year] <- juveniles_at_chipps %*% fallRunDSM::params$mass_by_size_class
 
-    adults_returning <- t(sapply(1:31, function(i) {
+    natural_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {
-        rmultinom(1, adults_in_ocean[i], prob = c(.25, .5, .25))
+        rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25))
       } else {
-        round(adults_in_ocean[i] * c(.25, .5, .25))
+        round((adults_in_ocean[i])* c(.25, .5, .25))
       }
-    }))
+    })) * spawners$proportion_natural
+
+    hatchery_adults_returning <- t(sapply(1:31, function(i) {
+      if (stochastic) {
+        rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25))
+      } else {
+        round((adults_in_ocean[i]) * c(.25, .5, .25))
+      }
+    })) * (1 - spawners$proportion_natural)
 
     output$returning_adults <- bind_rows(
       output$returning_adults,
-      adults_returning |>
+      natural_adults_returning |>
         as_tibble() |>
         mutate(watershed = watershed_labels,
                sim_year = year,
-               natural_adults = init_adults * spawners$proportion_natural,
-               proportion_natural = spawners$proportion_natural) |>
+               origin = "natural") |>
         pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
         mutate(return_year = readr::parse_number(return_year),
-               return_total_nat = return_total * proportion_natural,
-               return_total_hatch = return_total - return_total_nat,
+               return_sim_year = sim_year + return_year),
+
+      hatchery_adults_returning |>
+        as_tibble() |>
+        mutate(watershed = watershed_labels,
+               sim_year = year,
+               origin = "hatchery") |>
+        pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
+        mutate(return_year = readr::parse_number(return_year),
                return_sim_year = sim_year + return_year)
 
     )
@@ -734,9 +748,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
-      calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + (adults_returning * spawners$proportion_natural)
+      calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
     } else {
-      adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + (adults_returning * spawners$proportion_natural)
+      adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
     }
 
 

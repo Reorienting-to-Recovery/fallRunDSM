@@ -121,7 +121,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # } else {
     #   round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
     # }
-    hatch_adults <- if (year == 1) {
+    # TODO decide on starting number of hatchery adults <- currently starting at CWT data number until returns statrt to populate
+    hatch_adults <- if (year %in% c(1, 2)) {
       round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
     } else {
       return_hatch <- output$returning_adults |>
@@ -132,6 +133,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
       unname(return_hatch[order(match(names(return_hatch), watershed_labels))])
     }
+    # TODO add in hatchery releases **where do we get this data from - how was
+    #  the model using this data before? maybe they are actually added into Juveniles?
 
     # adults <-  hatch_adults <- if (year == 1) {
     #   round(adults)
@@ -209,7 +212,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                  T ~ phos)
      output$phos[ , year] <- corrected_phos
     }
-
     juveniles <- spawn_success(escapement = init_adults,
                                adult_prespawn_survival = prespawn_survival,
                                egg_to_fry_survival = egg_to_fry_surv,
@@ -721,26 +723,25 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
         round((adults_in_ocean[i]) * c(.25, .5, .25))
       }
     })) * (1 - spawners$proportion_natural)
-
+    colnames(natural_adults_returning) <-  c("V1", "V2", "V3")
+    colnames(hatchery_adults_returning) <-  c("V1", "V2", "V3")
     output$returning_adults <- bind_rows(
       output$returning_adults,
+
       natural_adults_returning |>
-        as_tibble() |>
+        as_tibble(.name_repair = "universal") |>
         mutate(watershed = watershed_labels,
                sim_year = year,
                origin = "natural") |>
         pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
-        mutate(return_year = readr::parse_number(return_year),
-               return_sim_year = sim_year + return_year),
-
+        mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year)),
       hatchery_adults_returning |>
-        as_tibble() |>
+        as_tibble(.name_repair = "universal") |>
         mutate(watershed = watershed_labels,
                sim_year = year,
                origin = "hatchery") |>
         pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
-        mutate(return_year = readr::parse_number(return_year),
-               return_sim_year = sim_year + return_year)
+        mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year))
 
     )
 
@@ -751,6 +752,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
     } else {
       adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
+      # TODO figure out if we want to add hatch stuff in here
+      # hatch_adults[1:31, (year + 2):(year + 4)] <- hatch_adults[1:31, (year + 2):(year + 4)] + hatchery_adults_returning
+
     }
 
 

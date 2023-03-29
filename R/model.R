@@ -136,18 +136,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # TODO add in hatchery releases **where do we get this data from - how was
     #  the model using this data before? maybe they are actually added into Juveniles?
 
-    # adults <-  hatch_adults <- if (year == 1) {
-    #   round(adults)
-    # } else {
-    #   return_adults <- output$returning_adults |>
-    #     filter(return_sim_year == year) |>
-    #     group_by(watershed) |>
-    #     summarise(nat_adults = sum(return_total_nat, na.rm = TRUE)) |>
-    #     deframe()
-    #
-    #   adults[, year] <- unname(return_adults[order(match(names(return_adults), watershed_labels))])
-    # }
-
     # returning adults are here: round(adults)
 
     spawners <- get_spawning_adults(year, round(adults), hatch_adults, mode = mode,
@@ -716,6 +704,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       }
     })) * spawners$proportion_natural
 
+    # TODO add argument for updating return proportions for hatchery adults
+    # TODO is this where we would want to add in Hatchery release juveniles?
     hatchery_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {
         rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25))

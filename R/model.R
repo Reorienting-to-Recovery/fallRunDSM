@@ -75,14 +75,15 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # SIT METRICS
     spawners = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juvenile_biomass = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    proportion_natural = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     returning_adults = tibble::tibble(),
 
     # R2R
     adults_in_ocean = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juveniles = data.frame(),
     juveniles_at_chipps = data.frame(),
-    phos = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20))
+    proportion_natural_at_spawning = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    phos = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    proportion_natural_at_ocean_entry = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20))
   )
 
 
@@ -163,12 +164,33 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                     stochastic = stochastic)
 
     init_adults <- spawners$init_adults
+    if (any(spawners$init_adults < 0)) print("yikes")
 
     output$spawners[ , year] <- init_adults
-    output$proportion_natural[ , year] <- spawners$proportion_natural
+
+    phos <- 1 - spawners$proportion_natural
+    # PHOS Stuff
+    if (year > 3){
+      phos_diff_two_years <- phos - output$phos[, (year - 2)]
+      phos_diff_last_year <- phos - output$phos[, (year - 1)]
+      if (any(phos_diff_two_years < 0 & phos_diff_last_year < 0)) {
+        perc_diff <- (phos - output$phos[, (year - 2)]) /  output$phos[, (year - 2)]
+        renaturing_tribs <- which(phos_diff_two_years < 0 & phos_diff_last_year < 0)
+        percent_renaturing <- ifelse(names(phos_diff_two_years) %in% names(renaturing_tribs), abs(phos_diff_two_years), 0)
+      } else {
+        percent_renaturing <- c(rep(0, 31)) # does not change proportion
+      }
+    } else {
+      percent_renaturing <- c(rep(0, 31)) # does not change proportion
+    }
+    new_natural_proportion <- ((spawners$init_adults * (1 - spawners$proportion_natural)) * percent_renaturing + (spawners$init_adults * spawners$proportion_natural))/
+      spawners$init_adults
+    new_natural_proportion <- ifelse(is.nan(new_natural_proportion), 0, new_natural_proportion)
+    output$proportion_natural_at_spawning[ , year] <- new_natural_proportion
+    output$phos[ , year] <- 1 - new_natural_proportion
 
     egg_to_fry_surv <- surv_egg_to_fry(
-      proportion_natural = spawners$proportion_natural,
+      proportion_natural = new_natural_proportion,
       scour = ..params$prob_nest_scoured,
       temperature_effect = ..params$mean_egg_temp_effect,
       .proportion_natural = ..params$.surv_egg_to_fry_proportion_natural,
@@ -187,19 +209,23 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     prespawn_survival <- surv_adult_prespawn(average_degree_days,
                                              ..surv_adult_prespawn_int = ..params$..surv_adult_prespawn_int,
                                              .deg_day = ..params$.adult_prespawn_deg_day)
-    capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
-    if (all(capacity >= init_adults)) {
-      output$phos <- 1 - spawners$proportion_natural
-    } else {
-      # TODO figure out ruleset here
-     hatch_capacity <- capacity - (init_adults * spawners$proportion_natural)
-     hatch_capacity <- ifelse(hatch_capacity < 0, 0, hatch_capacity)
-     phos <- hatch_capacity / init_adults
-     corrected_phos <- case_when(is.nan(phos) ~ 0,
-                                 phos >= 1 ~ spawners$proportion_natural,
-                                 T ~ phos)
-     output$phos[ , year] <- corrected_phos
-    }
+    # TODO see if we care about this logic
+    # capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
+    # if (all(capacity >= init_adults)) {
+    #   output$phos <- 1 - spawners$proportion_natural
+    # } else {
+    #   # TODO figure out ruleset here
+    #  hatch_capacity <- capacity - (init_adults * spawners$proportion_natural)
+    #  hatch_capacity <- ifelse(hatch_capacity < 0, 0, hatch_capacity)
+    #  phos <- hatch_capacity / init_adults
+    #  corrected_phos <- case_when(is.nan(phos) ~ 0,
+    #                              phos >= 1 ~ spawners$proportion_natural,
+    #                              T ~ phos)
+    #  output$phos[ , year] <- corrected_phos
+    # }
+
+    # Adding in conditional to try and represent renaturing
+
     juveniles <- spawn_success(escapement = init_adults,
                                adult_prespawn_survival = prespawn_survival,
                                egg_to_fry_survival = egg_to_fry_surv,
@@ -702,22 +728,27 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       } else {
         round((adults_in_ocean[i])* c(.25, .5, .25))
       }
-    })) * spawners$proportion_natural
+    })) * output$proportion_natural_at_spawning[ , year]
 
     # TODO add argument for updating return proportions for hatchery adults
     # TODO is this where we would want to add in Hatchery release juveniles?
+    hatchery_releases <- c(rep(0, 31)) # need actual release numbers for this
+
     hatchery_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {
-        rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25))
+        rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25)) * (1 - output$proportion_natural_at_spawning[ , year][i]) +
+        rmultinom(1, (hatchery_releases[i]), prob = c(.25, .5, .25))
+
       } else {
-        round((adults_in_ocean[i]) * c(.25, .5, .25))
+        round((adults_in_ocean[i]) * c(.25, .5, .25)) * (1 - output$proportion_natural_at_spawning[, year][i]) +
+          round((hatchery_releases[i]) * c(.25, .5, .25))
       }
-    })) * (1 - spawners$proportion_natural)
-    colnames(natural_adults_returning) <-  c("V1", "V2", "V3")
-    colnames(hatchery_adults_returning) <-  c("V1", "V2", "V3")
+    }))
+    colnames(natural_adults_returning) <- c("V1", "V2", "V3")
+    colnames(hatchery_adults_returning) <- c("V1", "V2", "V3")
+
     output$returning_adults <- bind_rows(
       output$returning_adults,
-
       natural_adults_returning |>
         as_tibble(.name_repair = "universal") |>
         mutate(watershed = watershed_labels,
@@ -736,6 +767,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     )
 
     output$adults_in_ocean[,year] <- adults_in_ocean
+
+    # Update proportion natural at ocean entry to reflect added hatchery releases
+    output$proportion_natural_at_ocean_entry <- adults_in_ocean * output$proportion_natural_at_spawning /
+      adults_in_ocean + hatchery_releases
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
@@ -760,7 +795,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     output$spawners[ , year] / (output$spawners[ , year + 1] + 1)
   })
 
-  viable <- spawn_change >= 1 & output$proportion_natural[ , -1] >= 0.9 & output$spawners[ , -1] >= 833
+  viable <- spawn_change >= 1 & output$proportion_natural_at_spawning[ , -1] >= 0.9 & output$spawners[ , -1] >= 833
 
   output$viability_metrics <- sapply(1:4, function(group) {
     colSums(viable[which(fallRunDSM::params$diversity_group == group), ])

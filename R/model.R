@@ -164,7 +164,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                     stochastic = stochastic)
 
     init_adults <- spawners$init_adults
-    if (any(spawners$init_adults < 0)) print("yikes")
+    if (any(spawners$init_adults < 0))
 
     output$spawners[ , year] <- init_adults
 
@@ -732,7 +732,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # TODO add argument for updating return proportions for hatchery adults
     # TODO is this where we would want to add in Hatchery release juveniles?
-    hatchery_releases <- c(rep(0, 31)) # need actual release numbers for this
+    # TODO turn into matrix with year component
+    hatchery_releases <- c(rep(20000, 31)) # need actual release numbers for this
 
     hatchery_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {

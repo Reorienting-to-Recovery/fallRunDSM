@@ -130,7 +130,7 @@ r_to_r_tmh_params <- list(
   inchannel_habitat_juvenile = DSMhabitat::fr_juv$r_to_r_tmh, # vary by run
   floodplain_habitat = DSMhabitat::fr_fp$r_to_r_tmh, # vary by run
   weeks_flooded = DSMhabitat::weeks_flooded$biop_itp_2018_2019,
-  delta_habitat = DSMhabitat::delta_habitat$r_to_r_baseline,
+  delta_habitat = DSMhabitat::delta_habitat$r_to_r_tmh,
   sutter_habitat = DSMhabitat::sutter_habitat$biop_itp_2018_2019,
   yolo_habitat = DSMhabitat::yolo_habitat$biop_itp_2018_2019,
   tisdale_bypass_watershed = DSMhabitat::tisdale_bypass_watershed,

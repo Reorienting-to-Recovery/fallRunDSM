@@ -1,7 +1,7 @@
 Package: fallRunDSM
 Type: Package
 Title: Structured Decision Fall Run Model for CVPIA
-Version: 2.0
+Version: 2.1
 Authors@R: c(
     person("James", "Petterson", email = "jt.peterson@oregonstate.edu", role = "aut"),
     person("Adam", "Duarte", email = "adam.duarte@oregonstate.edu", role = "aut"), 
@@ -15,7 +15,7 @@ Description: SDM is a key effort by CVPIA agencies to continuously improve proje
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 URL: https://CVPIA-OSC.github.io/fallRunDSM/
 BugReports: https://github.com/CVPIA-OSC/fallRunDSM/issues
 Imports: 

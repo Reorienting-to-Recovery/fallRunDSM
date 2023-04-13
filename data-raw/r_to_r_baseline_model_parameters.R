@@ -1,9 +1,16 @@
 library(tidyverse)
 
-# 2021
-calib_results <- read_rds("calibration/calibration-results.rds")
+remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# Reorienting to recovery
+# start with old params
+# add new decay multiplier
+# r_to_r_params_raw$spawn_decay_multiplier <- DSMhabitat::spawning_decay_multiplier
+
+# loads calibration data
+calib_results <- read_rds("calibration/calibration-results-2022.rds")
 solution <- calib_results@solution
 
+# initial params
 r_to_r_baseline_params <- list(
 
   # Data from DSMscenarios

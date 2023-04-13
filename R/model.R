@@ -35,12 +35,25 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       weeks_flooded = ..params$weeks_flooded
     )
 
-    scenario_data <- DSMscenario::load_scenario(scenario,
-                                                habitat_inputs = habitats,
-                                                species = DSMscenario::species$FALL_RUN,
-                                                spawn_decay_rate = ..params$spawn_decay_rate,
-                                                rear_decay_rate = ..params$rear_decay_rate,
-                                                stochastic = stochastic)
+    # check if the params has the new decay element, if yes use new function applying decay
+    # to spawning, if not then use the old method. This is a temporary bit of code to allow
+    # for quick comparison between two versions of the model.
+    if ("spawn_decay_multiplier" %in% names(..params)) {
+      scenario_data <- DSMscenario::load_scenario(scenario,
+                                                  habitat_inputs = habitats,
+                                                  species = DSMscenario::species$FALL_RUN,
+                                                  spawn_decay_rate = ..params$spawn_decay_rate,
+                                                  rear_decay_rate = ..params$rear_decay_rate,
+                                                  spawn_decay_multiplier = ..params$spawn_decay_multiplier,
+                                                  stochastic = stochastic)
+    } else {
+      scenario_data <- DSMscenario::load_scenario(scenario,
+                                                  habitat_inputs = habitats,
+                                                  species = DSMscenario::species$FALL_RUN,
+                                                  spawn_decay_rate = ..params$spawn_decay_rate,
+                                                  rear_decay_rate = ..params$rear_decay_rate,
+                                                  stochastic = stochastic)
+    }
 
     ..params$spawning_habitat <- scenario_data$spawning_habitat
     ..params$inchannel_habitat_fry <- scenario_data$inchannel_habitat_fry
@@ -67,7 +80,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # R2R
     adults_in_ocean = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    juveniles = data.frame()
+    juveniles = data.frame(),
+    juveniles_at_chipps = data.frame()
   )
 
 
@@ -169,6 +183,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                fecundity = ..params$spawn_success_fecundity,
                                stochastic = stochastic)
 
+
     # # For use in the r2r metrics
     d <- data.frame(juveniles)
     colnames(d) <- c("s", "m", "l", "vl")
@@ -176,6 +191,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     d <- d |> tidyr::pivot_longer(names_to = "size", values_to = "juveniles", -watershed)
     d$year <- year
     output$juveniles <- dplyr::bind_rows(output$juveniles, d)
+
     # TODO Some temperatures are over the 28C limit, for now I am going to
     # just make these be 28. Both of these cases in the 20 years of data
     # are barely over 28 so I think for now this is justified. With that
@@ -184,7 +200,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     growth_temps <- ..params$avg_temp
     growth_temps[which(growth_temps > 28)] <- 28
-
 
     for (month in 1:8) {
 
@@ -319,7 +334,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         juveniles_at_chipps <- delta_fish$juveniles_at_chipps
         migrants_at_golden_gate <- delta_fish$migrants_at_golden_gate
-
       } else {
         # if month < 8
         # route northern natal fish stay and rear or migrate downstream ------
@@ -643,6 +657,14 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                  stochastic = stochastic)
 
       adults_in_ocean <- adults_in_ocean + ocean_entry_success
+
+      d <- data.frame(juveniles_at_chipps)
+      colnames(d) <- c("s", "m", "l", "vl")
+      d$watershed <- fallRunDSM::watershed_labels
+      d <- d |> tidyr::pivot_longer(names_to = "size", values_to = "juveniles_at_chipps", -watershed)
+      d$year <- year
+      d$month <- month
+      output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
 
     } # end month loop
 

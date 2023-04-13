@@ -5,8 +5,9 @@ library(DSMtemperature)
 remotes::install_github("Reorienting-to-Recovery/DSMhabitat@r2r_add_tmh_habitat")
 library(DSMhabitat) # https://github.com/Reorienting-to-Recovery/DSMhabitat/tree/r2r_add_tmh_habitat
 
-# 2021
-calib_results <- read_rds("calibration/calibration-results.rds")
+# updated params
+# loads calibration data
+calib_results <- read_rds("calibration/calibration-results-2022.rds")
 solution <- calib_results@solution
 
 r_to_r_tmh_params <- list(
@@ -225,6 +226,8 @@ r_to_r_tmh_params <- list(
 )
 
 usethis::use_data(r_to_r_tmh_params, overwrite = TRUE)
+
+
 
 
 

@@ -77,13 +77,14 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     juvenile_biomass = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     returning_adults = tibble::tibble(),
 
-    # R2R
+    # R2R METRICS
     adults_in_ocean = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juveniles = data.frame(),
     juveniles_at_chipps = data.frame(),
     proportion_natural_at_spawning = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     phos = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     proportion_natural_at_ocean_entry = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20))
+    limiting_habitat = data.frame()
   )
 
 
@@ -117,11 +118,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     avg_ocean_transition_month <- ocean_transition_month(stochastic = stochastic) # 2
 
-    # hatch_adults <- if (stochastic) {
-    #   rmultinom(1, size = round(runif(1, 83097.01,532203.1)), prob = ..params$hatchery_allocation)[ , 1]
-    # } else {
-    #   round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
-    # }
+    # R2R hatchery logic update ------------------------------------------------
     # TODO decide on starting number of hatchery adults <- currently starting at CWT data number until returns statrt to populate
     hatch_adults <- if (year %in% c(1, 2)) {
       round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
@@ -131,14 +128,14 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       group_by(watershed) |>
       summarise(hatchery_total = sum(return_total, na.rm = TRUE)) |>
       deframe()
-
       unname(return_hatch[order(match(names(return_hatch), watershed_labels))])
     }
+    # end updated logic --------------------------------------------------------
+
     # TODO add in hatchery releases **where do we get this data from - how was
     #  the model using this data before? maybe they are actually added into Juveniles?
 
     # returning adults are here: round(adults)
-
     spawners <- get_spawning_adults(year, round(adults), hatch_adults, mode = mode,
                                     month_return_proportions = ..params$month_return_proportions,
                                     prop_flow_natal = ..params$prop_flow_natal,
@@ -168,6 +165,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     output$spawners[ , year] <- init_adults
 
+    # # For use in the r2r metrics ---------------------------------------------
     phos <- 1 - spawners$proportion_natural
     # PHOS Stuff
     if (year > 3){
@@ -188,9 +186,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     new_natural_proportion <- ifelse(is.nan(new_natural_proportion), 0, new_natural_proportion)
     output$proportion_natural_at_spawning[ , year] <- new_natural_proportion
     output$phos[ , year] <- 1 - new_natural_proportion
+    # end R2R metric logic -----------------------------------------------------
 
     egg_to_fry_surv <- surv_egg_to_fry(
-      proportion_natural = new_natural_proportion,
+      proportion_natural = new_natural_proportion, # update to new prop nat (renaturing logic applied)
       scour = ..params$prob_nest_scoured,
       temperature_effect = ..params$mean_egg_temp_effect,
       .proportion_natural = ..params$.surv_egg_to_fry_proportion_natural,
@@ -209,7 +208,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     prespawn_survival <- surv_adult_prespawn(average_degree_days,
                                              ..surv_adult_prespawn_int = ..params$..surv_adult_prespawn_int,
                                              .deg_day = ..params$.adult_prespawn_deg_day)
-    # TODO see if we care about this logic
+
+    # TODO see if we care about this logic - clean up if not
     # capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
     # if (all(capacity >= init_adults)) {
     #   output$phos <- 1 - spawners$proportion_natural
@@ -224,7 +224,18 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     #  output$phos[ , year] <- corrected_phos
     # }
 
-    # Adding in conditional to try and represent renaturing
+    # # For use in the r2r metrics ---------------------------------------------
+    # Adding in limiting spawning habitat here
+    capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
+    at_cap <- ifelse(capacity - init_adults <= 0, TRUE, FALSE)
+    lim_hab <- tibble(watershed = names(capacity),
+                      capacity = capacity,
+                      init_adults = init_adults,
+                      habitat_limited = at_cap,
+                      month = NA) |>
+      mutate(habitat_type = "spawnining")
+    output$limiting_habitat   <- dplyr::bind_rows(output$limiting_habitat, lim_hab)
+    # end R2R metric -----------------------------------------------------------
 
     juveniles <- spawn_success(escapement = init_adults,
                                adult_prespawn_survival = prespawn_survival,
@@ -237,13 +248,14 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                stochastic = stochastic)
 
 
-    # # For use in the r2r metrics
+    # # For use in the r2r metrics ---------------------------------------------
     d <- data.frame(juveniles)
     colnames(d) <- c("s", "m", "l", "vl")
     d$watershed <- fallRunDSM::watershed_labels
     d <- d |> tidyr::pivot_longer(names_to = "size", values_to = "juveniles", -watershed)
     d$year <- year
     output$juveniles <- dplyr::bind_rows(output$juveniles, d)
+    # end R2R metric -----------------------------------------------------------
 
     # TODO Some temperatures are over the 28C limit, for now I am going to
     # just make these be 28. Both of these cases in the 20 years of data
@@ -434,7 +446,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                              detour = 'sutter',
                                              territory_size = ..params$territory_size,
                                              stochastic = stochastic)
-
 
         sutter_fish <- route_bypass(bypass_fish = sutter_fish + upper_mid_sac_fish$detoured,
                                     bypass_habitat = habitat$sutter,
@@ -713,15 +724,19 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       adults_in_ocean <- adults_in_ocean + ocean_entry_success
 
     } # end month loop
+    # # For use in the r2r metrics ---------------------------------------------
     d <- data.frame(juveniles_at_chipps)
     colnames(d) <- c("s", "m", "l", "vl")
     d$watershed <- fallRunDSM::watershed_labels
-    d <- d |> tidyr::pivot_longer(names_to = "size", values_to = "juveniles_at_chipps", -watershed)
+    d <- d |> tidyr::pivot_longer(names_to = "size",
+                                  values_to = "juveniles_at_chipps", -watershed)
     d$year <- year
     output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
+    # end R2R metric -----------------------------------------------------------
 
     output$juvenile_biomass[ , year] <- juveniles_at_chipps %*% fallRunDSM::params$mass_by_size_class
 
+    # Updated logic here for R2R so that natural adults and hatchery adults return seperatly
     natural_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {
         rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25))
@@ -733,6 +748,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # TODO add argument for updating return proportions for hatchery adults
     # TODO is this where we would want to add in Hatchery release juveniles?
     # TODO turn into matrix with year component
+
+    # Specify hatchery releases here for R2R - assuming trucked to bay
     hatchery_releases <- c(rep(20000, 31)) # need actual release numbers for this
 
     hatchery_adults_returning <- t(sapply(1:31, function(i) {
@@ -745,6 +762,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
           round((hatchery_releases[i]) * c(.25, .5, .25))
       }
     }))
+
+    # # For use in the r2r metrics ---------------------------------------------
     colnames(natural_adults_returning) <- c("V1", "V2", "V3")
     colnames(hatchery_adults_returning) <- c("V1", "V2", "V3")
 
@@ -764,14 +783,16 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                origin = "hatchery") |>
         pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
         mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year))
-
     )
+    # End R2R metric logic -----------------------------------------------------
 
     output$adults_in_ocean[,year] <- adults_in_ocean
 
+    # # For use in the r2r metrics ---------------------------------------------
     # Update proportion natural at ocean entry to reflect added hatchery releases
     output$proportion_natural_at_ocean_entry <- adults_in_ocean * output$proportion_natural_at_spawning /
       adults_in_ocean + hatchery_releases
+    # End R2R metric logic -----------------------------------------------------
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
@@ -780,9 +801,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
       # TODO figure out if we want to add hatch stuff in here
       # hatch_adults[1:31, (year + 2):(year + 4)] <- hatch_adults[1:31, (year + 2):(year + 4)] + hatchery_adults_returning
-
     }
-
 
   } # end year for loop
 

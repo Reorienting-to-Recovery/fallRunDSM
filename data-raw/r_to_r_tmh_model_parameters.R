@@ -2,7 +2,7 @@ library(tidyverse)
 library(DSMflow)
 library(DSMtemperature)
 
-remotes::install_github("Reorienting-to-Recovery/DSMhabitat@r2r_add_tmh_habitat")
+remotes::install_github("Reorienting-to-Recovery/DSMhabitat@r2r_add_tmh_habitat", force = TRUE)
 library(DSMhabitat) # https://github.com/Reorienting-to-Recovery/DSMhabitat/tree/r2r_add_tmh_habitat
 
 # updated params

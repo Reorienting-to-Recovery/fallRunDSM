@@ -37,11 +37,11 @@ Detailed overviews of each update including the literature or data source are pr
 
 Hatchery return data comes from: 
 
-* 
-* 
-* 
+* Bay Delta Live Hatchery Database: Database on release information for five fall-run producing hatcheries: Coleman National Fish Hatchery on Battle Creek, Feather River Hatchery, Nimbus Fish Hatchery on the American River, Mokelumne River Hatchery, and Merced River Fish Hatchery. View [shiny app](https://baydeltalive.com/fish/hatchery-releases) displaying data and about page for a data summary and links to data. 
+* Winter-run release data: Compiled release data from winter run release programs. The supplementation program is the standard production program for Sacramento River winter-run and all are reared at the Livingston Stone NFH. The Jumpstart Program are winter-run reintroduced to Battle Creek and are reared at either Coleman NFH or Mount Lassen Trout Farm. Data available https://www.rmpc.org/. 
+* (? waiting to hear back from Patrick on Merced River Fish hatchery data. Sould be spring run)
 
-For the baseline Recovery scenario we use an average hatchery release value based on the average release data from all sources and years. 
+For the baseline Recovery scenario we use an average hatchery release value based on the average release data from all sources and years. (could also do a random selection of one of the historical years...TODO ask about what the prefernce is here)
 
 #TODO - we need number hatch return here - discuss best data source with Rene and Alison
 

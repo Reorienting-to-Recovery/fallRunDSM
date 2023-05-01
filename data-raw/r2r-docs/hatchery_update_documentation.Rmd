@@ -18,7 +18,7 @@ library(lubridate)
 The existing SIT DSMs follow the following model logic for hatchery fish:
 
 1)  Each year there are \_\_\_ hatchery adults initiated into the model based on (CWT data?)
-2)  Percent natural is output from model in the `get_spawning_adults()` submodel\
+2)  Percent natural is output from model in the `get_spawning_adults()` submodel
 3)  Both natural adults and hatchery adults spawn, all surviving juveniles outmigrate and are carried over to the next year but origin is not tracked.
 
 ## Updated Approach
@@ -26,7 +26,7 @@ The existing SIT DSMs follow the following model logic for hatchery fish:
 The updated Recovery life cycle model adds additional hatchery dynamic logic into the model. 
 1) The first two years there are \_\_\_ hatchery adults initiated into the model based on (TODO identify this?). In subsequent years hatchery adults are carried over from prior generations and not initated annually. 
 2) Percent natural is output from model in the `get_spawning_adults()` submodel\
-3) PHOS initiated as `1 - percent_natural` and adjusted to describe hatchery fish renaturing every 2 generations. Renaturing adjustment assumes that if PHOS is decreasing in 2 prior years than the population of hatchery for current year should be adjusted by the percent difference of PHOS in current year vs current year minus 2. PHOS is recalculated using adjusted number of hatchery fish divided by total population. 
+3) PHOS initiated as `1 - percent_natural` and adjusted to describe hatchery fish renaturing every 2 generations. Renaturing adjustment assumes that if PHOS is decreasing in two prior years than the population of hatchery for current year should be adjusted by the percent difference of PHOS in current year vs current year minus two. PHOS is recalculated using adjusted number of hatchery fish divided by total population. 
 4) Both natural adults and hatchery adults spawn and fecundity incorporates in an additional parameter describing size of fish (TODO ask rene if he has figured this out) 
 5) Hatchery releases are added into the model logic as juveniles at chipps island. 
 6) All surviving juveniles outmigrate and are carried over to the next year. Hatchery and natural adult returns are tracked separately and have different adult return ratios.
@@ -34,6 +34,30 @@ The updated Recovery life cycle model adds additional hatchery dynamic logic int
 Detailed overviews of each update including the literature or data source are provided below.
 
 ### Initiating Hatchery Returns
+
+TODO CWT data?
+
+#TODO - we need number hatch return here - discuss best data source with Rene and Alison
+
+### Calculating Perecnt Natural
+
+### Calculating PHOS
+
+Each year PHOS is initiated as 1 - percent_natural. PHOS is updated to account for renaturing every 2 generations if PHOS decreases in last two consecutive years. 
+
+#### Renaturing
+
+Renaturing only occurs in the model after year 3 if PHOS decreases for two consecutive years on a watershed.
+Each watershed experiences renaturing separately so one year renaturing could happen at one watershed and not another. 
+The renaturing adjustment assumes that if PHOS is decreasing in two prior years than the population of hatchery for current year should be adjusted by the percent difference of PHOS in current year vs current year minus two. 
+
+We use this renaturing adjustment to recalculate PHOS as `updated PHOS = 1 - ((hatchery spawners * percent renaturing) + wild spawners)/ total spawnwers)`
+
+### Fecundity
+
+#TODO check with rene on fecundity per fish - how would we add in age as a factor her
+
+### Juvenile Hatchery Releases
 
 Hatchery return data comes from: 
 
@@ -43,29 +67,10 @@ Hatchery return data comes from:
 
 For the baseline Recovery scenario we use an average hatchery release value based on the average release data from all sources and years. (could also do a random selection of one of the historical years...TODO ask about what the prefernce is here)
 
-#TODO - we need number hatch return here - discuss best data source with Rene and Alison
-
-### Calculating Perecnt Natural
-
-### Calculating PHOS
-
-#TODO confim okay to initiate as 1 - percent_natural - update via renaturing \# we can also add habitat constarint (assume natural get to occupy habitat first or something like that)
- - keep for now but we can think through some other logic if we see 
-
-#### Renaturing
-
-#TODO review logic with Rene and Alison
-
-### Fecundity
-
-#TODO check with rene on fecundity per fish - how would we add in age as a factor her
-
-### Juvenile Hatchery Releases
-
-#TODO what data do we want to use here
-
 ### Adult return logic
 
-# TODO What adult return ratio do we want to use for natural fish, what about hatchery fish?
+Wild fish return with a triangle distribution (25% year 3, 50% year 4, 25% year 5)
+Hatchery fish return with a triangle distribution (15% year 2, 70% year 3, 15% year 4)
 
-# TODO what are the sources for this data?
+# TODO see if I can come up with better data from this report
+https://cdnsciencepub.com/doi/full/10.1139/cjfas-2022-0171

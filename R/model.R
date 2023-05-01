@@ -82,6 +82,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     juveniles = data.frame(),
     juveniles_at_chipps = data.frame(),
     proportion_natural_at_spawning = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    proportion_natural_juves_in_tribs = matric(NA_real_, nrow = 31, nol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     phos = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     proportion_natural_at_ocean_entry = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     limiting_habitat = data.frame()
@@ -246,7 +247,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                redd_size = ..params$spawn_success_redd_size,
                                fecundity = ..params$spawn_success_fecundity,
                                stochastic = stochastic)
-
+    # R2R hatchery logic -------------------------------------------------------
+    # TODO add in hatchery release here
+    # TODO update percent hatchery
 
     # # For use in the r2r metrics ---------------------------------------------
     d <- data.frame(juveniles)

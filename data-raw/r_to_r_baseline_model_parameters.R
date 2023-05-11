@@ -223,7 +223,9 @@ r_to_r_baseline_params <- list(
     `Merced River` = solution[38],
     `Stanislaus River` = solution[39],
     `Tuolumne River` = solution[40],
-    `San Joaquin River` = solution[28])
+    `San Joaquin River` = solution[28]),
+  # R2R specific metrics
+  hatchery_release = fallRunDSM::fall_hatchery_release #TODO document
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)

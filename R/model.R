@@ -82,9 +82,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     juveniles = data.frame(),
     juveniles_at_chipps = data.frame(),
     proportion_natural_at_spawning = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    proportion_natural_juves_in_tribs = matric(NA_real_, nrow = 31, nol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    proportion_natural_juves_in_tribs = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     phos = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    proportion_natural_at_ocean_entry = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     limiting_habitat = data.frame()
   )
 
@@ -133,9 +132,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     }
     # end updated logic --------------------------------------------------------
 
-    # TODO add in hatchery releases **where do we get this data from - how was
-    #  the model using this data before? maybe they are actually added into Juveniles?
-
     # returning adults are here: round(adults)
     spawners <- get_spawning_adults(year, round(adults), hatch_adults, mode = mode,
                                     month_return_proportions = ..params$month_return_proportions,
@@ -182,8 +178,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     } else {
       percent_renaturing <- c(rep(0, 31)) # does not change proportion
     }
-    new_natural_proportion <- ((spawners$init_adults * (1 - spawners$proportion_natural)) * percent_renaturing + (spawners$init_adults * spawners$proportion_natural))/
-      spawners$init_adults
+    new_natural_proportion <- ((spawners$init_adults * (1 - spawners$proportion_natural)) * percent_renaturing +
+                                 (spawners$init_adults * spawners$proportion_natural))/spawners$init_adults
     new_natural_proportion <- ifelse(is.nan(new_natural_proportion), 0, new_natural_proportion)
     output$proportion_natural_at_spawning[ , year] <- new_natural_proportion
     output$phos[ , year] <- 1 - new_natural_proportion
@@ -210,21 +206,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                              ..surv_adult_prespawn_int = ..params$..surv_adult_prespawn_int,
                                              .deg_day = ..params$.adult_prespawn_deg_day)
 
-    # TODO see if we care about this logic - clean up if not
-    # capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
-    # if (all(capacity >= init_adults)) {
-    #   output$phos <- 1 - spawners$proportion_natural
-    # } else {
-    #   # TODO figure out ruleset here
-    #  hatch_capacity <- capacity - (init_adults * spawners$proportion_natural)
-    #  hatch_capacity <- ifelse(hatch_capacity < 0, 0, hatch_capacity)
-    #  phos <- hatch_capacity / init_adults
-    #  corrected_phos <- case_when(is.nan(phos) ~ 0,
-    #                              phos >= 1 ~ spawners$proportion_natural,
-    #                              T ~ phos)
-    #  output$phos[ , year] <- corrected_phos
-    # }
-
     # # For use in the r2r metrics ---------------------------------------------
     # Adding in limiting spawning habitat here
     capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
@@ -234,7 +215,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                       init_adults = init_adults,
                       habitat_limited = at_cap,
                       month = NA) |>
-      mutate(habitat_type = "spawnining")
+      mutate(habitat_type = "spawning")
     output$limiting_habitat   <- dplyr::bind_rows(output$limiting_habitat, lim_hab)
     # end R2R metric -----------------------------------------------------------
 
@@ -247,9 +228,20 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                redd_size = ..params$spawn_success_redd_size,
                                fecundity = ..params$spawn_success_fecundity,
                                stochastic = stochastic)
+
     # R2R hatchery logic -------------------------------------------------------
-    # TODO add in hatchery release here
-    # TODO update percent hatchery
+    # Currently adds only on major hatchery rivers (American, Battle, Feather, Merced, Moke)
+    # Add all as fry? or should we do larger
+    natural_juveniles <- rowSums(juveniles * new_natural_proportion)
+    total_juves_pre_hatchery <- rowSums(juveniles)
+    # TODO check that it is okay if we add in beginning or do we want to add later month
+    # def complicates things to add later
+    juveniles <- juveniles + ..params$hatchery_release
+
+    # Create new prop natural including hatch releases that we can use to apply to adult returns
+    # TODO see if we can simplify by combining into just one prop_hatchery
+    proportion_natural_juves_in_tribs <- natural_juveniles / (total_juves_pre_hatchery + rowSums(hatchery_release))
+    output$proportion_natural_juves_in_tribs[ , year] <- proportion_natural_juves_in_tribs
 
     # # For use in the r2r metrics ---------------------------------------------
     d <- data.frame(juveniles)
@@ -746,23 +738,16 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       } else {
         round((adults_in_ocean[i])* c(.25, .5, .25))
       }
-    })) * output$proportion_natural_at_spawning[ , year]
+    })) * output$proportion_natural_juves_in_tribs[ , year]
 
     # TODO add argument for updating return proportions for hatchery adults
-    # TODO is this where we would want to add in Hatchery release juveniles?
     # TODO turn into matrix with year component
-
-    # Specify hatchery releases here for R2R - assuming trucked to bay
-    hatchery_releases <- c(rep(20000, 31)) # need actual release numbers for this
-
     hatchery_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {
-        rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25)) * (1 - output$proportion_natural_at_spawning[ , year][i]) +
-        rmultinom(1, (hatchery_releases[i]), prob = c(.25, .5, .25))
+        rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i])
 
       } else {
-        round((adults_in_ocean[i]) * c(.25, .5, .25)) * (1 - output$proportion_natural_at_spawning[, year][i]) +
-          round((hatchery_releases[i]) * c(.25, .5, .25))
+        round((adults_in_ocean[i]) * c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[, year][i])
       }
     }))
 
@@ -791,12 +776,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     output$adults_in_ocean[,year] <- adults_in_ocean
 
-    # # For use in the r2r metrics ---------------------------------------------
-    # Update proportion natural at ocean entry to reflect added hatchery releases
-    output$proportion_natural_at_ocean_entry <- adults_in_ocean * output$proportion_natural_at_spawning /
-      adults_in_ocean + hatchery_releases
-    # End R2R metric logic -----------------------------------------------------
-
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
       calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
@@ -818,7 +797,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     output$spawners[ , year] / (output$spawners[ , year + 1] + 1)
   })
 
-  viable <- spawn_change >= 1 & output$proportion_natural_at_spawning[ , -1] >= 0.9 & output$spawners[ , -1] >= 833
+  viable <- spawn_change >= 1 & output$proportion_natural_juves_in_tribs[ , -1] >= 0.9 & output$spawners[ , -1] >= 833
 
   output$viability_metrics <- sapply(1:4, function(group) {
     colSums(viable[which(fallRunDSM::params$diversity_group == group), ])

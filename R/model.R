@@ -81,9 +81,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     adults_in_ocean = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juveniles = data.frame(),
     juveniles_at_chipps = data.frame(),
-    proportion_natural_at_spawning = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    proportion_natural_juves_in_tribs = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    phos = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    proportion_natural_at_spawning = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    proportion_natural_juves_in_tribs = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    phos = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     limiting_habitat = data.frame()
   )
 
@@ -158,8 +158,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                     stochastic = stochastic)
 
     init_adults <- spawners$init_adults
-    if (any(spawners$init_adults < 0))
-
     output$spawners[ , year] <- init_adults
 
     # # For use in the r2r metrics ---------------------------------------------
@@ -239,7 +237,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # Create new prop natural including hatch releases that we can use to apply to adult returns
     # TODO see if we can simplify by combining into just one prop_hatchery
-    proportion_natural_juves_in_tribs <- natural_juveniles / (total_juves_pre_hatchery + rowSums(hatchery_release))
+    proportion_natural_juves_in_tribs <- natural_juveniles / (total_juves_pre_hatchery + rowSums(..params$hatchery_release))
     output$proportion_natural_juves_in_tribs[ , year] <- proportion_natural_juves_in_tribs
 
     # # For use in the r2r metrics ---------------------------------------------
@@ -739,9 +737,12 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       }
     })) * output$proportion_natural_juves_in_tribs[ , year]
 
+    # TODO see if better place to do this
+    natural_adults_returning[is.na(natural_adults_returning)] = 0
+
     # TODO add argument for updating return proportions for hatchery adults
     # TODO turn into matrix with year component
-   hatchery_releases_at_chips <- c(rep(0, 31)) # need actual release numbers for this
+   hatchery_releases_at_chipps <- c(rep(0, 31)) # need actual release numbers for this
    hatchery_adults_returning <- t(sapply(1:31, function(i) {
      if (stochastic) {
        rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
@@ -750,6 +751,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
          round((adults_in_ocean[i]) * c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
            round((hatchery_releases_at_chipps[i]) * c(.25, .5, .25))}
      }))
+   # TODO see if better place to do this
+   hatchery_adults_returning[is.na(hatchery_adults_returning)] = 0
 
     # # For use in the r2r metrics ---------------------------------------------
     colnames(natural_adults_returning) <- c("V1", "V2", "V3")
@@ -781,6 +784,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
     } else {
       adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
+      adults[is.na(adults)] = 0
       # TODO figure out if we want to add hatch stuff in here
       # hatch_adults[1:31, (year + 2):(year + 4)] <- hatch_adults[1:31, (year + 2):(year + 4)] + hatchery_adults_returning
     }

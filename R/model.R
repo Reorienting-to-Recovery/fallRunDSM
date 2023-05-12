@@ -234,8 +234,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # Add all as fry? or should we do larger
     natural_juveniles <- rowSums(juveniles * new_natural_proportion)
     total_juves_pre_hatchery <- rowSums(juveniles)
-    # TODO check that it is okay if we add in beginning or do we want to add later month
-    # def complicates things to add later
+    # TODO add ability to vary release per year
     juveniles <- juveniles + ..params$hatchery_release
 
     # Create new prop natural including hatch releases that we can use to apply to adult returns
@@ -742,14 +741,15 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # TODO add argument for updating return proportions for hatchery adults
     # TODO turn into matrix with year component
-    hatchery_adults_returning <- t(sapply(1:31, function(i) {
-      if (stochastic) {
-        rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i])
-
-      } else {
-        round((adults_in_ocean[i]) * c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[, year][i])
-      }
-    }))
+   hatchery_releases_at_chips <- c(rep(0, 31)) # need actual release numbers for this
+   hatchery_adults_returning <- t(sapply(1:31, function(i) {
+     if (stochastic) {
+       rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
+         rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.25, .5, .25))
+       } else {
+         round((adults_in_ocean[i]) * c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
+           round((hatchery_releases_at_chipps[i]) * c(.25, .5, .25))}
+     }))
 
     # # For use in the r2r metrics ---------------------------------------------
     colnames(natural_adults_returning) <- c("V1", "V2", "V3")

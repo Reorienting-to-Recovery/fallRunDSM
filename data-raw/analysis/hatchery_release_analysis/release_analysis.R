@@ -8,7 +8,7 @@ winter_releases <- readxl::read_excel("data-raw/analysis/hatchery_release_analys
 # baseline will be based off numbers currently released in river
 
 # Fall quick summary
-summarized_fall_release <- fall_releases |> glimpse()
+summarized_fall_release <- fall_releases |>
   filter(Release_year >= 1995) |>
   group_by(Release_year, Hatchery) |>
   summarise(total_release = sum(Total_N, na.rm = TRUE)) |>
@@ -40,10 +40,10 @@ summarized_release <- left_join(summarized_fall_release, pairs) |>
   glimpse()
 
 # use values to populate named vector
-hatchery_release = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, c("s", "m", "l", "xl")))
+fall_hatchery_release = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, c("s", "m", "l", "xl")))
 
 # populate hatchery release as larger fish based on avg hatchery release data
-hatchery_release[, 3] <- summarized_release$release_number
+fall_hatchery_release[, 3] <- summarized_release$release_number
 
 usethis::use_data(fall_hatchery_release, overwrite = TRUE)
 # TODO document data, figure out how we want to store for different scenarios

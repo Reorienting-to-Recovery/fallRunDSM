@@ -740,16 +740,15 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # TODO see if better place to do this
     natural_adults_returning[is.na(natural_adults_returning)] = 0
 
-    # TODO add argument for updating return proportions for hatchery adults
-    # TODO turn into matrix with year component
+   # TODO turn into matrix with year component
    hatchery_releases_at_chipps <- c(rep(0, 31)) # need actual release numbers for this
    hatchery_adults_returning <- t(sapply(1:31, function(i) {
      if (stochastic) {
-       rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
-         rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.25, .5, .25))
+       rmultinom(1, (adults_in_ocean[i]), prob = c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
+         rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.15, .7, .15))
        } else {
-         round((adults_in_ocean[i]) * c(.25, .5, .25)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
-           round((hatchery_releases_at_chipps[i]) * c(.25, .5, .25))}
+         round((adults_in_ocean[i]) * c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
+           round((hatchery_releases_at_chipps[i]) * c(.15, .7, .15))}
      }))
    # TODO see if better place to do this
    hatchery_adults_returning[is.na(hatchery_adults_returning)] = 0
@@ -766,7 +765,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                sim_year = year,
                origin = "natural") |>
         pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
-        mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year)),
+        mutate(return_sim_year = readr::parse_number(return_year) + 2 + as.numeric(sim_year)),
       hatchery_adults_returning |>
         as_tibble(.name_repair = "universal") |>
         mutate(watershed = watershed_labels,

@@ -9,9 +9,11 @@ r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_
 
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fallRunDSM::r_to_r_baseline_params,
                                                 seeds = r2r_seeds)
+r2r_model_results$spawners
+r2r_model_results$phos
+
 # BASIC ABUNDANCE PLOTS
-# Total natural spawners plot --------------------------------------------------
-plot_total_spawners(r2r_model_results, "Total Natural Spawners")
+
 
 # Total Spawners (natural and hatchery )
 plot_total_spawners(r2r_model_results, "Total Spawners")

@@ -714,18 +714,17 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                  stochastic = stochastic)
 
       adults_in_ocean <- adults_in_ocean + ocean_entry_success
-
+      # # For use in the r2r metrics ---------------------------------------------
+      d <- data.frame(juveniles_at_chipps)
+      colnames(d) <- c("s", "m", "l", "vl")
+      d$watershed <- fallRunDSM::watershed_labels
+      d <- d |> tidyr::pivot_longer(names_to = "size",
+                                    values_to = "juveniles_at_chipps", -watershed)
+      d$year <- year
+      d$month <- month
+      output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
+      # end R2R metric -----------------------------------------------------------
     } # end month loop
-    # # For use in the r2r metrics ---------------------------------------------
-    d <- data.frame(juveniles_at_chipps)
-    colnames(d) <- c("s", "m", "l", "vl")
-    d$watershed <- fallRunDSM::watershed_labels
-    d <- d |> tidyr::pivot_longer(names_to = "size",
-                                  values_to = "juveniles_at_chipps", -watershed)
-    d$year <- year
-    output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
-    # end R2R metric -----------------------------------------------------------
-
     output$juvenile_biomass[ , year] <- juveniles_at_chipps %*% fallRunDSM::params$mass_by_size_class
 
     # Updated logic here for R2R so that natural adults and hatchery adults return seperatly

@@ -169,22 +169,27 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       if (any(phos_diff_two_years < 0 & phos_diff_last_year < 0)) {
         perc_diff <- (phos - output$phos[, (year - 2)]) /  output$phos[, (year - 2)]
         renaturing_tribs <- which(phos_diff_two_years < 0 & phos_diff_last_year < 0)
-        percent_renaturing <- ifelse(names(phos_diff_two_years) %in% names(renaturing_tribs), abs(phos_diff_two_years), 0)
+        proportion_renaturing <- ifelse(names(phos_diff_two_years) %in% names(renaturing_tribs), abs(phos_diff_two_years), 0)
+
+        total_renaturing_in_year <- spawners$init_adults * (1 - spawners$proportion_natural) * proportion_renaturing
+        total_natural_with_renaturing <- total_renaturing_in_year + spawners$init_adults * spawners$proportion_natural
+        natural_proportion_with_renat <-  total_natural_with_renaturing / spawners$init_adults
+        natural_proportion_with_renat <- ifelse(is.nan(natural_proportion_with_renat), 0, natural_proportion_with_renat)
+
       } else {
-        percent_renaturing <- c(rep(0, 31)) # does not change proportion
+        natural_proportion_with_renat <-  spawners$proportion_natural
       }
     } else {
-      percent_renaturing <- c(rep(0, 31)) # does not change proportion
+      natural_proportion_with_renat <-  spawners$proportion_natural
+
     }
-    new_natural_proportion <- ((spawners$init_adults * (1 - spawners$proportion_natural)) * percent_renaturing +
-                                 (spawners$init_adults * spawners$proportion_natural))/spawners$init_adults
-    new_natural_proportion <- ifelse(is.nan(new_natural_proportion), 0, new_natural_proportion)
-    output$proportion_natural_at_spawning[ , year] <- new_natural_proportion
-    output$phos[ , year] <- 1 - new_natural_proportion
+
+    output$proportion_natural_at_spawning[ , year] <- natural_proportion_with_renat
+    output$phos[ , year] <- 1 - natural_proportion_with_renat
     # end R2R metric logic -----------------------------------------------------
 
     egg_to_fry_surv <- surv_egg_to_fry(
-      proportion_natural = new_natural_proportion, # update to new prop nat (renaturing logic applied)
+      proportion_natural = natural_proportion_with_renat, # update to new prop nat (renaturing logic applied)
       scour = ..params$prob_nest_scoured,
       temperature_effect = ..params$mean_egg_temp_effect,
       .proportion_natural = ..params$.surv_egg_to_fry_proportion_natural,
@@ -230,7 +235,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # R2R hatchery logic -------------------------------------------------------
     # Currently adds only on major hatchery rivers (American, Battle, Feather, Merced, Moke)
     # Add all as fry? or should we do larger
-    natural_juveniles <- rowSums(juveniles * new_natural_proportion)
+    natural_juveniles <- rowSums(juveniles * natural_proportion_with_renat)
     total_juves_pre_hatchery <- rowSums(juveniles)
     # TODO add ability to vary release per year
     juveniles <- juveniles + ..params$hatchery_release

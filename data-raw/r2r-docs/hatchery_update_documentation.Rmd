@@ -17,7 +17,7 @@ library(lubridate)
 
 The existing SIT DSMs follow the following model logic for hatchery fish:
 
-1)  Each year, if model is run deterministic, there are 307650 hatchery adults initiated into the model based on (CWT data?)
+1)  Each year, if model is run deterministicly, there are 307650 hatchery adults initiated into the model based on (CWT data?) - TODO add how it is split into tribs
 2)  Percent natural is output from model in the `get_spawning_adults()` submodel
 3)  Both natural adults and hatchery adults spawn, all surviving juveniles outmigrate and are carried over to the next year but origin is not tracked.
 
@@ -28,7 +28,7 @@ The updated Recovery life cycle model adds additional hatchery dynamic logic int
 2) Percent natural is output from model in the `get_spawning_adults()` submodel\
 3) PHOS initiated as `1 - percent_natural` and adjusted to describe hatchery fish renaturing every 2 generations. Renaturing adjustment assumes that if PHOS is decreasing in two prior years than the population of hatchery for current year should be adjusted by the percent difference of PHOS in current year vs current year minus two. PHOS is recalculated using adjusted number of hatchery fish divided by total population. 
 4) Both natural adults and hatchery adults spawn and fecundity incorporates in an additional parameter describing size of fish (TODO ask rene if he has figured this out) 
-5) Hatchery releases are added into the model logic in tributaries and when applicable as juveniles at chipps island. 
+5) Hatchery releases are added into the model logic in tributaries and when applicable as juveniles at chipps island. (tODO describe size)
 6) All surviving juveniles outmigrate and are carried over to the next year. Hatchery and natural adult returns are tracked separately and have different adult return ratios.
 
 Detailed overviews of each update including the literature or data source are provided below.

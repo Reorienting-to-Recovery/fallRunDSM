@@ -70,6 +70,11 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                    1980:2000)))
   }
 
+  simulation_length <- switch(mode,
+                              "seed" = 5,
+                              "simulate" = 20,
+                              "calibrate" = 20)
+
   output <- list(
 
     # SIT METRICS
@@ -98,10 +103,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                     "calibrate" = seeds,
   )
 
-  simulation_length <- switch(mode,
-                              "seed" = 5,
-                              "simulate" = 20,
-                              "calibrate" = 20)
+
 
   for (year in 1:simulation_length) {
     adults_in_ocean <- numeric(31)
@@ -124,10 +126,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
     } else {
       return_hatch <- output$returning_adults |>
-      filter(return_sim_year == year, origin == "hatchery") |>
-      group_by(watershed) |>
-      summarise(hatchery_total = sum(return_total, na.rm = TRUE)) |>
-      deframe()
+        filter(return_sim_year == year, origin == "hatchery") |>
+        group_by(watershed) |>
+        summarise(hatchery_total = sum(return_total, na.rm = TRUE)) |>
+        deframe()
       unname(return_hatch[order(match(names(return_hatch), watershed_labels))])
     }
     # end updated logic --------------------------------------------------------
@@ -744,20 +746,21 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # TODO see if better place to do this
     natural_adults_returning[is.na(natural_adults_returning)] = 0
 
-   # TODO turn into matrix with year component
-   hatchery_releases_at_chipps <- c(rep(0, 31)) # need actual release numbers for this
-   hatchery_adults_returning <- t(sapply(1:31, function(i) {
-     if (stochastic) {
-       rmultinom(1, (adults_in_ocean[i]), prob = c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
-         rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.15, .7, .15))
-       } else {
-         round((adults_in_ocean[i]) * c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
-           round((hatchery_releases_at_chipps[i]) * c(.15, .7, .15))}
-     }))
-   # TODO see if better place to do this
-   hatchery_adults_returning[is.na(hatchery_adults_returning)] = 0
+    # TODO turn into matrix with year component
+    hatchery_releases_at_chipps <- c(rep(0, 31)) # need actual release numbers for this
+    hatchery_adults_returning <- t(sapply(1:31, function(i) {
+      if (stochastic) {
+        rmultinom(1, (adults_in_ocean[i]), prob = c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
+          rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.15, .7, .15))
+      } else {
+        round((adults_in_ocean[i]) * c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
+          round((hatchery_releases_at_chipps[i]) * c(.15, .7, .15))}
+    }))
+    # TODO see if better place to do this
+    hatchery_adults_returning[is.na(hatchery_adults_returning)] = 0
 
     # # For use in the r2r metrics ---------------------------------------------
+    if (year == 3) browser()
     colnames(natural_adults_returning) <- c("V1", "V2", "V3")
     colnames(hatchery_adults_returning) <- c("V1", "V2", "V3")
 

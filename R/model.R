@@ -163,8 +163,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     output$spawners[ , year] <- init_adults
 
     # # For use in the r2r metrics ---------------------------------------------
+    # TODO make NA if there are no spawners
     phos <- 1 - spawners$proportion_natural
     # PHOS Stuff
+    # # TODO confirm > of >=
     if (year > 3){
       phos_diff_two_years <- phos - output$phos[, (year - 2)]
       phos_diff_last_year <- phos - output$phos[, (year - 1)]
@@ -244,7 +246,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # Create new prop natural including hatch releases that we can use to apply to adult returns
     # TODO see if we can simplify by combining into just one prop_hatchery
-    proportion_natural_juves_in_tribs <- natural_juveniles / (total_juves_pre_hatchery + rowSums(..params$hatchery_release))
+    # TODO check NaN
+    proportion_natural_juves_in_tribs <- natural_juveniles / rowSums(juveniles)
     output$proportion_natural_juves_in_tribs[ , year] <- proportion_natural_juves_in_tribs
 
     # # For use in the r2r metrics ---------------------------------------------
@@ -733,8 +736,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       # end R2R metric -----------------------------------------------------------
     } # end month loop
     output$juvenile_biomass[ , year] <- juveniles_at_chipps %*% fallRunDSM::params$mass_by_size_class
-
-    # Updated logic here for R2R so that natural adults and hatchery adults return seperatly
+    # Updated logic here for R2R so that natural adults and hatchery adults return separately
     natural_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {
         rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25))
@@ -746,18 +748,19 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # TODO see if better place to do this
     natural_adults_returning[is.na(natural_adults_returning)] = 0
 
-    # TODO turn into matrix with year component
-    hatchery_releases_at_chipps <- c(rep(0, 31)) # need actual release numbers for this
-    hatchery_adults_returning <- t(sapply(1:31, function(i) {
-      if (stochastic) {
-        rmultinom(1, (adults_in_ocean[i]), prob = c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
-          rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.15, .7, .15))
-      } else {
-        round((adults_in_ocean[i]) * c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
-          round((hatchery_releases_at_chipps[i]) * c(.15, .7, .15))}
-    }))
-    # TODO see if better place to do this
-    hatchery_adults_returning[is.na(hatchery_adults_returning)] = 0
+   # TODO turn into matrix with year component
+   # TODO move up above ocean entry success - only have occur in last month
+   hatchery_releases_at_chipps <- c(rep(0, 31)) # need actual release numbers for this
+   hatchery_adults_returning <- t(sapply(1:31, function(i) {
+     if (stochastic) {
+       rmultinom(1, (adults_in_ocean[i]), prob = c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
+         rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.15, .7, .15))
+       } else {
+         round((adults_in_ocean[i]) * c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
+           round((hatchery_releases_at_chipps[i]) * c(.15, .7, .15))}
+     }))
+   # TODO see if better place to do this
+   hatchery_adults_returning[is.na(hatchery_adults_returning)] = 0
 
     # # For use in the r2r metrics ---------------------------------------------
     if (year == 3) browser()

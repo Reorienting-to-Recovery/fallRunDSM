@@ -238,15 +238,15 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # R2R hatchery logic -------------------------------------------------------
     # Currently adds only on major hatchery rivers (American, Battle, Feather, Merced, Moke)
-    # Add all as fry? or should we do larger
-    natural_juveniles <- rowSums(juveniles * natural_proportion_with_renat)
+    # Add all as large fish
+    total_juves_pre_hatchery <- rowSums(juveniles)
+    natural_juveniles <- total_juves_pre_hatchery  * natural_proportion_with_renat
     total_juves_pre_hatchery <- rowSums(juveniles)
     # TODO add ability to vary release per year
     juveniles <- juveniles + ..params$hatchery_release
 
     # Create new prop natural including hatch releases that we can use to apply to adult returns
     # TODO see if we can simplify by combining into just one prop_hatchery
-    # TODO check NaN
     proportion_natural_juves_in_tribs <- natural_juveniles / rowSums(juveniles)
     output$proportion_natural_juves_in_tribs[ , year] <- proportion_natural_juves_in_tribs
 
@@ -745,7 +745,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       }
     })) * output$proportion_natural_juves_in_tribs[ , year]
 
-    # TODO see if better place to do this
     natural_adults_returning[is.na(natural_adults_returning)] = NaN
 
    # TODO turn into matrix with year component
@@ -759,7 +758,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
          round((adults_in_ocean[i]) * c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
            round((hatchery_releases_at_chipps[i]) * c(.15, .7, .15))}
      }))
-   # TODO see if better place to do this
+
    hatchery_adults_returning[is.na(hatchery_adults_returning)] = NaN
 
     # # For use in the r2r metrics ---------------------------------------------

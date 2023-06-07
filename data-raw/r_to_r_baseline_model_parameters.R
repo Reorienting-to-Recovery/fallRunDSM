@@ -224,8 +224,8 @@ r_to_r_baseline_params <- list(
     `San Joaquin River` = solution[28]),
 
   # R2R specific metrics
-  hatchery_release = fallRunDSM::fall_hatchery_release, #TODO document
-  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)) #TODO documenat
+  hatchery_release = fallRunDSM::baseline_fall_hatchery_release, #TODO update with renes hatchery numbers and document
+  hatchery_releases_at_chipps = fallRunDSM::baseline_hatchery_releases_at_chipps #TODO documenat
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)

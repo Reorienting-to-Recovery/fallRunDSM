@@ -743,9 +743,15 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     natural_adults_returning[is.na(natural_adults_returning)] = NaN
 
-   # TODO turn into matrix with year component
-   # TODO move up above ocean entry success - only have occur in last month
-   hatchery_releases_at_chipps <- c(rep(0, 31)) # need actual release numbers for this
+   # R2R release at chipps logic
+    hatchery_releases_at_chipps <- ocean_entry_success(migrants = ..params$hatchery_releases_at_chipps,
+                                               month = 8, # set to final month
+                                               avg_ocean_transition_month = avg_ocean_transition_month,
+                                               .ocean_entry_success_length = ..params$.ocean_entry_success_length,
+                                               ..ocean_entry_success_int = ..params$..ocean_entry_success_int,
+                                               .ocean_entry_success_months = ..params$.ocean_entry_success_months,
+                                               stochastic = stochastic)
+
    hatchery_adults_returning <- t(sapply(1:31, function(i) {
      if (stochastic) {
        rmultinom(1, (adults_in_ocean[i]), prob = c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +

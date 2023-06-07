@@ -1,10 +1,6 @@
 library(tidyverse)
-
 remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
-# Reorienting to recovery
-# start with old params
-# add new decay multiplier
-# r_to_r_params_raw$spawn_decay_multiplier <- DSMhabitat::spawning_decay_multiplier
+library(DSMhabitat)
 
 # loads calibration data
 calib_results <- read_rds("calibration/calibration-results-2022.rds")
@@ -12,6 +8,8 @@ solution <- calib_results@solution
 
 # initial params
 r_to_r_baseline_params <- list(
+  #TODO add updated spawn decay multiplier for 2019 biop
+  # spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$2019_biop,
 
   # Data from DSMscenarios
   spawn_decay_rate = DSMscenario::spawn_decay_rate,
@@ -224,8 +222,10 @@ r_to_r_baseline_params <- list(
     `Stanislaus River` = solution[39],
     `Tuolumne River` = solution[40],
     `San Joaquin River` = solution[28]),
+
   # R2R specific metrics
-  hatchery_release = fallRunDSM::fall_hatchery_release #TODO document
+  hatchery_release = fallRunDSM::fall_hatchery_release, #TODO document
+  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)) #TODO documenat
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)

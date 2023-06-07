@@ -121,7 +121,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     avg_ocean_transition_month <- ocean_transition_month(stochastic = stochastic) # 2
 
     # R2R hatchery logic update ------------------------------------------------
-    # TODO decide on starting number of hatchery adults <- currently starting at CWT data number until returns start to populate
     hatch_adults <- if (year %in% c(1, 2)) {
       round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
     } else {
@@ -163,10 +162,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     output$spawners[ , year] <- init_adults
 
     # # For use in the r2r metrics ---------------------------------------------
-    # TODO make NA if there are no spawners
     phos <- 1 - spawners$proportion_natural
-    # PHOS Stuff
-    # # TODO confirm > of >=
     if (year > 3){
       phos_diff_two_years <- phos - output$phos[, (year - 2)]
       phos_diff_last_year <- phos - output$phos[, (year - 1)]
@@ -246,7 +242,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     juveniles <- juveniles + ..params$hatchery_release
 
     # Create new prop natural including hatch releases that we can use to apply to adult returns
-    # TODO see if we can simplify by combining into just one prop_hatchery
     proportion_natural_juves_in_tribs <- natural_juveniles / rowSums(juveniles)
     output$proportion_natural_juves_in_tribs[ , year] <- proportion_natural_juves_in_tribs
 

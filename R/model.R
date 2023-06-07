@@ -401,7 +401,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         juveniles_at_chipps <- delta_fish$juveniles_at_chipps
         migrants_at_golden_gate <- delta_fish$migrants_at_golden_gate
-
       } else {
         # if month < 8
         # route northern natal fish stay and rear or migrate downstream ------
@@ -724,6 +723,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                  stochastic = stochastic)
 
       adults_in_ocean <- adults_in_ocean + ocean_entry_success
+
       # # For use in the r2r metrics ---------------------------------------------
       d <- data.frame(juveniles_at_chipps)
       colnames(d) <- c("s", "m", "l", "vl")
@@ -735,6 +735,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
       # end R2R metric -----------------------------------------------------------
     } # end month loop
+
     output$juvenile_biomass[ , year] <- juveniles_at_chipps %*% fallRunDSM::params$mass_by_size_class
     # Updated logic here for R2R so that natural adults and hatchery adults return separately
     natural_adults_returning <- t(sapply(1:31, function(i) {

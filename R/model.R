@@ -746,7 +746,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     })) * output$proportion_natural_juves_in_tribs[ , year]
 
     # TODO see if better place to do this
-    natural_adults_returning[is.na(natural_adults_returning)] = 0
+    natural_adults_returning[is.na(natural_adults_returning)] = NaN
 
    # TODO turn into matrix with year component
    # TODO move up above ocean entry success - only have occur in last month
@@ -760,10 +760,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
            round((hatchery_releases_at_chipps[i]) * c(.15, .7, .15))}
      }))
    # TODO see if better place to do this
-   hatchery_adults_returning[is.na(hatchery_adults_returning)] = 0
+   hatchery_adults_returning[is.na(hatchery_adults_returning)] = NaN
 
     # # For use in the r2r metrics ---------------------------------------------
-    if (year == 3) browser()
     colnames(natural_adults_returning) <- c("V1", "V2", "V3")
     colnames(hatchery_adults_returning) <- c("V1", "V2", "V3")
 

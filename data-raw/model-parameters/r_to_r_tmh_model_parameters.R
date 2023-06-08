@@ -222,7 +222,11 @@ r_to_r_tmh_params <- list(
     `Merced River` = solution[38],
     `Stanislaus River` = solution[39],
     `Tuolumne River` = solution[40],
-    `San Joaquin River` = solution[28])
+    `San Joaquin River` = solution[28]),
+
+  # R2R specific metrics
+  hatchery_release = fallRunDSM::baseline_fall_hatchery_release, #TODO update with renes hatchery numbers and document
+  hatchery_releases_at_chipps = fallRunDSM::baseline_hatchery_releases_at_chipps #TODO documenat
 )
 
 usethis::use_data(r_to_r_tmh_params, overwrite = TRUE)

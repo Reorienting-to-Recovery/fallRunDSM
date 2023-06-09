@@ -5,6 +5,8 @@ library(DSMhabitat)
 #TODO update to main branch after finalizing temp stuff
 remotes::install_github("Reorienting-to-Recovery/DSMtemperature@run-of-river-temp")
 library(DSMtemperature)
+remotes::install_github("Reorienting-to-Recovery/DSMflow")
+library(DSMflow)
 
 # loads calibration data
 calib_results <- read_rds("calibration/calibration-results-2022.rds")

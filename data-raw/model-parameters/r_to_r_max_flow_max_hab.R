@@ -136,7 +136,7 @@ r_to_r_max_flow_max_hab_params <- list(
   inchannel_habitat_fry = DSMhabitat::fr_fry$run_of_river_tmh, # vary by run
   inchannel_habitat_juvenile = DSMhabitat::fr_juv$run_of_river_tmh, # vary by run
   floodplain_habitat = DSMhabitat::fr_fp$run_of_river_tmh, # vary by run
-  weeks_flooded = DSMhabitat::weeks_flooded$run_of_river_tmh,
+  weeks_flooded = DSMhabitat::weeks_flooded$run_of_river,
   delta_habitat = DSMhabitat::delta_habitat$run_of_river_tmh,
   sutter_habitat = DSMhabitat::sutter_habitat$run_of_river,
   yolo_habitat = DSMhabitat::yolo_habitat$run_of_river,

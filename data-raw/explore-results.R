@@ -5,12 +5,17 @@ library(plotly)
 source("data-raw/helper_graph_functions.R")
 # View prelim R2R results
 
-r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_to_r_baseline_params)
+r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_to_r_max_flow_max_hab_params)
 
-r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fallRunDSM::r_to_r_baseline_params,
+r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fallRunDSM::r_to_r_max_flow_max_hab_params,
                                                 seeds = r2r_seeds)
 r2r_model_results$spawners
 r2r_model_results$phos
+
+r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_to_r_baseline_params)
+
+r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fallRunDSM::r_to_r_max_flow_max_hab_params,
+                                                seeds = r2r_seeds)
 
 # BASIC ABUNDANCE PLOTS
 

@@ -117,7 +117,7 @@ usethis::use_data(bioenergetics_transitions, overwrite = TRUE)
 
 
 # prey_density <- rep("med", 31) # NOTE this is to drive the new prey density dependent growth
-prey_density <- rep("hi", 31) # NOTE this is to drive the new prey density dependent growth
+prey_density <- rep("med", 31) # NOTE this is to drive the new prey density dependent growth
 usethis::use_data(prey_density, overwrite = TRUE)
 
 # should be moved to a data package?

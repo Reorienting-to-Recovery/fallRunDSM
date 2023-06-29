@@ -36,7 +36,7 @@ r_to_r_baseline_params <- list(
   .adult_stray_prop_delta_trans = 2.89,
   .adult_en_route_migratory_temp = -0.26,
   .adult_en_route_bypass_overtopped = -0.019,
-  .adult_en_route_adult_harvest_rate = fallRunDSM::adult_harvest_rate, # varies by run
+  .adult_en_route_adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
   .adult_prespawn_deg_day = -0.000669526,
 
   # Ocean entry success coefficient and variable
@@ -224,8 +224,8 @@ r_to_r_baseline_params <- list(
     `San Joaquin River` = solution[28]),
 
   # R2R specific metrics
-  hatchery_release = fallRunDSM::baseline_fall_hatchery_release, #TODO update with renes hatchery numbers and document
-  hatchery_releases_at_chipps = fallRunDSM::baseline_hatchery_releases_at_chipps #TODO documenat
+  hatchery_release = fallRunDSM::fall_hatchery_release,
+  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)

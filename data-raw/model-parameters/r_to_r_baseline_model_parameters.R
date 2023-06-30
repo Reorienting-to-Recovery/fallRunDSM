@@ -9,7 +9,7 @@ solution <- calib_results@solution
 # initial params
 r_to_r_baseline_params <- list(
   #TODO add updated spawn decay multiplier for 2019 biop
-  # spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$2019_biop,
+  # spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier,
 
   # Data from DSMscenarios
   spawn_decay_rate = DSMscenario::spawn_decay_rate,
@@ -225,7 +225,8 @@ r_to_r_baseline_params <- list(
 
   # R2R specific metrics
   hatchery_release = fallRunDSM::fall_hatchery_release,
-  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
+  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
+  fecundity_lookup = fallRunDSM::fecundity_by_age
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)

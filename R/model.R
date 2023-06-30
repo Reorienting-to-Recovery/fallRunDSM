@@ -221,8 +221,49 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       mutate(habitat_type = "spawning")
     output$limiting_habitat   <- dplyr::bind_rows(output$limiting_habitat, lim_hab)
     # end R2R metric -----------------------------------------------------------
+    # R2R logic to add fish size as an input -----------------------------------
+    hatch_adults <- if (year %in% c(1:6)) {
+      hatch_age_dist <- tibble(watershed = fallRunDSM::watershed_labels,
+                               prop_2 = rep(.3, 31),
+                               prop_3 = rep(.6, 31),
+                               prop_4 = rep(.1, 31))
+      natural_age_dist <- tibble(watershed = fallRunDSM::watershed_labels,
+                               prop_2 = rep(.22, 31),
+                               prop_3 = rep(.47, 31),
+                               prop_4 = rep(.26, 31),
+                               prop_5 = rep(.05, 31))
+    } else {
+    hatch_age_dist <- output$returning_adults |>
+      filter(return_sim_year == year, origin == "hatchery") |>
+      mutate(age = return_sim_year - sim_year) |>
+      group_by(watershed, age) |>
+      summarise(total = sum(return_total, na.rm = TRUE)) |>
+      pivot_wider(names_from = age, values_from = total) |>
+      mutate(total = `2` + `3` + `4`,
+             prop_2 = `2`/total,
+             prop_3 = `3`/total,
+             prop_4 = `4`/total) |>
+      select(-c(`2`, `3`, `4`, total))
 
+    natural_age_dist <- output$returning_adults |>
+      filter(return_sim_year == year, origin == "natural") |>
+      mutate(age = return_sim_year - sim_year) |>
+      group_by(watershed, age) |>
+      summarise(total = sum(return_total, na.rm = TRUE)) |>
+      pivot_wider(names_from = age, values_from = total) |>
+      mutate(total = `2` + `3` + `4` + `5`,
+             prop_2 = `2`/total,
+             prop_3 = `3`/total,
+             prop_4 = `4`/total,
+             prop_5 = `5`/total) |>
+      select(-c(`2`, `3`, `4`, `5`, total))
+    }
+    # end R2R logic ------------------------------------------------------------
     juveniles <- spawn_success(escapement = init_adults,
+                               proportion_natural = natural_proportion_with_renat, # R2R ADDS NEW PARAM
+                               hatchery_age_distribution = hatch_age_dist, # R2R ADDS NEW PARAM
+                               natural_age_distribution = natural_age_dist, # R2R ADDS NEW PARAM
+                               fecundity_lookup = ..params$fecundity_lookup, # R2R ADDS NEW PARAM
                                adult_prespawn_survival = prespawn_survival,
                                egg_to_fry_survival = egg_to_fry_surv,
                                prob_scour = ..params$prob_nest_scoured,
@@ -735,9 +776,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # Updated logic here for R2R so that natural adults and hatchery adults return separately
     natural_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {
-        rmultinom(1, (adults_in_ocean[i]), prob = c(.25, .5, .25))
+        rmultinom(1, (adults_in_ocean[i]), prob = c(.22, .47, .26, .05))
       } else {
-        round((adults_in_ocean[i])* c(.25, .5, .25))
+        round((adults_in_ocean[i])* c(.22, .47, .26, .05))
       }
     })) * output$proportion_natural_juves_in_tribs[ , year]
 
@@ -754,17 +795,17 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
    hatchery_adults_returning <- t(sapply(1:31, function(i) {
      if (stochastic) {
-       rmultinom(1, (adults_in_ocean[i]), prob = c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
-         rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.15, .7, .15))
+       rmultinom(1, (adults_in_ocean[i]), prob = c(.30, .60, .10)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
+         rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.30, .60, .10))
        } else {
-         round((adults_in_ocean[i]) * c(.15, .7, .15)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
-           round((hatchery_releases_at_chipps[i]) * c(.15, .7, .15))}
+         round((adults_in_ocean[i]) * c(.30, .60, .10)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
+           round((hatchery_releases_at_chipps[i]) * c(.30, .60, .10))}
      }))
 
    hatchery_adults_returning[is.na(hatchery_adults_returning)] = NaN
 
     # # For use in the r2r metrics ---------------------------------------------
-    colnames(natural_adults_returning) <- c("V1", "V2", "V3")
+    colnames(natural_adults_returning) <- c("V1", "V2", "V3", "V4")
     colnames(hatchery_adults_returning) <- c("V1", "V2", "V3")
 
     output$returning_adults <- bind_rows(
@@ -774,8 +815,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
         mutate(watershed = watershed_labels,
                sim_year = year,
                origin = "natural") |>
-        pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
-        mutate(return_sim_year = readr::parse_number(return_year) + 2 + as.numeric(sim_year)),
+        pivot_longer(V1:V4, names_to = "return_year", values_to = "return_total") |>
+        mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year)),
       hatchery_adults_returning |>
         as_tibble(.name_repair = "universal") |>
         mutate(watershed = watershed_labels,
@@ -790,12 +831,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
-      calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
+      calculated_adults[1:31, (year + 1):(year + 4)] <- calculated_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
     } else {
-      adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + natural_adults_returning
+      adults[1:31, (year + 1):(year + 4)] <- adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
       adults[is.na(adults)] = 0
-      # TODO figure out if we want to add hatch stuff in here
-      # hatch_adults[1:31, (year + 2):(year + 4)] <- hatch_adults[1:31, (year + 2):(year + 4)] + hatchery_adults_returning
     }
 
   } # end year for loop

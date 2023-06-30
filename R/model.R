@@ -218,7 +218,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                       init_adults = init_adults,
                       habitat_limited = at_cap,
                       month = NA) |>
-      mutate(habitat_type = "spawning")
+      dplyr::mutate(habitat_type = "spawning")
     output$limiting_habitat   <- dplyr::bind_rows(output$limiting_habitat, lim_hab)
     # end R2R metric -----------------------------------------------------------
     # R2R logic to add fish size as an input -----------------------------------
@@ -233,30 +233,35 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                prop_4 = rep(.26, 31),
                                prop_5 = rep(.05, 31))
     } else {
-    hatch_age_dist <- output$returning_adults |>
-      filter(return_sim_year == year, origin == "hatchery") |>
-      mutate(age = return_sim_year - sim_year) |>
-      group_by(watershed, age) |>
-      summarise(total = sum(return_total, na.rm = TRUE)) |>
-      pivot_wider(names_from = age, values_from = total) |>
-      mutate(total = `2` + `3` + `4`,
-             prop_2 = `2`/total,
-             prop_3 = `3`/total,
-             prop_4 = `4`/total) |>
-      select(-c(`2`, `3`, `4`, total))
+      # TODO would be good to functionalize this age_dist - takes in origin, output$returning_adults, year
+      # TODO move to base r logic / remove dependencides on tidyverse
+      hatch_age_dist <- output$returning_adults |>
+        dplyr::filter(return_sim_year == year, origin == "hatchery") |>
+        dplyr::mutate(age = return_sim_year - sim_year,
+                      return_total = ifelse(is.nan(return_total), 0, return_total)) |>
+        dplyr::group_by(watershed, age) |>
+        dplyr::summarise(total = sum(return_total, na.rm = TRUE)) |>
+        tidyr::pivot_wider(names_from = age, values_from = total) |>
+        dplyr::mutate(total = `2` + `3` + `4`,
+               prop_2 = ifelse(total == 0, .3, `2`/total), #need to allow for straying fish even if total pop was initially 0
+               prop_3 = ifelse(total == 0, .6, `3`/total),
+               prop_4 = ifelse(total == 0, .1, `4`/total)) |>
+        dplyr::select(-c(`2`, `3`, `4`, total))
 
-    natural_age_dist <- output$returning_adults |>
-      filter(return_sim_year == year, origin == "natural") |>
-      mutate(age = return_sim_year - sim_year) |>
-      group_by(watershed, age) |>
-      summarise(total = sum(return_total, na.rm = TRUE)) |>
-      pivot_wider(names_from = age, values_from = total) |>
-      mutate(total = `2` + `3` + `4` + `5`,
-             prop_2 = `2`/total,
-             prop_3 = `3`/total,
-             prop_4 = `4`/total,
-             prop_5 = `5`/total) |>
-      select(-c(`2`, `3`, `4`, `5`, total))
+      # find natural age distribution
+      natural_age_dist <- output$returning_adults |>
+        dplyr::filter(return_sim_year == year, origin == "natural") |>
+        dplyr::mutate(age = return_sim_year - sim_year,
+                      return_total = ifelse(is.nan(return_total), 0, return_total)) |>
+        dplyr::group_by(watershed, age) |>
+        dplyr::summarise(total = sum(return_total, na.rm = TRUE)) |>
+        tidyr::pivot_wider(names_from = age, values_from = total) |>
+        dplyr::mutate(total = `2` + `3` + `4` + `5`,
+               prop_2 = ifelse(total == 0, .22, `2`/total), #need to allow for straying fish even if total pop was initially 0
+               prop_3 = ifelse(total == 0, .47, `3`/total),
+               prop_4 = ifelse(total == 0, .26, `4`/total),
+               prop_5 = ifelse(total == 0, .05, `5`/total)) |>
+        dplyr::select(-c(`2`, `3`, `4`, `5`, total))
     }
     # end R2R logic ------------------------------------------------------------
     juveniles <- spawn_success(escapement = init_adults,
@@ -811,19 +816,19 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     output$returning_adults <- bind_rows(
       output$returning_adults,
       natural_adults_returning |>
-        as_tibble(.name_repair = "universal") |>
-        mutate(watershed = watershed_labels,
+        dplyr::as_tibble(.name_repair = "universal") |>
+        dplyr::mutate(watershed = watershed_labels,
                sim_year = year,
                origin = "natural") |>
-        pivot_longer(V1:V4, names_to = "return_year", values_to = "return_total") |>
-        mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year)),
+        tidyr::pivot_longer(V1:V4, names_to = "return_year", values_to = "return_total") |>
+        dplyr::mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year)),
       hatchery_adults_returning |>
-        as_tibble(.name_repair = "universal") |>
-        mutate(watershed = watershed_labels,
+        dplyr::as_tibble(.name_repair = "universal") |>
+        dplyr::mutate(watershed = watershed_labels,
                sim_year = year,
                origin = "hatchery") |>
-        pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
-        mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year))
+        tidyr::pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
+        dplyr::mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year))
     )
     # End R2R metric logic -----------------------------------------------------
 

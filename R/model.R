@@ -124,12 +124,12 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     hatch_adults <- if (year %in% c(1, 2)) {
       round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
     } else {
-      return_hatch <- output$returning_adults |>
+      hatch_adults <- output$returning_adults |>
         filter(return_sim_year == year, origin == "hatchery") |>
         group_by(watershed) |>
         summarise(hatchery_total = sum(return_total, na.rm = TRUE)) |>
         deframe()
-      unname(return_hatch[order(match(names(return_hatch), watershed_labels))])
+      unname(hatch_adults[order(match(names(hatch_adults), watershed_labels))])
     }
     # end updated logic --------------------------------------------------------
 

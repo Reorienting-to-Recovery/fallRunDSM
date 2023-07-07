@@ -16,7 +16,7 @@
 #'                            seeds = fall_run_seeds)
 #' @export
 fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibrate"),
-                           seeds = NULL, ..params = fallRunDSM::params,
+                           seeds = NULL, ..params = fallRunDSM::r_to_r_baseline_params,
                            stochastic = FALSE){
 
   mode <- match.arg(mode)
@@ -286,6 +286,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     total_juves_pre_hatchery <- rowSums(juveniles)
     # TODO add ability to vary release per year
     juveniles <- juveniles + ..params$hatchery_release
+
+    stopifnot(nrow(juveniles) == 31)
 
     # Create new prop natural including hatch releases that we can use to apply to adult returns
     proportion_natural_juves_in_tribs <- natural_juveniles / rowSums(juveniles)

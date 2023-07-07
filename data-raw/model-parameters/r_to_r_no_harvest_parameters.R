@@ -3,13 +3,12 @@ remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
 library(DSMhabitat)
 
 # loads calibration data
-calib_results <- read_rds("calibration/calibration-results-2022.rds")
+calib_results <- read_rds("calibration/result-2023-07-06.rds")
 solution <- calib_results@solution
 
 # initial params
 r_to_r_no_harvest_params <- list(
-  #TODO add updated spawn decay multiplier for 2019 biop
-  # spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$2019_biop,
+  spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier,
 
   # Data from DSMscenarios
   spawn_decay_rate = DSMscenario::spawn_decay_rate,
@@ -224,8 +223,9 @@ r_to_r_no_harvest_params <- list(
     `San Joaquin River` = solution[28]),
 
   # R2R specific metrics
-  hatchery_release = fallRunDSM::baseline_fall_hatchery_release, #TODO update with renes hatchery numbers and document
-  hatchery_releases_at_chipps = fallRunDSM::baseline_hatchery_releases_at_chipps #TODO documenat
+  hatchery_release = fallRunDSM::fall_hatchery_release * 1.5,
+  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
+  fecundity_lookup = fallRunDSM::fecundity_by_age
 )
 
 usethis::use_data(r_to_r_no_harvest_params, overwrite = TRUE)

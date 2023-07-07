@@ -1,22 +1,19 @@
 library(tidyverse)
 remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
 library(DSMhabitat)
-
-#TODO update to main branch after finalizing temp stuff
-remotes::install_github("Reorienting-to-Recovery/DSMtemperature@run-of-river-temp")
+remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
 library(DSMtemperature)
 remotes::install_github("Reorienting-to-Recovery/DSMflow")
 library(DSMflow)
 
 # loads calibration data
-calib_results <- read_rds("calibration/calibration-results-2022.rds")
+calib_results <- read_rds("calibration/result-2023-07-06.rds")
 solution <- calib_results@solution
 
 
 # initial params
 r_to_r_max_flow_params <- list(
-  #TODO add updated spawn decay multiplier for 2019 biop
-  # spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$2019_biop,
+  spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier,
 
   # Data from DSMscenarios
   spawn_decay_rate = DSMscenario::spawn_decay_rate,
@@ -43,7 +40,7 @@ r_to_r_max_flow_params <- list(
   .adult_stray_prop_delta_trans = 2.89,
   .adult_en_route_migratory_temp = -0.26,
   .adult_en_route_bypass_overtopped = -0.019,
-  .adult_en_route_adult_harvest_rate = fallRunDSM::adult_harvest_rate, # varies by run
+  .adult_en_route_adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate, # varies by run
   .adult_prespawn_deg_day = -0.000669526,
 
   # Ocean entry success coefficient and variable
@@ -132,12 +129,12 @@ r_to_r_max_flow_params <- list(
   migratory_temperature_proportion_over_20 = DSMtemperature::migratory_temperature_proportion_over_20,
 
   # DSMhabitat variables -----
-  spawning_habitat = DSMhabitat::fr_spawn$run_of_river,
-  inchannel_habitat_fry = DSMhabitat::fr_fry$run_of_river, # vary by run
-  inchannel_habitat_juvenile = DSMhabitat::fr_juv$run_of_river, # vary by run
-  floodplain_habitat = DSMhabitat::fr_fp$run_of_river, # vary by run
+  spawning_habitat = DSMhabitat::fr_spawn$max_flow_w_hab_projects,
+  inchannel_habitat_fry = DSMhabitat::fr_fry$max_flow_w_hab_projects, # vary by run
+  inchannel_habitat_juvenile = DSMhabitat::fr_juv$max_flow_w_hab_projects, # vary by run
+  floodplain_habitat = DSMhabitat::fr_fp$max_flow_w_hab_projects, # vary by run
   weeks_flooded = DSMhabitat::weeks_flooded$run_of_river,
-  delta_habitat = DSMhabitat::delta_habitat,
+  delta_habitat = DSMhabitat::delta_habitat$max_flow_w_hab_projects,
   sutter_habitat = DSMhabitat::sutter_habitat$run_of_river,
   yolo_habitat = DSMhabitat::yolo_habitat$run_of_river,
   tisdale_bypass_watershed = DSMhabitat::tisdale_bypass_watershed,
@@ -231,8 +228,10 @@ r_to_r_max_flow_params <- list(
     `San Joaquin River` = solution[28]),
 
   # R2R specific metrics
-  hatchery_release = fallRunDSM::baseline_fall_hatchery_release, #TODO update with renes hatchery numbers and document
-  hatchery_releases_at_chipps = fallRunDSM::baseline_hatchery_releases_at_chipps #TODO documenat
+  hatchery_release = fallRunDSM::fall_hatchery_release,
+  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4,
+                                       dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
+  fecundity_lookup = fallRunDSM::fecundity_by_age
 )
 
 usethis::use_data(r_to_r_max_flow_params, overwrite = TRUE)

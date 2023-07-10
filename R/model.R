@@ -839,6 +839,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
       calculated_adults[1:31, (year + 1):(year + 4)] <- calculated_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
+      calculated_adults[1:31, (year + 1):(year + 3)] <- calculated_adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
     } else {
       adults[1:31, (year + 1):(year + 4)] <- adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
       adults[is.na(adults)] = 0

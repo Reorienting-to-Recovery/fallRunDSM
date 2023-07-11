@@ -3,7 +3,7 @@ remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
 library(DSMhabitat)
 
 # loads calibration data
-calib_results <- read_rds("calibration/result-test-known-nats.rds")
+calib_results <- read_rds("calibration/result-test-known-nats-2.rds")
 solution <- calib_results@solution
 
 # initial params

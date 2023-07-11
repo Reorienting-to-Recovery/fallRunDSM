@@ -331,7 +331,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                              yolo_habitat = ..params$yolo_habitat,
                              delta_habitat = ..params$delta_habitat)
 
-      ..params$..surv_juv_rear_int[18] <- -1.70030814
+      # ..params$..surv_juv_rear_int[18] <- -1.70030814
 
       rearing_survival <- get_rearing_survival(year, month,
                                                survival_adjustment = scenario_data$survival_adjustment,

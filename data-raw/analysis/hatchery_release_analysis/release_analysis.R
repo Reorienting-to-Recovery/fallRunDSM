@@ -11,11 +11,13 @@ winter_releases <- readxl::read_excel("data-raw/analysis/hatchery_release_analys
 summarized_fall_release <- fall_releases |>
   filter(Release_year >= 1995) |>
   group_by(Release_year, Hatchery) |>
-  summarise(total_release = sum(Total_N, na.rm = TRUE)) |>
+  summarise(total_release = sum(Total_N, na.rm = TRUE),
+            avg_fl_mm = mean(Avg_FL_mm, na.rm = TRUE)) |>
   group_by(Hatchery) |>
   summarize(seventy_fifth_percentile = quantile(total_release, .75),
             max_release = max(total_release, na.rm = TRUE),
-            median_release = median(total_release, na.rm = TRUE)) |>
+            median_release = median(total_release, na.rm = TRUE),
+            avg_fl_mm = mean(avg_fl_mm, na.rm = TRUE)) |>
   glimpse()
 
 

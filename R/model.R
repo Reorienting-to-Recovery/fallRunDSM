@@ -222,7 +222,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     output$limiting_habitat   <- dplyr::bind_rows(output$limiting_habitat, lim_hab)
     # end R2R metric -----------------------------------------------------------
     # R2R logic to add fish size as an input -----------------------------------
-    hatch_adults <- if (year %in% c(1:6)) {
+    if (year %in% c(1:6)) {
       hatch_age_dist <- tibble(watershed = fallRunDSM::watershed_labels,
                                prop_2 = rep(.3, 31),
                                prop_3 = rep(.6, 31),
@@ -331,6 +331,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                              yolo_habitat = ..params$yolo_habitat,
                              delta_habitat = ..params$delta_habitat)
 
+      ..params$..surv_juv_rear_int[18] <- -1.70030814
+
       rearing_survival <- get_rearing_survival(year, month,
                                                survival_adjustment = scenario_data$survival_adjustment,
                                                mode = mode,
@@ -378,6 +380,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                .surv_juv_delta_large = ..params$.surv_juv_delta_large,
                                                min_survival_rate = ..params$min_survival_rate,
                                                stochastic = stochastic)
+      # rearing_survival$inchannel[18, ] <- rearing_survival$inchannel[19, ]
+      # rearing_survival$floodplain[18, ] <- rearing_survival$floodplain[19, ]
 
       migratory_survival <- get_migratory_survival(year, month,
                                                    cc_gates_prop_days_closed = ..params$cc_gates_prop_days_closed,

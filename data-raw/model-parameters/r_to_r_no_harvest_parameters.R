@@ -3,7 +3,7 @@ remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
 library(DSMhabitat)
 
 # loads calibration data
-calib_results <- read_rds("calibration/result-2023-07-11.rds")
+calib_results <- read_rds("calibration/result-test-known-nats.rds")
 solution <- calib_results@solution
 
 # initial params
@@ -223,7 +223,7 @@ r_to_r_no_harvest_params <- list(
     `San Joaquin River` = solution[28]),
 
   # R2R specific metrics
-  hatchery_release = fallRunDSM::fall_hatchery_release * 1.5,
+  hatchery_release = fallRunDSM::fall_hatchery_release,
   hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
   fecundity_lookup = fallRunDSM::fecundity_by_age
 )

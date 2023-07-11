@@ -7,7 +7,7 @@ library(DSMhabitat)
 
 # updated params
 # loads calibration data
-calib_results <- read_rds("calibration/result-2023-07-06.rds")
+calib_results <- read_rds("calibration/result-2023-07-11.rds")
 solution <- calib_results@solution
 
 r_to_r_tmh_params <- list(

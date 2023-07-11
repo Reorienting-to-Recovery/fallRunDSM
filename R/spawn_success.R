@@ -45,7 +45,7 @@ spawn_success <- function(escapement,
     as.matrix()
 
   dimnames(total_nat_spawn) <- list(c(fallRunDSM::watershed_labels), c("2", "3", "4", "5"))
-  fecundity_natural <- fecundity_by_age |>
+  fecundity_natural <- fecundity_lookup |>
     dplyr::filter(origin == "Wild") |>
     dplyr::pull(fecundity)
 
@@ -62,7 +62,7 @@ spawn_success <- function(escapement,
     as.matrix()
 
   dimnames(total_hatch_spawn) <- list(c(fallRunDSM::watershed_labels), c("2", "3", "4"))
-  fecundity_hatch <- fecundity_by_age |>
+  fecundity_hatch <- fecundity_lookup |>
     dplyr::filter(origin == "Hatchery") |>
     dplyr::pull(fecundity)
 

@@ -184,7 +184,7 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
       }
     })
 
-    surviving_natural_adults <- rowSums(surviving_natural_adults_by_month)
+    surviving_natural_adults <- ifelse(rowSums(surviving_natural_adults_by_month) < 0, 0, rowSums(surviving_natural_adults_by_month))
     surviving_hatchery_adults <- rowSums(surviving_hatchery_adults_by_month)
     init_adults <- surviving_natural_adults + surviving_hatchery_adults
     init_adults_by_month <- surviving_natural_adults_by_month + surviving_hatchery_adults_by_month

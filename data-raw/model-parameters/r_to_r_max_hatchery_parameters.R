@@ -223,7 +223,7 @@ r_to_r_max_hatchery_params <- list(
     `San Joaquin River` = solution[28]),
 
   # R2R specific metrics
-  hatchery_release = fallRunDSM::fall_hatchery_release * 1.5,
+  hatchery_release = fallRunDSM::fall_hatchery_release * 2,
   hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
   fecundity_lookup = fallRunDSM::fecundity_by_age
 )

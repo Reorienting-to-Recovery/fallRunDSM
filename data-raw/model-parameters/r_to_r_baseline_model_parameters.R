@@ -9,7 +9,7 @@ solution <- calib_results@solution
 # initial params
 r_to_r_baseline_params <- list(
   #TODO add updated spawn decay multiplier for 2019 biop
-  spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier,
+  spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$biop_itp_2018_2019$fr,
 
   # Data from DSMscenarios
   spawn_decay_rate = DSMscenario::spawn_decay_rate,

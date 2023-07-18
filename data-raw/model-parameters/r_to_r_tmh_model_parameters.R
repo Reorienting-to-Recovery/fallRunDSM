@@ -11,7 +11,7 @@ calib_results <- read_rds("calibration/result-test-known-nats-2.rds")
 solution <- calib_results@solution
 
 r_to_r_tmh_params <- list(
-  spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier,
+  spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$biop_itp_2018_2019$fr,
 
   # Data from DSMscenarios
   spawn_decay_rate = DSMscenario::spawn_decay_rate,

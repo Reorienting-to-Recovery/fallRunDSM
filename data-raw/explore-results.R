@@ -12,7 +12,7 @@ r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fallRunDSM::r_to_r_baseline_params,
                                                 seeds = r2r_seeds)
 r2r_model_results$spawners
-r2r_model_results$phos
+  r2r_model_results$proportion_natural_at_spawning
 
 
 spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
@@ -20,7 +20,7 @@ spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
   pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
   group_by(year, location) |>
   summarize(total_spawners = sum(spawners)) |>
-  filter(location != "Feather River") |>
+  # filter(location != "Feather River") |>
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(year, total_spawners, color = location)) +
   geom_line() +
@@ -32,6 +32,65 @@ spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
   theme(text = element_text(size = 20))
 
 spawn
+
+
+# seed
+r2r_seeds_max_flow_tmh <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_to_r_max_flow_max_hab_params)
+
+# run model
+r2r_model_results_max_flow_tmh <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fallRunDSM::r_to_r_max_flow_max_hab_params,
+                                                seeds = r2r_seeds_max_flow_tmh)
+
+# seed
+r2r_seeds_max_flow <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_to_r_max_flow_params)
+
+# run model
+r2r_model_results_max_flow <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fallRunDSM::r_to_r_max_flow_params,
+                                                             seeds = r2r_seeds_max_flow)
+
+max_flow_tmh <- dplyr::as_tibble(r2r_model_results_max_flow_tmh$spawners) |>
+  dplyr::mutate(location = fallRunDSM::watershed_labels,
+                run = "Max Flow Max Hab") |>
+  pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
+  group_by(year, run) |>
+  summarize(total_spawners = sum(spawners))
+
+dplyr::as_tibble(r2r_model_results_max_flow$spawners) |>
+  dplyr::mutate(location = fallRunDSM::watershed_labels,
+                run = "Max Flow") |>
+  pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
+  group_by(year, run) |>
+  summarize(total_spawners = sum(spawners)) |>
+  bind_rows(max_flow_tmh) |>
+  # filter(location != "Feather River") |>
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(year, total_spawners, color = run)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = "Spawners",
+       x = "Year") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks = 1:20) +
+  theme(text = element_text(size = 20))
+
+spawn
+
+
+dplyr::as_tibble(r2r_model_results$spawners) |>
+  dplyr::mutate(location = fallRunDSM::watershed_labels) |>
+  pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
+  group_by(year) |>
+  summarize(total_spawners = sum(spawners)) |>
+  # filter(location != "Feather River") |>
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(year, total_spawners)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = "Spawners",
+       x = "Year") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks = 1:20) +
+  theme(text = element_text(size = 20))
 
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_to_r_baseline_params)
 

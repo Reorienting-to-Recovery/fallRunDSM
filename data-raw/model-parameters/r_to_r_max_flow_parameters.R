@@ -134,7 +134,7 @@ r_to_r_max_flow_params <- list(
   inchannel_habitat_juvenile = DSMhabitat::fr_juv$max_flow_w_hab_projects, # vary by run
   floodplain_habitat = DSMhabitat::fr_fp$max_flow_w_hab_projects, # vary by run
   weeks_flooded = DSMhabitat::weeks_flooded$run_of_river,
-  delta_habitat = DSMhabitat::delta_habitat$max_flow_w_hab_projects,
+  delta_habitat = DSMhabitat::delta_habitat$r_to_r_baseline,
   sutter_habitat = DSMhabitat::sutter_habitat$run_of_river,
   yolo_habitat = DSMhabitat::yolo_habitat$run_of_river,
   tisdale_bypass_watershed = DSMhabitat::tisdale_bypass_watershed,

@@ -8,7 +8,7 @@ solution <- calib_results@solution
 
 # initial params
 r_to_r_no_hatchery_params <- list(
-  spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier,
+  spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$biop_itp_2018_2019$fr,
 
   # Data from DSMscenarios
   spawn_decay_rate = DSMscenario::spawn_decay_rate,

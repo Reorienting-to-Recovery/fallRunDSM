@@ -1,9 +1,9 @@
 library(tidyverse)
-remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
 library(DSMhabitat)
-remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
+# remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
 library(DSMtemperature)
-remotes::install_github("Reorienting-to-Recovery/DSMflow")
+# remotes::install_github("Reorienting-to-Recovery/DSMflow")
 library(DSMflow)
 
 # loads calibration data

@@ -1,9 +1,9 @@
 library(tidyverse)
-remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
 library(DSMhabitat)
-remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
+# remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
 library(DSMtemperature)
-remotes::install_github("Reorienting-to-Recovery/DSMflow")
+# remotes::install_github("Reorienting-to-Recovery/DSMflow")
 library(DSMflow)
 
 # loads calibration data
@@ -110,9 +110,9 @@ r_to_r_max_flow_max_hab_params <- list(
   total_diverted = DSMflow::total_diverted$run_of_river,
   delta_proportion_diverted = DSMflow::delta_proportion_diverted$run_of_river,
   delta_total_diverted = DSMflow::delta_total_diverted$run_of_river,
-  prop_pulse_flows = DSMflow::proportion_pulse_flows$run_of_river,
+  prop_pulse_flows = DSMflow::proportion_pulse_flows$run_of_river, #TODO update back to ROR - testing out other because performs better
   prop_flow_natal = DSMflow::proportion_flow_natal$run_of_river,
-  upper_sacramento_flows = DSMflow::upper_sacramento_flows$run_of_river,
+  upper_sacramento_flows = DSMflow::upper_sacramento_flows$run_of_river, #TODO update back to ROR - testing out other because performs better
   delta_inflow = DSMflow::delta_inflow$run_of_river,
   cc_gates_days_closed = DSMflow::delta_cross_channel_closed$run_of_river["count", ],
   cc_gates_prop_days_closed = DSMflow::delta_cross_channel_closed$run_of_river["proportion", ],
@@ -134,7 +134,7 @@ r_to_r_max_flow_max_hab_params <- list(
   inchannel_habitat_juvenile = DSMhabitat::fr_juv$run_of_river_tmh, # vary by run
   floodplain_habitat = DSMhabitat::fr_fp$run_of_river_tmh, # vary by run
   weeks_flooded = DSMhabitat::weeks_flooded$run_of_river,
-  delta_habitat = DSMhabitat::delta_habitat$run_of_river_tmh, # TODO rerun delta hab for
+  delta_habitat = DSMhabitat::delta_habitat$run_of_river_tmh,
   sutter_habitat = DSMhabitat::sutter_habitat$run_of_river,
   yolo_habitat = DSMhabitat::yolo_habitat$run_of_river,
   tisdale_bypass_watershed = DSMhabitat::tisdale_bypass_watershed,

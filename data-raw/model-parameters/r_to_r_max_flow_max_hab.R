@@ -110,9 +110,9 @@ r_to_r_max_flow_max_hab_params <- list(
   total_diverted = DSMflow::total_diverted$run_of_river,
   delta_proportion_diverted = DSMflow::delta_proportion_diverted$run_of_river,
   delta_total_diverted = DSMflow::delta_total_diverted$run_of_river,
-  prop_pulse_flows = DSMflow::proportion_pulse_flows$run_of_river, #TODO update back to ROR - testing out other because performs better
+  prop_pulse_flows = DSMflow::proportion_pulse_flows$run_of_river,
   prop_flow_natal = DSMflow::proportion_flow_natal$run_of_river,
-  upper_sacramento_flows = DSMflow::upper_sacramento_flows$run_of_river, #TODO update back to ROR - testing out other because performs better
+  upper_sacramento_flows = DSMflow::upper_sacramento_flows$run_of_river,
   delta_inflow = DSMflow::delta_inflow$run_of_river,
   cc_gates_days_closed = DSMflow::delta_cross_channel_closed$run_of_river["count", ],
   cc_gates_prop_days_closed = DSMflow::delta_cross_channel_closed$run_of_river["proportion", ],

@@ -17,7 +17,7 @@
 #' @export
 fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibrate"),
                            seeds = NULL, ..params = fallRunDSM::r_to_r_baseline_params,
-                           stochastic = FALSE){
+                           stochastic = FALSE, delta_surv_inflation = FALSE){
 
   mode <- match.arg(mode)
 
@@ -180,8 +180,11 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
         natural_proportion_with_renat <-  spawners$proportion_natural
       }
     } else {
-      natural_proportion_with_renat <-  spawners$proportion_natural
+        natural_proportion_with_renat <-  spawners$proportion_natural
+    }
 
+    if (year >= 8 & all(..params$hatchery_release == matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)))) {
+        natural_proportion_with_renat <- c(rep(1, 31))
     }
 
     output$proportion_natural_at_spawning[ , year] <- natural_proportion_with_renat
@@ -402,6 +405,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                    .surv_juv_outmigration_san_joaquin_large = ..params$.surv_juv_outmigration_san_joaquin_large,
                                                    min_survival_rate = ..params$min_survival_rate,
                                                    stochastic = stochastic)
+      if (delta_surv_inflation == TRUE){
+        migratory_survival$bay_delta <- .5
+      }
 
       migrants <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
 

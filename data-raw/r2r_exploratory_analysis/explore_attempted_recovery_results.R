@@ -1,0 +1,114 @@
+library(tidyverse)
+library(fallRunDSM)
+library(plotly)
+library(producePMs)
+# View prelim R2R results
+
+# seed
+# Included in this scenario
+# Every year has flows of 1983 (wet year)
+# Stream, vernalis, and pp temps set to max out at 17 (increase survival)
+# prey density set to high (increase growth)
+# increase delta survival to 50% (15% increase)
+r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
+                                        ..params = recovery_params,
+                                        delta_surv_inflation = TRUE)
+
+# run model
+r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
+                                                ..params = recovery_params,
+                                                seeds = r2r_seeds,
+                                                delta_surv_inflation = TRUE)
+r2r_model_results$spawners
+r2r_model_results$proportion_natural_at_spawning
+
+non_spawn_locations <- c("Yolo Bypass", "Upper-mid Sacramento River",
+                         "Sutter Bypass", "San Joaquin River", "Lower-mid Sacramento River",
+                         "Lower Sacramento River", "")
+
+spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
+  dplyr::mutate(location = fallRunDSM::watershed_labels) |>
+  pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
+  group_by(year, location) |>
+  summarize(total_spawners = sum(spawners)) |>
+  filter(!location %in% non_spawn_locations) |>
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(year, total_spawners, color = location)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = "Spawners",
+       x = "Year") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks = 1:20) +
+  theme(text = element_text(size = 20))
+ggplotly(spawn)
+
+results_df <- create_model_results_dataframe(r2r_model_results, scenario = "recovery", model_parameters = recovery_params, selected_run = "fall")
+potential_dependent_pops <- c("Bear River", "Big Chico Creek", "Elder Creek", "Paynes Creek",  "Stoney Creek", "Thomes Creek")
+
+ind_pops <- results_df |>
+  select(-size_or_age, -origin, -month, -run) |>
+  filter(performance_metric %in% c("Natural Spawners", "2.2 Growth Rate Spawners",
+                                   "4 PHOS", "2.1 CRR: Total Adult to Returning Natural Adult"),
+         !location %in% potential_dependent_pops,
+         !location %in% non_spawn_locations) |>
+  pivot_wider(names_from = performance_metric, values_from = value) |>
+  # round results
+  mutate(`2.1 CRR: Total Adult to Returning Natural Adult` = round(`2.1 CRR: Total Adult to Returning Natural Adult`, 1),
+         `2.2 Growth Rate Spawners` = round(`2.2 Growth Rate Spawners`, 1),
+         `4 PHOS` = round(`4 PHOS`, 2),
+         `Natural Spawners` = round(`Natural Spawners`)) |>
+  # categorize as meets threshold or not
+  mutate(above_500_spawners = if_else(`Natural Spawners` > 500, TRUE, FALSE),
+         phos_less_than_5_percent = ifelse(`4 PHOS` < .05, TRUE, FALSE),
+         crr_above_1 = ifelse(`2.1 CRR: Total Adult to Returning Natural Adult` >= 1, TRUE, FALSE),
+         growth_rate_above_1 = ifelse(`2.2 Growth Rate Spawners` >= 0, TRUE, FALSE),
+         independent_population = ifelse(above_500_spawners & phos_less_than_5_percent & growth_rate_above_1 & crr_above_1, TRUE, FALSE))
+# View(ind_pops)
+
+ind_pops |>
+  filter(year < 17, year > 1) |> # removes last three years because CRR is NA,
+  # first year because growth rate is NA
+  ggplot(aes(x = year, y = location, color = independent_population)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = c("azure2", "cadetblue4", "#CCC591"), name = "") +
+  theme_minimal() +
+  labs(y = "",
+       x = "",
+       title = "Independent Populations") +
+  theme(legend.position = "bottom")
+
+produce_spawner_abundance_pm(results_df)
+produce_crr_geometric_mean_pm <- function(model_results_df){
+  geom_mean_calc <- function(watershed, scenario) {
+    data <- model_results_df |>
+      filter(performance_metric == "2.1 CRR: Total Adult to Returning Natural Adult",
+             location == watershed) |>
+      select(year, location, scenario, run, performance_metric, value) |>
+      mutate(geometric_mean = zoo::rollapply(value, 3, psych::geometric.mean, fill = NA)) |>
+      filter(!is.na(geometric_mean))
+    return(data)
+  }
+  watersheds <- rep(fallRunDSM::watershed_labels, 7)
+  scenarios_lists <- c(rep("Baseline", 31),
+                       rep("Theoretical Max Habitat", 31),
+                       rep("No Harvest", 31),
+                       rep("No Hatchery", 31),
+                       rep("Max Flow", 31),
+                       rep("Max Flow & Max Habitat", 31),
+                       rep("Max Hatchery", 31))
+
+  res <- purrr::map2(watersheds,scenarios_lists, geom_mean_calc) |> reduce(bind_rows)
+  goem_mean_crr <- res |>
+    group_by(location, scenario) |>
+    summarize(average_crr = mean(geometric_mean, na.rm = TRUE)) |>
+    ungroup() |>
+    mutate(average_crr = ifelse(average_crr == Inf, 0, average_crr)) |>
+    group_by(scenario) |>
+    summarize(avg_annual_crr = mean(average_crr, na.rm = T),
+              min_annual_crr = min(average_crr, na.rm = T),
+              max_annual_crr = max(average_crr, na.rm = T))
+  return(goem_mean_crr)
+}
+produce_crr_geometric_mean_pm(results_df)
+produce_growth_rate_pm(results_df)

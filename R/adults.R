@@ -16,7 +16,7 @@
 #' @source IP-117068
 #' @export
 adult_stray <- function(wild, natal_flow, south_delta_watershed, cross_channel_gates_closed,
-                        prop_bay_trans = 0, prop_delta_trans = 0,
+                        prop_bay_trans = 0, prop_delta_trans = 0, # bring these up top level so we can have as params based on hatchery logic (can also manipualate props in R2R scenario)
                         .intercept = fallRunDSM::params$.adult_stray_intercept,
                         .wild = fallRunDSM::params$.adult_stray_wild,
                         .natal_flow = fallRunDSM::params$.adult_stray_natal_flow,
@@ -33,6 +33,63 @@ adult_stray <- function(wild, natal_flow, south_delta_watershed, cross_channel_g
     .prop_delta_trans * prop_delta_trans * (1 - wild)
   )
 
+}
+
+stray_returning_adults <- function(monthly_adult_returns,
+                                   year,
+                                   stochastic,
+                                   month_return_proportions,
+                                   wild, prop_flow_natal,
+                                   south_delta_routed_watersheds,
+                                   cc_gates_days_closed,
+                                   prop_bay_trans = 0, prop_delta_trans = 0,
+                                   .adult_stray_intercept = fallRunDSM::params$.adult_stray_intercept,
+                                   .adult_stray_wild = fallRunDSM::params$.adult_stray_wild,
+                                   .adult_stray_natal_flow = fallRunDSM::params$.adult_stray_natal_flow,
+                                   .adult_stray_cross_channel_gates_closed = fallRunDSM::params$.adult_stray_cross_channel_gates_closed,
+                                   .adult_stray_prop_bay_trans = fallRunDSM::params$.adult_stray_prop_bay_trans,
+                                   .adult_stray_prop_delta_trans = fallRunDSM::params$.adult_stray_prop_delta_trans) {
+  stray_props <- sapply(10:12, function(month) {
+    #TODO add different stray logic for realease types
+    adult_stray(wild = wild,
+                natal_flow = prop_flow_natal[ , year],
+                south_delta_watershed = south_delta_routed_watersheds,
+                cross_channel_gates_closed = cc_gates_days_closed[month],
+                .intercept = .adult_stray_intercept,
+                .wild = .adult_stray_wild,
+                .natal_flow = .adult_stray_natal_flow,
+                .cross_channel_gates_closed = .adult_stray_cross_channel_gates_closed,
+                .prop_bay_trans = .adult_stray_prop_bay_trans,
+                .prop_delta_trans = .adult_stray_prop_delta_trans)
+  })
+
+  straying_adults <- sapply(1:3, function(month) {
+    if (stochastic) {
+      rbinom(n = 31, monthly_adult_returns[, month], stray_props[, month])
+    } else {
+      round(monthly_adult_returns[, month] * stray_props[, month])
+    }
+  })
+
+  south_delta_routed_adults <- round(colSums(straying_adults * south_delta_routed_watersheds))
+  south_delta_stray_adults <- sapply(1:3, function(month) {
+    if (stochastic) {
+      as.vector(rmultinom(1, south_delta_routed_adults[month], cross_channel_stray_rate))
+    } else {
+      round(south_delta_routed_adults[month] * cross_channel_stray_rate)
+    }
+  })
+
+  remaining_stray_adults <- round(colSums(straying_adults * (1 - south_delta_routed_watersheds)))
+  stray_adults <- sapply(1:3, function(month) {
+    if (stochastic) {
+      as.vector(rmultinom(1, remaining_stray_adults[month], stray_rate))
+    } else {
+      round(remaining_stray_adults[month] * stray_rate)
+    }
+  })
+
+  adults_after_stray <- monthly_adult_returns - straying_adults + south_delta_stray_adults + stray_adults
 }
 
 #' @title Adult En Route Survival

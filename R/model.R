@@ -162,6 +162,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     output$spawners[ , year] <- init_adults
 
     # # For use in the r2r metrics ---------------------------------------------
+    # TODO add conditional here for if hatch release == 0
     phos <- 1 - spawners$proportion_natural
     if (year > 3){
       phos_diff_two_years <- phos - output$phos[, (year - 2)]
@@ -330,8 +331,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                              sutter_habitat = ..params$sutter_habitat,
                              yolo_habitat = ..params$yolo_habitat,
                              delta_habitat = ..params$delta_habitat)
-
-      # ..params$..surv_juv_rear_int[18] <- -1.70030814
 
       rearing_survival <- get_rearing_survival(year, month,
                                                survival_adjustment = scenario_data$survival_adjustment,

@@ -174,9 +174,9 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
     })
     surviving_hatchery_adults_by_month <- sapply(1:3, function(month) {
       if (stochastic) {
-        rbinom(31, round(hatchery_by_month[, month]), adult_en_route_surv[, month])
+        rbinom(31, round(adults_survived_to_spawning[, month]), adult_en_route_surv[, month])
       } else {
-        round(hatchery_by_month[, month] * adult_en_route_surv[, month])
+        round(adults_survived_to_spawning[, month] * adult_en_route_surv[, month])
       }
     })
 

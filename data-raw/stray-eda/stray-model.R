@@ -29,6 +29,7 @@ normalize <- function(x) {
   (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 }
 
+
 data2 <- data %>%
   mutate(across(all_of(cols_to_transform), ~ normalize(.)))
 
@@ -81,9 +82,9 @@ summary(base) #r2=0.42
 
 #TRY LATER JUST IN CASE: brood_year, rel_month, LH_Type2, flow.J45, avg_FL
 
-par(mfrow=c(2,2)); plot(base)
-res <- dredge(base)
-head(res)
+# par(mfrow=c(2,2)); plot(base)
+# res <- dredge(base)
+# head(res)
 
 # Global model call: betareg(formula = transf(stray_ind) ~ hatchery * dist_hatch +
 #                              run_year + age + Total_N + Bay + Xchannel + flow.1011 + flow.J45R +
@@ -192,6 +193,14 @@ hatchery_stray <- betareg(
 )
 
 
+rec <- recipes::recipe(stray_ind ~ hatchery + dist_hatch + run_year + age + Total_N + rel_month
+                       + flow.1011 + flow_discrep + mean_PDO_retn,
+                       data = data)
+
+norm_trans <- rec |> recipes::step_normalize(recipes::all_numeric_predictors())
+norm_obj <-recipes::prep(norm_trans, training = data)
+transformed_te <- recipes::bake(norm_obj, data)
+
 data2 |>
   select(hatchery,
          dist_hatch,
@@ -205,28 +214,57 @@ data2 |>
   ) |>
   glimpse()
 
+normlize_with_known <- function(x, mean, sd) {
+  (x - mean) / (sd)
+}
 
-new_data <- tibble(
-  hatchery = "coleman", # hatchery of origin
-  dist_hatch = .2, # hatchery to release site distance
-  run_year = 0, # the run year
-  age = 0,
-  Total_N = ,
-  rel_month = 1,
-  flow.1011 =.2,
-  flow_discrep = 1,
-  mean_PDO_retn = 1
-)
+normalize_with_context <- function(x, data) {
+  (x - mean(data, na.rm = TRUE))/sd(data, na.rm = TRUE)
+}
 
-predict(hatchery_stray, newdata = new_data)
+unormalize <- function(x, data) {
+  (x * sd(data)) + mean(data)
+}
 
 
+# in-river = 0 disntace
+# delta = use the table1 in https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267
+
+new_data <- expand_grid(
+  hatchery = c("coleman", "feather", "merced", "mokelumne", "nimbus"), # hatchery of origin
+  dist_hatch = normalize_with_context(0:1599, data$dist_hatch), # hatchery to release site distance, this encodes BAY vs INRIVER releases?
+  run_year = normalize_with_context(1990, data$run_year), # the run year, this should be normalized
+  age = normalize_with_context(3, data$age), # hathcery fish 60% return at age = 3
+  Total_N = normalize_with_context(200000, data$Total_N), # obtained from ..params$hatchery_release
+  rel_month = normalize_with_context(1:12, data$rel_month), # released are done all at once in the mode
+  flow.1011 = normalize_with_context(200, data$flow.1011), # median flow for Oct
+  flow_discrep = normalize_with_context(-200, data$flow_discrep), # difference between flow.1011 and avg flow apr-may
+  mean_PDO_retn = normalize_with_context(0, data$mean_PDO_retn) # use the dataset they use cached intot he model, vary by year
+) |>
+  mutate(
+    unorm_rel_month = unormalize(rel_month, data$rel_month),
+    unorm_dist_hatch = unormalize(dist_hatch, data$dist_hatch),
+    unorm_rel_month = factor(month.abb[unorm_rel_month], levels = month.abb)
+  )
 
 
 
+new_data$prediction = predict(hatchery_stray, newdata = new_data)
+
+new_data |>
+  ggplot(aes(unorm_dist_hatch, prediction, color = unorm_rel_month)) + geom_line() + facet_wrap(vars(hatchery)) +
+  labs(x = "Release Distance to Hatchery", y = "Stray Rate", color = "Relase Month")
+
+new_data |>
+  ggplot(aes(unorm_dist_hatch, prediction, color = unorm_rel_month)) + geom_line() + facet_wrap(vars(hatchery))
 
 
-
-
-
+new_data |>
+  filter(unorm_dist_hatch == 500) |>
+  group_by(hatchery, unorm_rel_month) |>
+  summarise(
+    min_stray_reate = min(prediction),
+    avg_stray_reate = mean(prediction),
+    max_stray_reate = max(prediction)
+  )
 

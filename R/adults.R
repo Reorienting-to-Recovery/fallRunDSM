@@ -1,3 +1,47 @@
+# hatchery = c("coleman", "feather", "merced", "mokelumne", "nimbus"), # hatchery of origin
+# dist_hatch = normalize_with_context(0:1599, data$dist_hatch), # hatchery to release site distance, this encodes BAY vs INRIVER releases?
+# run_year = normalize_with_context(1990, data$run_year), # the run year, this should be normalized
+# age = normalize_with_context(3, data$age), # hathcery fish 60% return at age = 3
+# Total_N = normalize_with_context(200000, data$Total_N), # obtained from ..params$hatchery_release
+# rel_month = normalize_with_context(1:12, data$rel_month), # released are done all at once in the mode
+# flow.1011 = normalize_with_context(200, data$flow.1011), # median flow for Oct
+# flow_discrep = normalize_with_context(-200, data$flow_discrep), # difference between flow.1011 and avg flow apr-may
+# mean_PDO_retn = normalize_with_context(0, data$mean_PDO_retn) # use the dataset they use cached intot he model, vary by year
+
+#' @title Adult Straying for Hatchery Origin Fish
+#' @param hatchery of origin, must be one of `c("coleman", "feather", "merced", "mokelumne", "nimbus")`
+#' @param distance_from_hatchery the distance in km from hathcery of origin to release location
+#' @param run_year year of run
+#' @param age age of fish
+#' @param total_released total number of fish released at hatchery
+#' @param released_month month of release
+#' @param flow_oct_nov the median flow for October and November
+#' @param flow_apr_may the median flow for April and May
+#' @param mean_pdo_return PDO return
+#' @md
+hatchery_adult_stray <- function(hatchery = c("coleman", "feather", "merced", "mokelumne", "nimbus"),
+                                 distance_from_hatchery, run_year, age, total_released, released_month,
+                                 flow_oct_nov, flow_apr_may, mean_pdo_return) {
+
+  flow_discrep <- flow_oct_nov - flow_apr_may
+
+  new_data <- data.frame(
+    hatchery = hatchery,
+    dist_hatch = distance_from_hatchery,
+    run_year = run_year,
+    age = age,
+    Total_N = total_released,
+    rel_month = released_month,
+    flow.1011 = flow_oct_nov,
+    flow_discrep = flow_discrep,
+    mean_PDO_retn = mean_pdo_return
+  )
+
+  predictions <- predict(fallRunDSM::hatchery_stray_betareg)
+
+}
+
+
 #' @title Adult Straying
 #' @description Calculate the proportion of adults straying to non-natal streams to spawn
 #' @details See \code{\link{params}} for details on parameter sources
@@ -49,6 +93,7 @@ stray_returning_adults <- function(monthly_adult_returns,
                                    .adult_stray_cross_channel_gates_closed = fallRunDSM::params$.adult_stray_cross_channel_gates_closed,
                                    .adult_stray_prop_bay_trans = fallRunDSM::params$.adult_stray_prop_bay_trans,
                                    .adult_stray_prop_delta_trans = fallRunDSM::params$.adult_stray_prop_delta_trans) {
+
   stray_props <- sapply(10:12, function(month) {
     #TODO add different stray logic for realease types
     adult_stray(wild = wild,

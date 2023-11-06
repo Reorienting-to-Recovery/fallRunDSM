@@ -1,15 +1,15 @@
 title: fallRunDSM
-url: https://CVPIA-OSC.github.io/fallRunDSM/
+url: https://reorienting-to-recovery.github.io/fallRunDSM/
 template:
   params:
-    bootswatch: yeti
+    bootswatch: flatly
 
 home:
   links:
-  - text: Fish and Wildlife Service's CVPIA website
-    href: https://www.fws.gov/cno/fisheries/CAMP/CVPIA/
-  - text: Bureau of Reclamation's CVPIA website
-    href: https://www.usbr.gov/mp/cvpia/
+  - text: Reorienting to Recovery Project Website
+    href: https://csamp.baydeltalive.com/recovery/reorienting-to-recovery
+  - text: Reorienting to Recovery Modeling Overview Website
+    href: https://reorienting-to-recovery.gitbook.io/documentation-site/zCZ2Z2yqFYMUQrtZdTlg/
 
 reference:
 - title: Life Cycle Model and Model Parameters
@@ -75,6 +75,7 @@ reference:
   - territory_by_size
   - gamma_MOM
   - days_in_month
+  - pretty_num
 
 navbar:
   structure:
@@ -96,10 +97,8 @@ navbar:
         href: 'articles/temperature-model.html'
       - text: 'Model FAQ'
         href: 'articles/model_faq.html'
-  - text: 'News'
-    href: news/index.html
 
 repo:
  url:
-  home: https://github.com/CVPIA-OSC/fallRunDSM
-  issue: https://github.com/CVPIA-OSC/fallRunDSM/issues/
+  home: https://github.com/reorienting-to-recovery/fallRunDSM
+  issue: https://github.com/reorienting-to-recovery/fallRunDSM/issues/

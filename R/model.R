@@ -146,6 +146,11 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                     natural_adult_removal_rate = ..params$natural_adult_removal_rate,
                                     cross_channel_stray_rate = ..params$cross_channel_stray_rate,
                                     stray_rate = ..params$stray_rate,
+                                    total_releases = ..params$hatchery_release,
+                                    release_month = 1,
+                                    flows_oct_nov = ..params$flows_oct_nov,
+                                    flows_apr_may = ..params$flows_apr_may,
+                                    monthly_mean_pdo = fallRunDSM::monthly_mean_pdo,
                                     ..surv_adult_enroute_int = ..params$..surv_adult_enroute_int,
                                     .adult_stray_intercept = ..params$.adult_stray_intercept,
                                     .adult_stray_wild = ..params$.adult_stray_wild,
@@ -286,7 +291,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     natural_juveniles <- total_juves_pre_hatchery  * natural_proportion_with_renat
     total_juves_pre_hatchery <- rowSums(juveniles)
     # TODO add ability to vary release per year
+    # TODO(stray) capture parameters for calculating straying
     juveniles <- juveniles + ..params$hatchery_release
+    # stray_rates_in_river_releases <- hatchery_adult_stray(hatchery = )
 
     stopifnot(nrow(juveniles) == 31)
 
@@ -760,6 +767,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
         juveniles_at_chipps <- delta_fish$juveniles_at_chipps
       }
 
+      # migrants at golden gate is a init adults(hatchery+natural) -> juvs -> survival+migration -> ocean
+
       ocean_entry_success <- ocean_entry_success(migrants = migrants_at_golden_gate,
                                                  month = month,
                                                  avg_ocean_transition_month = avg_ocean_transition_month,
@@ -795,6 +804,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     natural_adults_returning[is.na(natural_adults_returning)] = NaN
 
    # R2R release at chipps logic
+    # TODO(stray) capture parameter for calculating straying
+    # stray_rates_in_bay_releases <- hatchery_adult_stray()
     hatchery_releases_at_chipps <- ocean_entry_success(migrants = ..params$hatchery_releases_at_chipps,
                                                month = 8, # set to final month
                                                avg_ocean_transition_month = avg_ocean_transition_month,
@@ -808,7 +819,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
        rmultinom(1, (adults_in_ocean[i]), prob = c(.30, .60, .10)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
          rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.30, .60, .10))
        } else {
-         round((adults_in_ocean[i]) * c(.30, .60, .10)) * (1 - output$proportion_natural_juves_in_tribs[, year][i]) +
+         round((adults_in_ocean[i] * c(.30, .60, .10)) * (1 - output$proportion_natural_juves_in_tribs[, year][i])) +
            round((hatchery_releases_at_chipps[i]) * c(.30, .60, .10))}
      }))
 

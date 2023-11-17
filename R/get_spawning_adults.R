@@ -41,6 +41,11 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
                                 natural_adult_removal_rate,
                                 cross_channel_stray_rate,
                                 stray_rate,
+                                total_releases,
+                                release_month,
+                                flows_oct_nov,
+                                flows_apr_may,
+                                monthly_mean_pdo,
                                 ..surv_adult_enroute_int,
                                 .adult_stray_intercept,
                                 .adult_stray_wild,
@@ -97,6 +102,7 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
         round(hatch_adults[watershed] * month_return_proportions)
       }
     }))
+
     # Call new stray adult returns function on natural adults
     natural_adults_after_stray <- stray_returning_adults(monthly_adult_returns = adults_by_month,
                                                          year = year,
@@ -106,6 +112,12 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
                                                          prop_flow_natal = prop_flow_natal,
                                                          south_delta_routed_watersheds = south_delta_routed_watersheds,
                                                          cc_gates_days_closed = cc_gates_days_closed,
+                                                         type = "natural",
+                                                         total_releases = total_releases,
+                                                         release_month = release_month,
+                                                         flows_oct_nov = flows_oct_nov,
+                                                         flows_apr_may = flows_apr_may,
+                                                         monthly_mean_pdo = monthly_mean_pdo ,
                                                          .adult_stray_intercept = .adult_stray_intercept,
                                                          .adult_stray_wild = .adult_stray_wild,
                                                          .adult_stray_natal_flow = .adult_stray_natal_flow,
@@ -114,22 +126,28 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
                                                          .adult_stray_prop_delta_trans = .adult_stray_prop_delta_trans)
 
     # Call new stray adult returns function on hatchery fish
-    hatch_adults_after_stray <-  stray_returning_adults(monthly_adult_returns = hatchery_by_month,
-                                                        year = year,
-                                                        stochastic = stochastic,
-                                                        month_return_proportions = month_return_proportions,
-                                                        wild = 0,
-                                                        prop_flow_natal = prop_flow_natal,
-                                                        south_delta_routed_watersheds = south_delta_routed_watersheds,
-                                                        cc_gates_days_closed = cc_gates_days_closed,
-                                                        .adult_stray_intercept = .adult_stray_intercept,
-                                                        .adult_stray_wild = .adult_stray_wild,
-                                                        .adult_stray_natal_flow = .adult_stray_natal_flow,
-                                                        .adult_stray_cross_channel_gates_closed = .adult_stray_cross_channel_gates_closed,
-                                                        .adult_stray_prop_bay_trans = .adult_stray_prop_bay_trans,
-                                                        .adult_stray_prop_delta_trans = .adult_stray_prop_delta_trans)
+    hatch_adults_after_stray <- stray_returning_adults(monthly_adult_returns = hatchery_by_month,
+                                                       year = year,
+                                                       stochastic = stochastic,
+                                                       month_return_proportions = month_return_proportions,
+                                                       wild = 0,
+                                                       prop_flow_natal = prop_flow_natal,
+                                                       south_delta_routed_watersheds = south_delta_routed_watersheds,
+                                                       cc_gates_days_closed = cc_gates_days_closed,
+                                                       type = "hatchery",
+                                                       total_releases = total_releases,
+                                                       release_month = release_month,
+                                                       flows_oct_nov = flows_oct_nov,
+                                                       flows_apr_may = flows_apr_may,
+                                                       monthly_mean_pdo = monthly_mean_pdo ,
+                                                       .adult_stray_intercept = .adult_stray_intercept,
+                                                       .adult_stray_wild = .adult_stray_wild,
+                                                       .adult_stray_natal_flow = .adult_stray_natal_flow,
+                                                       .adult_stray_cross_channel_gates_closed = .adult_stray_cross_channel_gates_closed,
+                                                       .adult_stray_prop_bay_trans = .adult_stray_prop_bay_trans,
+                                                       .adult_stray_prop_delta_trans = .adult_stray_prop_delta_trans)
 
-      # for all years and months 10-12 there is always at least one true
+    # for all years and months 10-12 there is always at least one true
     bypass_is_overtopped <- sapply(10:12, function(month) {
 
       tis <- gates_overtopped[month, year, 1] * tisdale_bypass_watershed

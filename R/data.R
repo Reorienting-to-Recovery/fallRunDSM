@@ -308,5 +308,17 @@ NULL
 #' @title Hatchery Stray Model
 #' @description
 #' A serialized version of the beta-regression model for hatchery origin fish straying
-#' @export
 "hatchery_stray_betareg"
+
+
+#' @title Hatchery to Chipps Island (rkm)
+#' @description
+#' Lookup for distances from hatchery to the Chipps Island, measured in river kilometers
+"hatchery_to_bay_distance"
+
+#' @title Bay Proportion Hatchery Releases
+#' @description
+#' The proporiton of hatchery releases occuring at the Bay. Note that the complement
+#' `1 - hatchery_release_proportion_bay` is the proportion of releases occuring in-river.
+#'@md
+"hatchery_release_proportion_bay"

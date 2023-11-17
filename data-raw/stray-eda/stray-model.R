@@ -187,10 +187,12 @@ summary(base) #r2=0.47
 ###########################################################################
 ###########################################################################
 
-hatchery_stray <- betareg(
+hatchery_stray_betareg <- betareg(
   transf(stray_ind) ~ hatchery*dist_hatch + run_year + age + Total_N + rel_month
   + flow.1011 + flow_discrep + mean_PDO_retn, link = "probit",weights = log(tot_N_rec+1), data = data2
 )
+
+usethis::use_data(hatchery_stray_betareg, overwrite = TRUE)
 
 
 rec <- recipes::recipe(stray_ind ~ hatchery + dist_hatch + run_year + age + Total_N + rel_month
@@ -214,7 +216,7 @@ data2 |>
   ) |>
   glimpse()
 
-normlize_with_known <- function(x, mean, sd) {
+normalize_with_known <- function(x, mean, sd) {
   (x - mean) / (sd)
 }
 

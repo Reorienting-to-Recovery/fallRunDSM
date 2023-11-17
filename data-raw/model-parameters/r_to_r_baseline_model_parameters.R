@@ -115,6 +115,7 @@ r_to_r_baseline_params <- list(
   proportion_flow_bypass = DSMflow::proportion_flow_bypasses$biop_itp_2018_2019,
   gates_overtopped = DSMflow::gates_overtopped$biop_itp_2018_2019,
 
+
   # DSMtemperature variables -----
   vernalis_temps = DSMtemperature::vernalis_temperature,
   prisoners_point_temps = DSMtemperature::prisoners_point_temperature,
@@ -226,7 +227,12 @@ r_to_r_baseline_params <- list(
   # R2R specific metrics
   hatchery_release = fallRunDSM::fall_hatchery_release,
   hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
-  fecundity_lookup = fallRunDSM::fecundity_by_age
+  fecundity_lookup = fallRunDSM::fecundity_by_age,
+
+
+  # stray model
+  flows_oct_nov = DSMflow::hatchery_oct_nov_flows,
+  flows_apr_may = DSMflow::hatchery_apr_may_flows
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)

@@ -133,4 +133,39 @@ usethis::use_data(watershed_attributes, overwrite = TRUE)
 # TODO eventually clean up and move into this script
 
 
+# distances from hatchery to bay
+hatchery_to_bay_distance <- c(445, 239, 138, 133, 270)
+names(hatchery_to_bay_distance) <- c("coleman", "feather", "nimbus", "mokelumne", "merced")
+usethis::use_data(hatchery_to_bay_distance, overwrite = TRUE)
 
+all_data <- read_csv("data-raw/stray-eda/alldata_formodel_031918.csv")
+betareg_normalizing_context <- all_data |>
+  select(dist_hatch, run_year, age, Total_N, rel_month, flow.1011, flow_discrep, mean_PDO_retn) |>
+  map(\(x) list("mean" = mean(x), "sd" = sd(x)))
+
+usethis::use_data(betareg_normalizing_context, overwrite = TRUE)
+
+hatchery_to_watershed_lookup <- c(
+  "coleman" = "Battle Creek",
+  "feather" = "Feather River",
+  "nimbus" = "American River",
+  "mokelumne" = "Mokelumne River",
+  "merced" = "Merced River"
+)
+usethis::use_data(hatchery_to_watershed_lookup, overwrite = TRUE)
+
+
+
+# proportion of in-river vs bay releases
+hatchery_release_proportion_bay <- rep(0, 31)
+# names(hatchery_release_proportion_bay1) <- fallRunDSM::watershed_labels
+usethis::use_data(hatchery_release_proportion_bay)
+
+
+# mean PDO
+raw_ocean_pdo <- read_csv("data-raw/stray-eda/PDO_monthly_Mantua.csv", skip = 1, col_names = c("year", "month", "PDO"))
+monthly_mean_pdo <- raw_ocean_pdo |>
+  filter(year %in% 1980:2002) |>
+  mutate(date = as_date(paste0(year, "-", month, "-01")))
+
+usethis::use_data(monthly_mean_pdo, overwrite = TRUE)

@@ -41,6 +41,8 @@ cwt_stray_data <- read_csv(system.file("extdata", "straying-data", "cwt_stray.cs
 release_data <- read_csv(system.file("extdata", "straying-data", "releases.csv", 
                        package = "fallRunDSM", mustWork = TRUE))
 
+release_data |> filter(Wild == 1)
+
 cross_channel_data <- read_csv(system.file("extdata", "straying-data", "crxchan.csv", 
                                            package = "fallRunDSM", mustWork = TRUE)) %>% 
   rename("run_year" = Run.year,

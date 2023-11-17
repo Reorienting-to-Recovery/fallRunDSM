@@ -52,14 +52,7 @@ compute_adult_stray_rates <- function(type = c("natural", "hatchery"), sim_year,
     stray_rate = prediction
   )
 
-  if (type == "natural") {
-    stray_rates |>
-      filter(watershed == "Feather River")
-  } else {
-    stray_rates
-  }
-
-
+    stray_rates_to_matrix(stray_rates, type = type)
 }
 
 #' @title Normalize data with context data
@@ -269,3 +262,49 @@ prepare_stray_model_data <- function(hatchery, type = c("natural", "hatchery"), 
   )
 }
 
+
+
+#' @keywords internal
+stray_rates_to_matrix <- function(data, type) {
+  out <- vector(mode = "list")
+  out$natural <- NA
+  out$release_bay <- NA
+  out$release_river <- NA
+
+  if (type == "natural") {
+    # natural origin fish
+    out$natural <- data |>
+      filter(watershed == "Feather River", stray_type == "natural") |>
+      pivot_wider(names_from = "age", values_from = "stray_rate") |>
+      slice(rep(1:n(), each = 31)) |>
+      select(`2`:`5`) |>
+      as.matrix() |>
+      `row.names<-`(watershed_labels)
+  } else {
+    # rates dataframe to the matrix for bay hatchery
+    out$release_bay <- data |>
+      filter(stray_type == "release bay") |>
+      pivot_wider(values_from = "stray_rate", names_from = "age") |>
+      select(-sim_year, -stray_type) |>
+      right_join(select(watershed_attributes, watershed, order)) |>
+      arrange(order) |>
+      mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
+      select(-watershed, -order) |>
+      as.matrix() |>
+      `row.names<-`(watershed_labels)
+
+    # rates for river release fish
+    out$release_river <- data |>
+      filter(stray_type == "release river") |>
+      pivot_wider(values_from = "stray_rate", names_from = "age") |>
+      select(-sim_year, -stray_type) |>
+      right_join(select(watershed_attributes, watershed, order)) |>
+      arrange(order) |>
+      mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
+      select(-watershed, -order) |>
+      as.matrix() |>
+      `row.names<-`(watershed_labels)
+  }
+
+  return(out)
+}

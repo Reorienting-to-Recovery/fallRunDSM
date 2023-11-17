@@ -101,3 +101,36 @@ hatchery_origin_new_data <- new_data_for_predictions(
 
 predict(fallRunDSM::hatchery_stray_betareg, newdata = hatchery_origin_new_data)
 
+# rates dataframe to the matrix for bay hatchery
+stray_rates |>
+  filter(stray_type == "release bay") |>
+  pivot_wider(values_from = "stray_rate", names_from = "age") |>
+  select(-sim_year, -stray_type) |>
+  right_join(select(watershed_attributes, watershed, order)) |>
+  arrange(order) |>
+  mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
+  select(-watershed, -order) |>
+  as.matrix() |>
+  `row.names<-`(watershed_labels)
+
+# rates for river release fish
+stray_rates |>
+  filter(stray_type == "release river") |>
+  pivot_wider(values_from = "stray_rate", names_from = "age") |>
+  select(-sim_year, -stray_type) |>
+  right_join(select(watershed_attributes, watershed, order)) |>
+  arrange(order) |>
+  mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
+  select(-watershed, -order) |>
+  as.matrix() |>
+  `row.names<-`(watershed_labels)
+
+# natural origin fish
+stray_rates |>
+  filter(watershed == "Feather River", stray_type == "release bay") |> # <- stray_type will be change to "natural"
+  pivot_wider(names_from = "age", values_from = "stray_rate") |>
+  slice(rep(1:n(), each = 31)) |>
+  select(`2`:`5`) |>
+  as.matrix() |>
+  `row.names<-`(watershed_labels)
+

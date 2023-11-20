@@ -133,6 +133,18 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     }
     # end updated logic --------------------------------------------------------
 
+    # do harvest
+    # adults <- apply_harvest(year, natural_adults, hatchery_adults)
+
+    # do straying
+    if (year > 2) {
+      nat_adults <- output$returning_adults |> filter(return_sim_year == year, origin == "natural") |> mutate(age = return_sim_year - sim_year)
+      hatch_adults <- output$returning_adults |> filter(return_sim_year == year, origin == "hatchery") |> mutate(age = return_sim_year - sim_year)
+
+      adults <- apply_straying(year, adults = output$returning_adults)
+    }
+
+
     # returning adults are here: round(adults)
     spawners <- get_spawning_adults(year, round(adults), hatch_adults, mode = mode,
                                     month_return_proportions = ..params$month_return_proportions,

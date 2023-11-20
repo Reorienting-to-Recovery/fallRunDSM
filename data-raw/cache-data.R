@@ -169,3 +169,58 @@ monthly_mean_pdo <- raw_ocean_pdo |>
   mutate(date = as_date(paste0(year, "-", month, "-01")))
 
 usethis::use_data(monthly_mean_pdo, overwrite = TRUE)
+
+
+straying_destinations <-
+  matrix(nrow = 31, ncol = 6, dimnames = list(watershed_labels, c(names(fallRunDSM::hatchery_to_watershed_lookup), "default")))
+
+default_prop_coleman <- ((100 - 35 - 13 - 12)/28)/100
+default_prop_feather <- ((100 - 44 - 16 - 14)/28)/100
+default_prop_nimbus <- ((100 - 41 - 18)/29)/100
+default_prop_mokelumne <- ((100 - 44 - 21 )/29)/100
+default_prop_merced <- ((100 - 25 - 20 - 14 )/28)/100
+
+straying_destinations[, "coleman"] <- default_prop_coleman
+straying_destinations["Feather River", "coleman"] <- .13
+straying_destinations["Upper Sacramento River", "coleman"] <- .35
+straying_destinations["Clear Creek", "coleman"] <- .12
+
+straying_destinations[, "feather"] <- default_prop_feather
+straying_destinations["Upper Sacramento River", "feather"] <- .44
+straying_destinations["Yuba River", "feather"] <- .16
+straying_destinations["Clear Creek", "feather"] <- .14
+
+straying_destinations[, "nimbus"] <- default_prop_nimbus
+straying_destinations["Mokelumne River", "nimbus"] <- .41
+straying_destinations["Yuba River", "nimbus"] <- .18
+
+
+straying_destinations[, "mokelumne"] <- default_prop_mokelumne
+straying_destinations["American River", "mokelumne"] <- .44
+straying_destinations["Stanislaus River", "mokelumne"] <- .21
+
+
+straying_destinations[, "merced"] <- default_prop_merced
+straying_destinations["Mokelumne River", "merced"] <- .25
+straying_destinations["Stanislaus River", "merced"] <- .20
+straying_destinations["American River", "merced"] <- .14
+
+straying_destinations[, "default"] <- 1/31
+
+
+# TODO make the non spawning locations be 0
+usethis::use_data(straying_destinations, overwrite = TRUE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

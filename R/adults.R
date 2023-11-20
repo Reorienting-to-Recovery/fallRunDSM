@@ -190,6 +190,3 @@ prepare_stray_model_data <- function(hatchery, type = c("natural", "hatchery"), 
   )
 }
 
-
-
-

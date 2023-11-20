@@ -322,3 +322,9 @@ NULL
 #' `1 - hatchery_release_proportion_bay` is the proportion of releases occuring in-river.
 #'@md
 "hatchery_release_proportion_bay"
+
+
+#' @title Straying Destnations
+#' @description
+#' Given a hatchery this matrix returns as rows the proportion of fish to stray at perticular watersheds.
+"straying_destinations"

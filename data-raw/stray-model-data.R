@@ -99,5 +99,34 @@ hatchery_origin_new_data <- new_data_for_predictions(
   released = sum(fallRunDSM::r_to_r_baseline_params$hatchery_release[hatchery_to_watershed_lookup["nimbus"], ]),
   mean_PDO_return = mean(monthly_mean_pdo[monthly_mean_pdo$month == 1, ]$PDO))
 
-predict(fallRunDSM::hatchery_stray_betareg, newdata = hatchery_origin_new_data)
+hatchery <- "nimbus"
+run_year <- 1983
+released <- fallRunDSM::r_to_r_baseline_params$hatchery_release
+flow_oct_nov <- fallRunDSM::r_to_r_baseline_params$flows_oct_nov["American River", "1983"]
+flow_apr_may <- fallRunDSM::r_to_r_baseline_params$flows_apr_may["American River", "1983"]
+mean_PDO_return <- fallRunDSM::monthly_mean_pdo |> filter(year == 1983, month == 1) |> pull(PDO)
+flow_discrep <- flow_oct_nov - flow_apr_may
+
+d <- expand_grid(
+  hatchery = hatchery,
+  dist_hatch = normalize_with_params(
+    50,
+    betareg_normalizing_context$dist_hatch$mean,
+    betareg_normalizing_context$dist_hatch$sd),
+  run_year = normalize_with_params(
+    1983, betareg_normalizing_context$run_year$mean, betareg_normalizing_context$run_year$sd
+  ),
+  age = normalize_with_params(2:5, betareg_normalizing_context$age$mean, betareg_normalizing_context$age$sd),
+  Total_N = normalize_with_params(sum(released["American River",]), betareg_normalizing_context$Total_N$mean, betareg_normalizing_context$Total_N$sd),
+  rel_month = normalize_with_params(1, betareg_normalizing_context$rel_month$mean, betareg_normalizing_context$rel_month$sd),
+  flow.1011 = normalize_with_params(flow_oct_nov, betareg_normalizing_context$flow.1011$mean, betareg_normalizing_context$flow.1011$sd),
+  flow_discrep = normalize_with_params(
+    flow_discrep,
+    betareg_normalizing_context$flow_discrep$mean,
+    betareg_normalizing_context$flow_discrep$sd),
+  mean_PDO_retn = normalize_with_params(mean_PDO_return, betareg_normalizing_context$mean_PDO_retn$mean, betareg_normalizing_context$mean_PDO_retn$sd)
+)
+
+
+predict(fallRunDSM::hatchery_stray_betareg, newdata = d)
 

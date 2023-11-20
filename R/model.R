@@ -138,12 +138,19 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # do straying
     if (year > 2) {
-      nat_adults <- output$returning_adults |> filter(return_sim_year == year, origin == "natural") |> mutate(age = return_sim_year - sim_year)
-      hatch_adults <- output$returning_adults |> filter(return_sim_year == year, origin == "hatchery") |> mutate(age = return_sim_year - sim_year)
 
-      adults <- apply_straying(year, adults = output$returning_adults)
+      nat_adults <- output$returning_adults |>
+        filter(return_sim_year == year, origin == "natural") |>
+        mutate(age = return_sim_year - sim_year)
+      hatch_adults <- output$returning_adults |>
+        filter(return_sim_year == year, origin == "hatchery") |>
+        mutate(age = return_sim_year - sim_year)
+
+      adults <- apply_straying(year, nat_adults, hatch_adults, total_releases = ..params$hathcery_release,
+                               release_month = 1, flows_oct_nov = ..params$flows_oct_nov, flows_apr_may = ..params$flows_apr_may,
+                               fallRunDSM::monthly_mean_pdo)
+
     }
-
 
     # returning adults are here: round(adults)
     spawners <- get_spawning_adults(year, round(adults), hatch_adults, mode = mode,

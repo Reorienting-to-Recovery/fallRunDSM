@@ -11,21 +11,42 @@
 apply_straying <- function(year, natural_adults, hatchery_adults, total_releases,
                            release_month, flows_oct_nov, flows_apr_may, monthly_mean_pdo) {
 
+  nat_adults_temp <- natural_adults |>
+    pivot_wider(names_from = "age", values_from = "return_total") |>
+    transmute( `2`, `3` = 0, `4` = 0, `5` = 0) |>
+    as.matrix() |>
+    `row.names<-`(watershed_labels)
+
+
+  hatch_adults_temp <- hatchery_adults |>
+    pivot_wider(names_from = "age", values_from = "return_total") |>
+    transmute( `2`, `3` = 0, `4` = 0, `5` = 0) |>
+    as.matrix() |>
+    `row.names<-`(watershed_labels)
+
   # TODO just use the values that are generated as part of the hatchery calculation for the natural stray rates, this way we only make the calculation once
   # calculate the straying
   natural_stray_rates <- compute_adult_stray_rates(type = "natural", sim_year = year, total_releases = total_releases,
                                                    released_month = release_month, flows_oct_nov = flows_oct_nov, flows_apr_may = flows_apr_may,
                                                    mean_pdo_return = monthly_mean_pdo)
 
-  natural_stray_rates <- compute_adult_stray_rates(type = "hatchery", sim_year = year, total_releases = total_releases,
+  hatchery_stray_rates <- compute_adult_stray_rates(type = "hatchery", sim_year = year, total_releases = total_releases,
                                                    released_month = release_month, flows_oct_nov = flows_oct_nov, flows_apr_may = flows_apr_may,
                                                    mean_pdo_return = monthly_mean_pdo)
 
   # apply stray to natural
+  strayed_natural_adults <- round(nat_adults_temp * natural_stray_rates$natural)
+
 
   # apply stray to hatchery
+  # prop of in river vs prop in bay releases
+  in_bay_releases <- hatch_adults_temp * fallRunDSM::hatchery_release_proportion_bay
+  in_river_releases <- hatch_adults_temp * (1 - fallRunDSM::hatchery_release_proportion_bay)
+
+  strayed_hatchery_adults <- ceiling(in_bay_releases * hatchery_stray_rates$release_bay + in_river_releases * hatchery_stray_rates$release_river)
 
   # reallocate strays
+
 
 
 }
@@ -106,7 +127,7 @@ stray_rates_to_matrix <- function(data, type) {
   if (type == "natural") {
     # natural origin fish
     out$natural <- data |>
-      filter(watershed == "Feather River", stray_type == "natural") |>
+      filter(watershed == "American River", stray_type == "natural") |>
       pivot_wider(names_from = "age", values_from = "stray_rate") |>
       slice(rep(1:n(), each = 31)) |>
       select(`2`:`5`) |>

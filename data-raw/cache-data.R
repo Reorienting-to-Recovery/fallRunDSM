@@ -211,12 +211,15 @@ straying_destinations[, "default"] <- 1/31
 # TODO make the non spawning locations be 0
 usethis::use_data(straying_destinations, overwrite = TRUE)
 
+natural_straying_destinations <- matrix(1/31, nrow = 31, ncol = 4)
+
+rmultinom(n = 1, size = matrix(1:4, ncol = 2), prob = matrix(1:4, ncol = 2))
 
 
 
-
-
-
+sapply(1:4, function(i) {
+  col
+})
 
 
 

@@ -17,7 +17,6 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
     as.matrix() |>
     `row.names<-`(watershed_labels)
 
-
   hatch_adults_temp <- hatchery_adults |>
     pivot_wider(names_from = "age", values_from = "return_total") |>
     transmute( `2`, `3` = 0, `4` = 0, `5` = 0) |>
@@ -45,7 +44,19 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
 
   strayed_hatchery_adults <- ceiling(in_bay_releases * hatchery_stray_rates$release_bay + in_river_releases * hatchery_stray_rates$release_river)
 
+  lapply(1:4, function(age) {
+    coleman <- rmultinom(n = 1, size = strayed_hatchery_adults["Battle Creek", age], prob = straying_destinations[, "coleman"])
+    feather <- rmultinom(n = 1, size = strayed_hatchery_adults["Feather River", age], prob = straying_destinations[, "feather"])
+    nimbus <- rmultinom(n = 1, size = strayed_hatchery_adults["American River", age], prob = straying_destinations[, "nimbus"])
+    mokelumne <- rmultinom(n = 1, size = strayed_hatchery_adults["Mokelumne River", age], prob = straying_destinations[, "mokelumne"])
+    merced <- rmultinom(n = 1, size = strayed_hatchery_adults["Merced River", age], prob = straying_destinations[, "merced"])
+
+    cbind(coleman, feather, nimbus, mokelumne, merced)
+  })
+
   # reallocate strays
+
+
 
 
 

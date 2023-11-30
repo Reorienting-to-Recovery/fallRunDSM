@@ -43,22 +43,57 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
   in_river_releases <- hatch_adults_temp * (1 - fallRunDSM::hatchery_release_proportion_bay)
 
   strayed_hatchery_adults <- ceiling(in_bay_releases * hatchery_stray_rates$release_bay + in_river_releases * hatchery_stray_rates$release_river)
+  strayed_hatchery_adults[is.nan(strayed_hatchery_adults)] <- 0
+  strayed_natural_adults[is.nan(strayed_natural_adults)] <- 0
 
-  lapply(1:4, function(age) {
-    coleman <- rmultinom(n = 1, size = strayed_hatchery_adults["Battle Creek", age], prob = straying_destinations[, "coleman"])
-    feather <- rmultinom(n = 1, size = strayed_hatchery_adults["Feather River", age], prob = straying_destinations[, "feather"])
-    nimbus <- rmultinom(n = 1, size = strayed_hatchery_adults["American River", age], prob = straying_destinations[, "nimbus"])
-    mokelumne <- rmultinom(n = 1, size = strayed_hatchery_adults["Mokelumne River", age], prob = straying_destinations[, "mokelumne"])
-    merced <- rmultinom(n = 1, size = strayed_hatchery_adults["Merced River", age], prob = straying_destinations[, "merced"])
 
-    cbind(coleman, feather, nimbus, mokelumne, merced)
+
+  # hatchery origin
+  hatchery_strays <- lapply(1:4, function(age) {
+
+    age_strays <- lapply(fallRunDSM::hatchery_to_watershed_lookup, function(w) {
+      rmultinom(n = 1, size = strayed_hatchery_adults[w, age], prob = straying_destinations[, fallRunDSM::watershed_to_hatchery_lookup[w]])
+    })
+
+    allocated <- matrix(0, ncol = 1, nrow = 31)
+    for (i in seq_along(fallRunDSM::hatchery_to_watershed_lookup)) {
+      allocated <- allocated + age_strays[[i]]
+    }
+
+    return(allocated)
+
   })
 
-  # reallocate strays
+  hatchery_strays_allocated <- cbind(hatchery_strays[[1]], hatchery_strays[[2]], hatchery_strays[[3]], hatchery_strays[[4]])
+  hatchery_adults_after_stray <- hatch_adults_temp - strayed_hatchery_adults + hatchery_strays_allocated
 
+  # natural origin
+  natural_strays <- lapply(1:4, function(age) {
 
+    age_strays <- lapply(fallRunDSM::watershed_labels, function(w) {
+      rmultinom(n = 1, size = strayed_natural_adults[w, age], prob = straying_destinations[, "default"])
+    })
 
+    allocated <- matrix(0, ncol = 1, nrow = 31)
+    for (i in 1:31) {
+      allocated <- allocated + age_strays[[i]]
+    }
 
+    return(allocated)
+
+  })
+
+  natural_strays_allocated <- cbind(natural_strays[[1]], natural_strays[[2]], natural_strays[[3]], natural_strays[[4]])
+  natural_adults_after_stray <- nat_adults_temp - strayed_natural_adults + natural_strays_allocated
+
+  # TODO what prop natural to report when 0 fish present at the watershed
+  proportion_natural <- rowSums(natural_adults_after_stray / (natural_adults_after_stray + hatchery_adults_after_stray), na.rm = TRUE)
+
+  return(list(
+    natural = natural_adults_after_stray,
+    hatchery = hathcery_adults_after_stray,
+    proportion_natural = proportion_natural
+  ))
 
 }
 

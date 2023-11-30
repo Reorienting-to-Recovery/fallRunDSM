@@ -154,6 +154,10 @@ hatchery_to_watershed_lookup <- c(
 )
 usethis::use_data(hatchery_to_watershed_lookup, overwrite = TRUE)
 
+watershed_to_hatchery_lookup <- names(fallRunDSM::hatchery_to_watershed_lookup)
+names(watershed_to_hatchery_lookup) <- fallRunDSM::hatchery_to_watershed_lookup
+
+usethis::use_data(watershed_to_hatchery_lookup, overwrite = TRUE)
 
 
 # proportion of in-river vs bay releases
@@ -214,16 +218,5 @@ usethis::use_data(straying_destinations, overwrite = TRUE)
 natural_straying_destinations <- matrix(1/31, nrow = 31, ncol = 4)
 
 rmultinom(n = 1, size = matrix(1:4, ncol = 2), prob = matrix(1:4, ncol = 2))
-
-
-
-sapply(1:4, function(i) {
-  col
-})
-
-
-
-
-
 
 

@@ -133,20 +133,22 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     }
     # end updated logic --------------------------------------------------------
 
-    # do harvest
-    # adults <- apply_harvest(year, natural_adults, hatchery_adults)
+    # # do harvest
+    if (year > 2) {
 
+    adults <- harvest_adults(output$returning_adults, year, hatchery_allocation = ..params$hatchery_allocation, ocean_harvest_percentage = .5,
+                             tributary_harvest_percentage = rep(.07, 31),
+                             restrict_harvest_to_hatchery = FALSE,
+                             no_cohort_harvest_years = 1998,
+                             intelligent_crr_harvest = FALSE
+    )
+
+    }
     # do straying
     if (year > 2) {
 
-      nat_adults <- output$returning_adults |>
-        filter(return_sim_year == year, origin == "natural") |>
-        mutate(age = return_sim_year - sim_year)
-      hatch_adults <- output$returning_adults |>
-        filter(return_sim_year == year, origin == "hatchery") |>
-        mutate(age = return_sim_year - sim_year)
 
-      adults <- apply_straying(year, nat_adults, hatch_adults, total_releases = ..params$hathcery_release,
+      adults <- apply_straying(year, adults$natural_adults, adults$hatchery_adults, total_releases = ..params$hathcery_release,
                                release_month = 1, flows_oct_nov = ..params$flows_oct_nov, flows_apr_may = ..params$flows_apr_may,
                                fallRunDSM::monthly_mean_pdo)
 

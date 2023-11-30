@@ -11,18 +11,6 @@
 apply_straying <- function(year, natural_adults, hatchery_adults, total_releases,
                            release_month, flows_oct_nov, flows_apr_may, monthly_mean_pdo) {
 
-  nat_adults_temp <- natural_adults |>
-    pivot_wider(names_from = "age", values_from = "return_total") |>
-    transmute( `2`, `3` = 0, `4` = 0, `5` = 0) |>
-    as.matrix() |>
-    `row.names<-`(watershed_labels)
-
-  hatch_adults_temp <- hatchery_adults |>
-    pivot_wider(names_from = "age", values_from = "return_total") |>
-    transmute( `2`, `3` = 0, `4` = 0, `5` = 0) |>
-    as.matrix() |>
-    `row.names<-`(watershed_labels)
-
   # TODO just use the values that are generated as part of the hatchery calculation for the natural stray rates, this way we only make the calculation once
   # calculate the straying
   natural_stray_rates <- compute_adult_stray_rates(type = "natural", sim_year = year, total_releases = total_releases,
@@ -33,23 +21,25 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
                                                    released_month = release_month, flows_oct_nov = flows_oct_nov, flows_apr_may = flows_apr_may,
                                                    mean_pdo_return = monthly_mean_pdo)
 
+  natural_ages <- ncol(natural_adults)
+  hatchery_ages <- ncol(hatchery_adults)
   # apply stray to natural
-  strayed_natural_adults <- round(nat_adults_temp * natural_stray_rates$natural)
+  strayed_natural_adults <- round(natural_adults * natural_stray_rates$natural[,natural_ages])
 
 
   # apply stray to hatchery
   # prop of in river vs prop in bay releases
-  in_bay_releases <- hatch_adults_temp * fallRunDSM::hatchery_release_proportion_bay
-  in_river_releases <- hatch_adults_temp * (1 - fallRunDSM::hatchery_release_proportion_bay)
+  in_bay_releases <- hatchery_adults * fallRunDSM::hatchery_release_proportion_bay
+  in_river_releases <- hatchery_adults * (1 - fallRunDSM::hatchery_release_proportion_bay)
 
-  strayed_hatchery_adults <- ceiling(in_bay_releases * hatchery_stray_rates$release_bay + in_river_releases * hatchery_stray_rates$release_river)
+  strayed_hatchery_adults <- ceiling(in_bay_releases * hatchery_stray_rates$release_bay[,hatchery_ages] + in_river_releases * hatchery_stray_rates$release_river[,hatchery_ages])
   strayed_hatchery_adults[is.nan(strayed_hatchery_adults)] <- 0
   strayed_natural_adults[is.nan(strayed_natural_adults)] <- 0
 
 
 
   # hatchery origin
-  hatchery_strays <- lapply(1:4, function(age) {
+  hatchery_strays <- lapply(1:hatchery_ages, function(age) {
 
     age_strays <- lapply(fallRunDSM::hatchery_to_watershed_lookup, function(w) {
       rmultinom(n = 1, size = strayed_hatchery_adults[w, age], prob = straying_destinations[, fallRunDSM::watershed_to_hatchery_lookup[w]])
@@ -64,8 +54,13 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
 
   })
 
-  hatchery_strays_allocated <- cbind(hatchery_strays[[1]], hatchery_strays[[2]], hatchery_strays[[3]], hatchery_strays[[4]])
-  hatchery_adults_after_stray <- hatch_adults_temp - strayed_hatchery_adults + hatchery_strays_allocated
+  if (hatchery_ages > 1) {
+    hatchery_strays_allocated <- do.call(cbind, hatchery_strays)
+  } else {
+    hatchery_strays_allocated <- hatchery_strays[[1]]
+  }
+
+  hatchery_adults_after_stray <- hatchery_adults - strayed_hatchery_adults + hatchery_strays_allocated
 
   # natural origin
   natural_strays <- lapply(1:4, function(age) {
@@ -83,15 +78,20 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
 
   })
 
-  natural_strays_allocated <- cbind(natural_strays[[1]], natural_strays[[2]], natural_strays[[3]], natural_strays[[4]])
-  natural_adults_after_stray <- nat_adults_temp - strayed_natural_adults + natural_strays_allocated
+  if (natural_ages > 1) {
+    natural_strays_allocated <- do.call(cbind, natural_strays)
+  } else {
+    natural_strays_allocated <- natural_strays[[1]]
+  }
+
+  natural_adults_after_stray <- natural_adults - strayed_natural_adults + natural_strays_allocated
 
   # TODO what prop natural to report when 0 fish present at the watershed
   proportion_natural <- rowSums(natural_adults_after_stray / (natural_adults_after_stray + hatchery_adults_after_stray), na.rm = TRUE)
 
   return(list(
     natural = natural_adults_after_stray,
-    hatchery = hathcery_adults_after_stray,
+    hatchery = hatchery_adults_after_stray,
     proportion_natural = proportion_natural
   ))
 

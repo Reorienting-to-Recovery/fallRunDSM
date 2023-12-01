@@ -121,14 +121,123 @@ stray_returning_adults <- function(monthly_adult_returns,
 #' @source IP-117068
 #' @export
 
-surv_adult_enroute <- function(migratory_temp, bypass_overtopped, adult_harvest,
+surv_adult_enroute <- function(migratory_temp, bypass_overtopped,
                                ..surv_adult_enroute_int = fallRunDSM::params$..surv_adult_enroute_int,
                                .migratory_temp = fallRunDSM::params$.adult_en_route_migratory_temp,
                                .bypass_overtopped = fallRunDSM::params$.adult_en_route_bypass_overtopped) {
 
   pmax(boot::inv.logit(..surv_adult_enroute_int +
                        .migratory_temp * migratory_temp +
-                       .bypass_overtopped * bypass_overtopped) - adult_harvest, 0)
+                       .bypass_overtopped * bypass_overtopped), 0)
+}
+
+#' Apply enroute survival to adult salmon
+#'
+#' This function calculates the survival of adult salmon during their enroute migration.
+#'
+#' @param year The year of the simulation.
+#' @param month The starting month of the simulation.
+#' @param adults A data frame containing information about adult salmon.
+#' @param month_return_proportions A vector of proportions for each month.
+#' @param gates_overtopped A three-dimensional array containing information about gates overtopped.
+#' @param tisdale_bypass_watershed A parameter related to the Tisdale bypass watershed.
+#' @param yolo_bypass_watershed A parameter related to the Yolo bypass watershed.
+#' @param migratory_temperature_proportion_over_20 A matrix containing proportions of migratory temperatures over 20 degrees.
+#' @param ..surv_adult_enroute_int Additional parameters for adult enroute survival.
+#' @param .adult_en_route_migratory_temp Parameter for adult enroute survival related to migratory temperature.
+#' @param .adult_en_route_bypass_overtopped Parameter for adult enroute survival related to bypass overtopped.
+#' @param .adult_en_route_adult_harvest_rate Parameter for adult enroute survival related to adult harvest rate.
+#' @param stochastic Logical indicating whether to include stochastic elements in the simulation.
+#'
+#' @return A list containing the initial number of adults, the proportion of natural adults, and the initial number of adults by month.
+#'
+#'
+#' @export
+apply_enroute_survival <- function(year,
+                                   month,
+                                   adults,
+                                   month_return_proportions,
+                                   gates_overtopped,
+                                   tisdale_bypass_watershed,
+                                   yolo_bypass_watershed,
+                                   migratory_temperature_proportion_over_20,
+                                   ..surv_adult_enroute_int,
+                                   .adult_en_route_migratory_temp,
+                                   .adult_en_route_bypass_overtopped,
+                                   .adult_en_route_adult_harvest_rate,
+                                   stochastic) {
+  # Do adults by month
+  # Natural Adults
+  natural_adults_by_month <- t(sapply(1:31, function(watershed) {
+    if (stochastic) {
+      rmultinom(1, rowSums(adults$natural)[watershed], month_return_proportions)
+    } else {
+      round(rowSums(adults$natural)[watershed] * month_return_proportions)
+    }
+  }))
+
+  # Hatchery Adults
+  hatchery_adults_by_month <- t(sapply(1:31, function(watershed) {
+    if (stochastic) {
+      rmultinom(1, rowSums(adults$hatchery)[watershed], month_return_proportions)
+    } else {
+      round(rowSums(adults$hatchery)[watershed] * month_return_proportions)
+    }
+  }))
+
+
+  # for all years and months 10-12 there is always at least one true
+  bypass_is_overtopped <- sapply(10:12, function(month) {
+
+    tis <- gates_overtopped[month, year, 1] * tisdale_bypass_watershed
+    yolo <- gates_overtopped[month, year, 2] * yolo_bypass_watershed
+    as.logical(tis + yolo)
+  })
+
+  en_route_temps <- migratory_temperature_proportion_over_20[, 10:12]
+
+  adult_en_route_surv <- pmin(sapply(1:3, function(month) {
+    adult_en_route_surv <- surv_adult_enroute(migratory_temp = en_route_temps[,month],
+                                              bypass_overtopped = bypass_is_overtopped[,month],
+                                              ..surv_adult_enroute_int = ..surv_adult_enroute_int,
+                                              .migratory_temp = .adult_en_route_migratory_temp,
+                                              .bypass_overtopped = .adult_en_route_bypass_overtopped)
+  }), 1)
+
+  # Natural adults
+  natural_adults_survived_to_spawning <- sapply(1:3, function(month) {
+    if (stochastic) {
+      rbinom(31, round(natural_adults_by_month[, month]), adult_en_route_surv[, month])
+    } else {
+      round(natural_adults_by_month[, month] * adult_en_route_surv[, month])
+    }
+  })
+  # APPLY NAT ADULT REMOVAL RATE (SHOULD THIS ACTUALLY BE APPLIED TO HATCHERY FISH)
+  natural_adults_survived_to_spawning_minus_nat_adult_removal <- sapply(1:3, function(month) {
+    if (stochastic) {
+      rbinom(31, round(natural_adults_survived_to_spawning[, month]), (1 - natural_adult_removal_rate))
+    } else {
+      round(natural_adults_survived_to_spawning[, month] * (1 - natural_adult_removal_rate))
+    }
+  })
+  # Hatchery
+  hathery_adults_survived_to_spawning <- sapply(1:3, function(month) {
+    if (stochastic) {
+      rbinom(31, round(hatchery_adults_by_month[, month]), adult_en_route_surv[, month])
+    } else {
+      round(hatchery_adults_by_month[, month] * adult_en_route_surv[, month])
+    }
+  })
+  # TODO remove fish in non spawn regions
+  surviving_natural_adults <- ifelse(rowSums(natural_adults_survived_to_spawning_minus_nat_adult_removal) < 0, 0,
+                                     rowSums(natural_adults_survived_to_spawning_minus_nat_adult_removal))
+  surviving_hatchery_adults <- ifelse(rowSums(hathery_adults_survived_to_spawning) < 0, 0, rowSums(hathery_adults_survived_to_spawning))
+  init_adults <- surviving_natural_adults + surviving_hatchery_adults
+  proportion_natural <- surviving_natural_adults / init_adults
+
+  list(init_adults = round(init_adults),
+       proportion_natural = replace(proportion_natural, is.nan(proportion_natural), 0)
+  ) # TODO do we need inut adult by month
 }
 
 #' @title Adult Prespawn Survival

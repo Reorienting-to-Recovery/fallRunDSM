@@ -13,13 +13,21 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
 
   # TODO just use the values that are generated as part of the hatchery calculation for the natural stray rates, this way we only make the calculation once
   # calculate the straying
-  natural_stray_rates <- compute_adult_stray_rates(type = "natural", sim_year = year, total_releases = total_releases,
-                                                   released_month = release_month, flows_oct_nov = flows_oct_nov, flows_apr_may = flows_apr_may,
+  natural_stray_rates <- compute_adult_stray_rates(type = "natural",
+                                                   sim_year = year,
+                                                   total_releases = total_releases,
+                                                   released_month = release_month,
+                                                   flows_oct_nov = flows_oct_nov,
+                                                   flows_apr_may = flows_apr_may,
                                                    mean_pdo_return = monthly_mean_pdo)
 
-  hatchery_stray_rates <- compute_adult_stray_rates(type = "hatchery", sim_year = year, total_releases = total_releases,
-                                                   released_month = release_month, flows_oct_nov = flows_oct_nov, flows_apr_may = flows_apr_may,
-                                                   mean_pdo_return = monthly_mean_pdo)
+  hatchery_stray_rates <- compute_adult_stray_rates(type = "hatchery",
+                                                    sim_year = year,
+                                                    total_releases = total_releases,
+                                                    released_month = release_month,
+                                                    flows_oct_nov = flows_oct_nov,
+                                                    flows_apr_may = flows_apr_may,
+                                                    mean_pdo_return = monthly_mean_pdo)
 
   natural_ages <- ncol(natural_adults)
   hatchery_ages <- ncol(hatchery_adults)
@@ -63,7 +71,7 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
   hatchery_adults_after_stray <- hatchery_adults - strayed_hatchery_adults + hatchery_strays_allocated
 
   # natural origin
-  natural_strays <- lapply(1:4, function(age) {
+  natural_strays <- lapply(1:natural_ages, function(age) {
 
     age_strays <- lapply(fallRunDSM::watershed_labels, function(w) {
       rmultinom(n = 1, size = strayed_natural_adults[w, age], prob = straying_destinations[, "default"])
@@ -87,7 +95,8 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
   natural_adults_after_stray <- natural_adults - strayed_natural_adults + natural_strays_allocated
 
   # TODO what prop natural to report when 0 fish present at the watershed
-  proportion_natural <- rowSums(natural_adults_after_stray / (natural_adults_after_stray + hatchery_adults_after_stray), na.rm = TRUE)
+  proportion_natural <- rowSums(natural_adults_after_stray, na.rm = TRUE) /
+    (rowSums(natural_adults_after_stray, na.rm = TRUE) + rowSums(hatchery_adults_after_stray, na.rm = TRUE))
 
   return(list(
     natural = natural_adults_after_stray,
@@ -129,11 +138,11 @@ compute_adult_stray_rates <- function(type = c("natural", "hatchery"), sim_year,
     prepare_stray_model_data(hatchery = x, type = type, sim_year = sim_year, flow_oct_nov = flow_10_11, flow_apr_may = flow_4_5,
                              releases = releases, mean_PDO_return = pdo)
   })
-
-  predictions <- predict(fallRunDSM::hatchery_stray_betareg, newdata = new_data)
+  predictions <- betareg::predict(fallRunDSM::hatchery_stray_betareg, newdata = new_data)
   new_data$prediction <- predictions
-  age_unorm <- if (type == "natural") rep(2:5, 5) else rep(2:5, 10)
-  stray_type = if (type == "natural") "natural" else rep(rep(c("release bay", "release river"), each = 4), 5)
+  age_unorm <- if (type == "natural") c(rep(2:5, 5)) else c(rep(2:5, 10))
+  stray_type <-  if (type == "natural") "natural" else rep(rep(c("release bay", "release river"),
+                                                            each = 4), 5)
 
   stray_rates <- new_data |> transmute(
     sim_year = sim_year,
@@ -185,7 +194,7 @@ stray_rates_to_matrix <- function(data, type) {
       filter(stray_type == "release bay") |>
       pivot_wider(values_from = "stray_rate", names_from = "age") |>
       select(-sim_year, -stray_type) |>
-      right_join(select(watershed_attributes, watershed, order)) |>
+      right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
       arrange(order) |>
       mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
       select(-watershed, -order) |>
@@ -197,7 +206,7 @@ stray_rates_to_matrix <- function(data, type) {
       filter(stray_type == "release river") |>
       pivot_wider(values_from = "stray_rate", names_from = "age") |>
       select(-sim_year, -stray_type) |>
-      right_join(select(watershed_attributes, watershed, order)) |>
+      right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
       arrange(order) |>
       mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
       select(-watershed, -order) |>

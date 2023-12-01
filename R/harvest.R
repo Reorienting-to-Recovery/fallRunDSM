@@ -7,7 +7,6 @@
 #'
 #' @param adult_df A data frame containing information about adult salmon.
 #' @param year The target year for the harvest calculation.
-#' @param hatchery_allocation The allocation of harvest to hatcheries.
 #' @param ocean_harvest_percentage The percentage of harvest from the ocean, same for all tributaries.
 #' @param tributary_harvest_percentage The percentage of harvest from tributaries, can vary by tributary.
 #' @param restrict_harvest_to_hatchery A logical vector indicating whether to restrict harvest to hatcheries for each tributary.
@@ -20,20 +19,21 @@
 
 harvest_adults <- function(adult_df,
                            year = year,
-                           hatchery_allocation = ..params$hatchery_allocation,
+                           terminal_hatchery_logic = c(T, F),
                            ocean_harvest_percentage, # same for all tribs
-                           tributary_harvest_percentage, # can vary by trip
+                           tributary_harvest_percentage, # can vary by trib
                            restrict_harvest_to_hatchery = c(F, T),
-                           no_cohort_harvest_years,
+                           no_cohort_harvest_years = NULL, # maybe we can get rid of this
+                           intelligent_habitat_harvest = c(F, T),
                            intelligent_crr_harvest = c(F, T)
-                           # intelligent_harvest_regime = c(F, T) -
-                           # decide if we want to do it like this or seperate params
 ){
   # TODO make sure that it works with terminal hatchery logic
   # helper data
   return_prop <- matrix(c(.30, .60, .10, 0, .22, .47, .26, .05), nrow = 2, ncol = 4,
                         dimnames = list(c("hatchery", "natural"),
                                         c("V1", "V2", "V3", "V4")))
+  # TODO apply baseline bycatch or hook mortality 10%
+  # TODO think about adding min spawn habitat into intelligent CRR
   # OCEAN HARVEST
   # Set no harvest adults based on no cohort years and no hatchery only harvest restrictions
   no_harvest_adults <- adult_df |>

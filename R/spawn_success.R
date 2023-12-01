@@ -57,11 +57,12 @@ spawn_success <- function(escapement,
     dplyr::left_join(hatchery_age_distribution, by = c("watershed" = "watershed")) |>
     dplyr::mutate(age_2_spawners = round(spawners * prop_2),
            age_3_spawners = round(spawners * prop_3),
-           age_4_spawners = round(spawners * prop_4)) |>
-    dplyr::select(-c(prop_2, prop_3, prop_4, spawners, watershed)) |>
+           age_4_spawners = round(spawners * prop_4),
+           age_5_spawners = round(spawners * prop_5)) |>
+    dplyr::select(-c(prop_2, prop_3, prop_4, prop_5, spawners, watershed)) |>
     as.matrix()
 
-  dimnames(total_hatch_spawn) <- list(c(fallRunDSM::watershed_labels), c("2", "3", "4"))
+  dimnames(total_hatch_spawn) <- list(c(fallRunDSM::watershed_labels), c("2", "3", "4", "5"))
   fecundity_hatch <- fecundity_lookup |>
     dplyr::filter(origin == "Hatchery") |>
     dplyr::pull(fecundity)

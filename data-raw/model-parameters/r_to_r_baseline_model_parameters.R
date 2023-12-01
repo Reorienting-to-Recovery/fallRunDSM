@@ -1,6 +1,7 @@
 library(tidyverse)
-remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+remotes::install_github("Reorienting-to-Recovery/DSMflow")
 library(DSMhabitat)
+library(DSMflow)
 
 # loads calibration data
 calib_results <- read_rds("calibration/result-test-known-nats-2.rds")
@@ -36,7 +37,6 @@ r_to_r_baseline_params <- list(
   .adult_stray_prop_delta_trans = 2.89,
   .adult_en_route_migratory_temp = -0.26,
   .adult_en_route_bypass_overtopped = -0.019,
-  .adult_en_route_adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
   .adult_prespawn_deg_day = -0.000669526,
 
   # Ocean entry success coefficient and variable
@@ -228,11 +228,18 @@ r_to_r_baseline_params <- list(
   hatchery_release = fallRunDSM::fall_hatchery_release,
   hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
   fecundity_lookup = fallRunDSM::fecundity_by_age,
-
+  adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
+  restrict_harvest_to_hatchery = FALSE,
+  ocean_harvest_percentage = .5,
+  tributary_harvest_percentage = fallRunDSM::r2r_adult_harvest_rate - rep(.05, 31),
+  no_cohort_harvest_years = c(),
+  intelligent_crr_harvest = FALSE,
+  intelligent_habitat_harvest = FALSE,
+  terminal_hatchery_logic = FALSE,
 
   # stray model
-  flows_oct_nov = DSMflow::hatchery_oct_nov_flows,
-  flows_apr_may = DSMflow::hatchery_apr_may_flows
+  flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,
+  flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)

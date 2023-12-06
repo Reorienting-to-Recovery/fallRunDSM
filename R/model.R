@@ -194,7 +194,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     }
 
     # Harvest
-    if (year <= 2 & mode == "simulate") {
+    if (year <= 5 & mode == "simulate") {
       # HATCH
       # Confirm with tech team that harvest logic doesn't start fully until year 2
       hatch_adults <- adults[, year] * seeds$proportion_hatchery
@@ -219,17 +219,17 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                    natural_adults = natutal_adults_by_age)
     }
     # TODO THIS IS SOURCE OF LOW FEATHER NUMBERS
-    if (year > 2 & mode == "simulate") {
+    if (year > 5 & mode == "simulate") {
      adults_after_harvest <- harvest_adults(output$returning_adults, output$spawners, year,
                                             ..params$spawning_habitat,
                                             terminal_hatchery_logic = ..params$terminal_hatchery_logic,
                                             ocean_harvest_percentage = ..params$ocean_harvest_percentage,
                                             tributary_harvest_percentage = ..params$tributary_harvest_percentage,
                                             restrict_harvest_to_hatchery = ..params$restrict_harvest_to_hatchery,
-                                            no_cohort_harvest_years = c(1:20), #..params$no_cohort_harvest_years,
-                                            intelligent_crr_harvest = TRUE, #..params$no_cohort_harvest_years,
+                                            no_cohort_harvest_years = ..params$no_cohort_harvest_years,
+                                            intelligent_crr_harvest = ..params$intelligent_crr_harvest,
                                             intelligent_habitat_harvest = ..params$intelligent_habitat_harvest,
-                                            crr_scaling = 10
+                                            crr_scaling = ..params$crr_scaling
 
       )
 
@@ -918,8 +918,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       calculated_adults[1:31, (year + 1):(year + 4)] <- calculated_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
       calculated_adults[1:31, (year + 1):(year + 3)] <- calculated_adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
     } else {
-      natural_adults[1:31, (year + 1):(year + 4)] <- natural_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
-      # TODO update to have a natural adults and then a total adults to use for seeding
       adults[1:31, (year + 1):(year + 4)] <- adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
       adults[1:31, (year + 1):(year + 3)] <- adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
       adults[is.na(adults)] = 0

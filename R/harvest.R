@@ -89,7 +89,7 @@ harvest_adults <- function(adult_df,
                                                              ocean_harvest_percentage, 0)),
              utalize_crr_totals = ifelse(num_adults_required_after_harvest < (return_total - harvested_adults) & intelligent_crr_harvest, TRUE, FALSE),
              remaining_adults = round(ifelse(utalize_crr_totals, num_adults_required_after_harvest, return_total - harvested_adults), 0),
-             actual_harvest = round(ifelse(utalize_crr_totals, return_total - num_adults_required_after_harvest, harvested_adults), 0),) |>
+             actual_harvest = round(ifelse(utalize_crr_totals, return_total - num_adults_required_after_harvest, harvested_adults), 0)) |>
       select(watershed, origin, age, remaining_adults)
   }
   # Set to always allow - apply to no harvest and harvest adults, this will break crr logic (TODO talk with rene about that)

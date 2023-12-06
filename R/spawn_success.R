@@ -50,7 +50,7 @@ spawn_success <- function(escapement,
     dplyr::pull(fecundity)
 
   # calculate natural fry
-  natural_fry <- rowSums(sweep(total_nat_spawn * (1 - prob_scour), 2, fecundity_natural, "*") * egg_to_fry_survival)
+  natural_fry <- suppressWarnings(rowSums(sweep(total_nat_spawn * (1 - prob_scour), 2, fecundity_natural, "*") * egg_to_fry_survival))
 
   # nat_spawn_with_ages[1] <- total_nat_spawn * natural_age_distribution
   total_hatch_spawn <- dplyr::tibble(watershed = fallRunDSM::watershed_labels, spawners = round(spawners * (1 - proportion_natural))) |>
@@ -68,7 +68,7 @@ spawn_success <- function(escapement,
     dplyr::pull(fecundity)
 
   # calculate hatchery fry
-  hatchery_fry <- rowSums(sweep(total_hatch_spawn * (1 - prob_scour), 2, fecundity_hatch, "*") * egg_to_fry_survival)
+  hatchery_fry <- suppressWarnings(rowSums(sweep(total_hatch_spawn * (1 - prob_scour), 2, fecundity_hatch, "*") * egg_to_fry_survival))
   fry <- natural_fry + hatchery_fry
 
   fry <- if(stochastic) {

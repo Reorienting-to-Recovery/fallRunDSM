@@ -11,8 +11,8 @@ r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fallRunDSM::r_to_r_baseline_params,
                                                 seeds = r2r_seeds)
-r2r_model_results$spawners
-  r2r_model_results$proportion_natural_at_spawning
+# r2r_model_results$spawners
+#   r2r_model_results$proportion_natural_at_spawning
 
 
 spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
@@ -31,7 +31,7 @@ spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
   scale_x_continuous(breaks = 1:20) +
   theme(text = element_text(size = 20))
 
-spawn
+ggplotly(spawn)
 
 
 # seed

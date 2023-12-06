@@ -231,7 +231,7 @@ r_to_r_baseline_params <- list(
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
   restrict_harvest_to_hatchery = FALSE,
   ocean_harvest_percentage = .5,
-  tributary_harvest_percentage = fallRunDSM::r2r_adult_harvest_rate - rep(.05, 31),
+  tributary_harvest_percentage = fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31),
   no_cohort_harvest_years = c(),
   intelligent_crr_harvest = FALSE,
   intelligent_habitat_harvest = FALSE,

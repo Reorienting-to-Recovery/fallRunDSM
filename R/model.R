@@ -71,7 +71,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
   }
 
   simulation_length <- switch(mode,
-                              "seed" = 5,
+                              "seed" = 6,
                               "simulate" = 20,
                               "calibrate" = 20)
 
@@ -99,7 +99,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
   adults <- switch (mode,
                     "seed" = fallRunDSM::adult_seeds,
-                    "simulate" = seeds,
+                    "simulate" = seeds$adults,
                     "calibrate" = seeds,
   )
 
@@ -117,10 +117,11 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     north_delta_fish <- matrix(0, nrow = 23, ncol = 4, dimnames = list(fallRunDSM::watershed_labels[1:23], fallRunDSM::size_class_labels))
     south_delta_fish <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
     juveniles_at_chipps <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
+    natural_adults <- round(adults * (1 - ..params$proportion_hatchery))
 
     avg_ocean_transition_month <- ocean_transition_month(stochastic = stochastic) # 2
     # R2R logic updates #
-    # Age logic to use ---------------------------------------------------------
+    # R2R logic to add fish size as an input -----------------------------------
     default_hatch_age_dist <- tibble(watershed = fallRunDSM::watershed_labels,
                                      prop_2 = rep(.3, 31),
                                      prop_3 = rep(.6, 31),
@@ -131,6 +132,41 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                    prop_3 = rep(.47, 31),
                                    prop_4 = rep(.26, 31),
                                    prop_5 = rep(.05, 31))
+    if (year %in% c(1:6)) {
+      hatch_age_dist <- default_hatch_age_dist
+      natural_age_dist <- default_nat_age_dist
+    } else {
+      # TODO would be good to functionalize this age_dist - takes in origin, output$returning_adults, year
+      # TODO move to base r logic / remove dependencides on tidyverse
+      hatch_age_dist <- output$returning_adults |>
+        dplyr::filter(return_sim_year == year, origin == "hatchery") |>
+        dplyr::mutate(age = return_sim_year - sim_year,
+                      return_total = ifelse(is.nan(return_total), 0, return_total)) |>
+        dplyr::group_by(watershed, age) |>
+        dplyr::summarise(total = sum(return_total, na.rm = TRUE)) |>
+        tidyr::pivot_wider(names_from = age, values_from = total) |>
+        dplyr::mutate(total = `2` + `3` + `4`,
+                      prop_2 = ifelse(total == 0, .3, `2`/total), #need to allow for straying fish even if total pop was initially 0
+                      prop_3 = ifelse(total == 0, .6, `3`/total),
+                      prop_4 = ifelse(total == 0, .1, `4`/total),
+                      prop_5 = 0) |>
+        dplyr::select(-c(`2`, `3`, `4`, total))
+
+      # find natural age distribution
+      natural_age_dist <- output$returning_adults |>
+        dplyr::filter(return_sim_year == year, origin == "natural") |>
+        dplyr::mutate(age = return_sim_year - sim_year,
+                      return_total = ifelse(is.nan(return_total), 0, return_total)) |>
+        dplyr::group_by(watershed, age) |>
+        dplyr::summarise(total = sum(return_total, na.rm = TRUE)) |>
+        tidyr::pivot_wider(names_from = age, values_from = total) |>
+        dplyr::mutate(total = `2` + `3` + `4` + `5`,
+                      prop_2 = ifelse(total == 0, .22, `2`/total), #need to allow for straying fish even if total pop was initially 0
+                      prop_3 = ifelse(total == 0, .47, `3`/total),
+                      prop_4 = ifelse(total == 0, .26, `4`/total),
+                      prop_5 = ifelse(total == 0, .05, `5`/total)) |>
+        dplyr::select(-c(`2`, `3`, `4`, `5`, total))
+    }
     # Begin adult logic --------------------------------------------------------
     # In seed and calibrate just use adults
     # Do not need to apply harvest, or survival because starting with GrandTab values
@@ -158,11 +194,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     }
 
     # Harvest
-    # TODO think through if this logic should hold until year 5
     if (year <= 2 & mode == "simulate") {
       # HATCH
       # Confirm with tech team that harvest logic doesn't start fully until year 2
-      hatch_adults <- round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
+      hatch_adults <- adults[, year] * seeds$proportion_hatchery
       # Default to base harvest levels .57 most tribs
       adults_after_harvest <- hatch_adults * (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage)
       hatch_after_harvest_by_age <- round(unname(adults_after_harvest) * as.matrix(default_hatch_age_dist[2:5]))
@@ -170,11 +205,12 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       colnames(hatch_after_harvest_by_age) = c(2, 3, 4, 5)
       # NATURAL
       if (..params$restrict_harvest_to_hatchery) {
-        #TODO - adult DF if I add hatchery adults on
-        natutal_adults_by_age <- round(unname(adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
+        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
+        natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
         # THINK about if we need an else if for no comercial here
       } else {
-        natutal_adults_after_harvest <- adults[, year] * (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage)
+        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
+        natutal_adults_after_harvest <- nat_adults * (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage)
         natutal_adults_by_age <- round(unname(natutal_adults_after_harvest) * as.matrix(default_nat_age_dist[2:5]))
       }
       row.names(natutal_adults_by_age) = fallRunDSM::watershed_labels
@@ -182,16 +218,19 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       adults_after_harvest <- list(hatchery_adults = hatch_after_harvest_by_age,
                                    natural_adults = natutal_adults_by_age)
     }
+    # TODO THIS IS SOURCE OF LOW FEATHER NUMBERS
     if (year > 2 & mode == "simulate") {
+     adults_after_harvest <- harvest_adults(output$returning_adults, output$spawners, year,
+                                            ..params$spawning_habitat,
+                                            terminal_hatchery_logic = ..params$terminal_hatchery_logic,
+                                            ocean_harvest_percentage = ..params$ocean_harvest_percentage,
+                                            tributary_harvest_percentage = ..params$tributary_harvest_percentage,
+                                            restrict_harvest_to_hatchery = ..params$restrict_harvest_to_hatchery,
+                                            no_cohort_harvest_years = c(1:20), #..params$no_cohort_harvest_years,
+                                            intelligent_crr_harvest = TRUE, #..params$no_cohort_harvest_years,
+                                            intelligent_habitat_harvest = ..params$intelligent_habitat_harvest,
+                                            crr_scaling = 10
 
-     adults_after_harvest <- harvest_adults(output$returning_adults, year,
-                               terminal_hatchery_logic = ..params$terminal_hatchery_logic,
-                               ocean_harvest_percentage = ..params$ocean_harvest_percentage,
-                               tributary_harvest_percentage = ..params$tributary_harvest_percentage,
-                               restrict_harvest_to_hatchery = ..params$restrict_harvest_to_hatchery,
-                               no_cohort_harvest_years = ..params$no_cohort_harvest_years,
-                               intelligent_crr_harvest = ..params$intelligent_crr_harvest,
-                               intelligent_habitat_harvest = ..params$intelligent_habitat_harvest
       )
 
     }
@@ -233,10 +272,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # # For use in the r2r metrics ---------------------------------------------
     # TODO add conditional here for if hatch release == 0
     # TODO fix handeling for PHOS on non spawn and 0 fish watersheds
-    phos <- 1 - spawners$proportion_natural
+    phos <- ifelse(is.na(1 - spawners$proportion_natural), 0, 1 - spawners$proportion_natural)
     if (year > 3){
-      phos_diff_two_years <- phos - output$phos[, (year - 2)]
-      phos_diff_last_year <- phos - output$phos[, (year - 1)]
+      phos_diff_two_years <- ifelse(is.na(phos - output$phos[, (year - 2)]), 0, phos - output$phos[, (year - 2)])
+      phos_diff_last_year <- ifelse(is.na(phos - output$phos[, (year - 1)]), 0, phos - output$phos[, (year - 1)])
       if (any(phos_diff_two_years < 0 & phos_diff_last_year < 0)) {
         perc_diff <- (phos - output$phos[, (year - 2)]) /  output$phos[, (year - 2)]
         renaturing_tribs <- which(phos_diff_two_years < 0 & phos_diff_last_year < 0)
@@ -293,42 +332,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       dplyr::mutate(habitat_type = "spawning")
     output$limiting_habitat   <- dplyr::bind_rows(output$limiting_habitat, lim_hab)
     # end R2R metric -----------------------------------------------------------
-    # R2R logic to add fish size as an input -----------------------------------
-    if (year %in% c(1:6)) {
-      hatch_age_dist <- default_hatch_age_dist
-      natural_age_dist <- default_nat_age_dist
-    } else {
-      # TODO would be good to functionalize this age_dist - takes in origin, output$returning_adults, year
-      # TODO move to base r logic / remove dependencides on tidyverse
-      hatch_age_dist <- output$returning_adults |>
-        dplyr::filter(return_sim_year == year, origin == "hatchery") |>
-        dplyr::mutate(age = return_sim_year - sim_year,
-                      return_total = ifelse(is.nan(return_total), 0, return_total)) |>
-        dplyr::group_by(watershed, age) |>
-        dplyr::summarise(total = sum(return_total, na.rm = TRUE)) |>
-        tidyr::pivot_wider(names_from = age, values_from = total) |>
-        dplyr::mutate(total = `2` + `3` + `4`,
-               prop_2 = ifelse(total == 0, .3, `2`/total), #need to allow for straying fish even if total pop was initially 0
-               prop_3 = ifelse(total == 0, .6, `3`/total),
-               prop_4 = ifelse(total == 0, .1, `4`/total),
-               prop_5 = 0) |>
-        dplyr::select(-c(`2`, `3`, `4`, total))
-
-      # find natural age distribution
-      natural_age_dist <- output$returning_adults |>
-        dplyr::filter(return_sim_year == year, origin == "natural") |>
-        dplyr::mutate(age = return_sim_year - sim_year,
-                      return_total = ifelse(is.nan(return_total), 0, return_total)) |>
-        dplyr::group_by(watershed, age) |>
-        dplyr::summarise(total = sum(return_total, na.rm = TRUE)) |>
-        tidyr::pivot_wider(names_from = age, values_from = total) |>
-        dplyr::mutate(total = `2` + `3` + `4` + `5`,
-               prop_2 = ifelse(total == 0, .22, `2`/total), #need to allow for straying fish even if total pop was initially 0
-               prop_3 = ifelse(total == 0, .47, `3`/total),
-               prop_4 = ifelse(total == 0, .26, `4`/total),
-               prop_5 = ifelse(total == 0, .05, `5`/total)) |>
-        dplyr::select(-c(`2`, `3`, `4`, `5`, total))
-    }
     # end R2R logic ------------------------------------------------------------
     juveniles <- spawn_success(escapement = init_adults,
                                proportion_natural = natural_proportion_with_renat, # R2R ADDS NEW PARAM
@@ -446,8 +449,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                .surv_juv_delta_large = ..params$.surv_juv_delta_large,
                                                min_survival_rate = ..params$min_survival_rate,
                                                stochastic = stochastic)
-      # rearing_survival$inchannel[18, ] <- rearing_survival$inchannel[19, ]
-      # rearing_survival$floodplain[18, ] <- rearing_survival$floodplain[19, ]
+      rearing_survival$inchannel[19, ] <- rearing_survival$inchannel[20, ]
+      rearing_survival$floodplain[19, ] <- rearing_survival$floodplain[20, ]
 
       migratory_survival <- get_migratory_survival(year, month,
                                                    cc_gates_prop_days_closed = ..params$cc_gates_prop_days_closed,
@@ -915,15 +918,19 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       calculated_adults[1:31, (year + 1):(year + 4)] <- calculated_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
       calculated_adults[1:31, (year + 1):(year + 3)] <- calculated_adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
     } else {
+      natural_adults[1:31, (year + 1):(year + 4)] <- natural_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
       # TODO update to have a natural adults and then a total adults to use for seeding
       adults[1:31, (year + 1):(year + 4)] <- adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
+      adults[1:31, (year + 1):(year + 3)] <- adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
       adults[is.na(adults)] = 0
     }
 
   } # end year for loop
 
   if (mode == "seed") {
-    return(adults[ , 6:30])
+    # browser()
+    return(list(adults = adults[ , 6:30],
+                proportion_hatchery = 1 - proportion_natural_juves_in_tribs))
   } else if (mode == "calibrate") {
     return(calculated_adults[, 6:20])
   }

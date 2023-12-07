@@ -235,7 +235,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     }
     # STRAY
-    # TODO DEBUG STARTING HERE getting error
     if (mode == "simulate") {
     adults_after_stray <- apply_straying(year, adults_after_harvest$natural_adults,
                                          adults_after_harvest$hatchery_adults,
@@ -449,8 +448,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                .surv_juv_delta_large = ..params$.surv_juv_delta_large,
                                                min_survival_rate = ..params$min_survival_rate,
                                                stochastic = stochastic)
-      rearing_survival$inchannel[19, ] <- rearing_survival$inchannel[20, ]
-      rearing_survival$floodplain[19, ] <- rearing_survival$floodplain[20, ]
 
       migratory_survival <- get_migratory_survival(year, month,
                                                    cc_gates_prop_days_closed = ..params$cc_gates_prop_days_closed,

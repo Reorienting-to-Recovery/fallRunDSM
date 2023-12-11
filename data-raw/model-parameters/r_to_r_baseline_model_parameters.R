@@ -7,6 +7,10 @@ library(DSMflow)
 calib_results <- read_rds("calibration/result-test-known-nats-2.rds")
 solution <- calib_results@solution
 
+harvest_percentage <- fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31)
+harvest_percentage[harvest_percentage < 0] <- 0
+
+
 # initial params
 r_to_r_baseline_params <- list(
   #TODO add updated spawn decay multiplier for 2019 biop
@@ -27,6 +31,7 @@ r_to_r_baseline_params <- list(
   cross_channel_stray_rate = fallRunDSM::cross_channel_stray_rate,
   stray_rate = fallRunDSM::stray_rate,
   diversity_group = fallRunDSM::diversity_group,
+  crr_scaling = 2, # defaults to 2
 
   # Coefficients for adult submodules
   .adult_stray_intercept = 3,
@@ -231,7 +236,7 @@ r_to_r_baseline_params <- list(
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
   restrict_harvest_to_hatchery = FALSE,
   ocean_harvest_percentage = .5,
-  tributary_harvest_percentage = fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31),
+  tributary_harvest_percentage = harvest_percentage,
   no_cohort_harvest_years = c(),
   intelligent_crr_harvest = FALSE,
   intelligent_habitat_harvest = FALSE,

@@ -41,6 +41,11 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
                                 natural_adult_removal_rate,
                                 cross_channel_stray_rate,
                                 stray_rate,
+                                total_releases,
+                                release_month,
+                                flows_oct_nov,
+                                flows_apr_may,
+                                monthly_mean_pdo,
                                 ..surv_adult_enroute_int,
                                 .adult_stray_intercept,
                                 .adult_stray_wild,
@@ -80,7 +85,7 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
     init_adults_by_month <- adults_by_month_hatchery_removed
 
   } else  {
-
+    # Natural Adults
     adults_by_month <- t(sapply(1:31, function(watershed) {
       if (stochastic) {
         rmultinom(1, adults[watershed, year], month_return_proportions)
@@ -89,6 +94,7 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
       }
     }))
 
+    # Hatchery Adults
     hatchery_by_month <- t(sapply(1:31, function(watershed) {
       if (stochastic) {
         rmultinom(1, hatch_adults[watershed], month_return_proportions)
@@ -97,50 +103,51 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
       }
     }))
 
-    stray_props <- sapply(10:12, function(month) {
-      adult_stray(wild = 1,
-                  natal_flow = prop_flow_natal[ , year],
-                  south_delta_watershed = south_delta_routed_watersheds,
-                  cross_channel_gates_closed = cc_gates_days_closed[month],
-                  .intercept = .adult_stray_intercept,
-                  .wild = .adult_stray_wild,
-                  .natal_flow = .adult_stray_natal_flow,
-                  .cross_channel_gates_closed = .adult_stray_cross_channel_gates_closed,
-                  .prop_bay_trans = .adult_stray_prop_bay_trans,
-                  .prop_delta_trans = .adult_stray_prop_delta_trans)
-    })
+    # Call new stray adult returns function on natural adults
+    natural_adults_after_stray <- stray_returning_adults(monthly_adult_returns = adults_by_month,
+                                                         year = year,
+                                                         stochastic = stochastic,
+                                                         month_return_proportions = month_return_proportions,
+                                                         wild = 1,
+                                                         prop_flow_natal = prop_flow_natal,
+                                                         south_delta_routed_watersheds = south_delta_routed_watersheds,
+                                                         cc_gates_days_closed = cc_gates_days_closed,
+                                                         type = "natural",
+                                                         total_releases = total_releases,
+                                                         release_month = release_month,
+                                                         flows_oct_nov = flows_oct_nov,
+                                                         flows_apr_may = flows_apr_may,
+                                                         monthly_mean_pdo = monthly_mean_pdo ,
+                                                         .adult_stray_intercept = .adult_stray_intercept,
+                                                         .adult_stray_wild = .adult_stray_wild,
+                                                         .adult_stray_natal_flow = .adult_stray_natal_flow,
+                                                         .adult_stray_cross_channel_gates_closed = .adult_stray_cross_channel_gates_closed,
+                                                         .adult_stray_prop_bay_trans = .adult_stray_prop_bay_trans,
+                                                         .adult_stray_prop_delta_trans = .adult_stray_prop_delta_trans)
 
-    straying_adults <- sapply(1:3, function(month) {
-      if (stochastic) {
-        rbinom(n = 31, adults_by_month[, month], stray_props[, month])
-      } else {
-        round(adults_by_month[, month] * stray_props[, month])
-      }
-    })
+    # Call new stray adult returns function on hatchery fish
+    hatch_adults_after_stray <- stray_returning_adults(monthly_adult_returns = hatchery_by_month,
+                                                       year = year,
+                                                       stochastic = stochastic,
+                                                       month_return_proportions = month_return_proportions,
+                                                       wild = 0,
+                                                       prop_flow_natal = prop_flow_natal,
+                                                       south_delta_routed_watersheds = south_delta_routed_watersheds,
+                                                       cc_gates_days_closed = cc_gates_days_closed,
+                                                       type = "hatchery",
+                                                       total_releases = total_releases,
+                                                       release_month = release_month,
+                                                       flows_oct_nov = flows_oct_nov,
+                                                       flows_apr_may = flows_apr_may,
+                                                       monthly_mean_pdo = monthly_mean_pdo ,
+                                                       .adult_stray_intercept = .adult_stray_intercept,
+                                                       .adult_stray_wild = .adult_stray_wild,
+                                                       .adult_stray_natal_flow = .adult_stray_natal_flow,
+                                                       .adult_stray_cross_channel_gates_closed = .adult_stray_cross_channel_gates_closed,
+                                                       .adult_stray_prop_bay_trans = .adult_stray_prop_bay_trans,
+                                                       .adult_stray_prop_delta_trans = .adult_stray_prop_delta_trans)
 
-    south_delta_routed_adults <- round(colSums(straying_adults * south_delta_routed_watersheds))
-    south_delta_stray_adults <- sapply(1:3, function(month) {
-      if (stochastic) {
-        as.vector(rmultinom(1, south_delta_routed_adults[month], cross_channel_stray_rate))
-      } else {
-        round(south_delta_routed_adults[month] * cross_channel_stray_rate)
-      }
-    })
-
-    remaining_stray_adults <- round(colSums(straying_adults * (1 - south_delta_routed_watersheds)))
-    stray_adults <- sapply(1:3, function(month) {
-      if (stochastic) {
-        as.vector(rmultinom(1, remaining_stray_adults[month], stray_rate))
-      } else {
-        round(remaining_stray_adults[month] * stray_rate)
-      }
-    })
-
-    adults_after_stray <- adults_by_month - straying_adults + south_delta_stray_adults + stray_adults
-
-    # are tisdale or yolo bypasses overtopped?
     # for all years and months 10-12 there is always at least one true
-
     bypass_is_overtopped <- sapply(10:12, function(month) {
 
       tis <- gates_overtopped[month, year, 1] * tisdale_bypass_watershed
@@ -162,9 +169,9 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
 
     adults_survived_to_spawning <- sapply(1:3, function(month) {
       if (stochastic) {
-        rbinom(31, round(adults_after_stray[, month]), adult_en_route_surv[, month])
+        rbinom(31, round(natural_adults_after_stray[, month]), adult_en_route_surv[, month])
       } else {
-        round(adults_after_stray[, month] * adult_en_route_surv[, month])
+        round(natural_adults_after_stray[, month] * adult_en_route_surv[, month])
       }
     })
 
@@ -175,16 +182,23 @@ get_spawning_adults <- function(year, adults, hatch_adults, mode,
         round(adults_survived_to_spawning[, month] * (1 - natural_adult_removal_rate))
       }
     })
-
+    # Hatchery
+    adults_survived_to_spawning <- sapply(1:3, function(month) {
+      if (stochastic) {
+        rbinom(31, round(hatch_adults_after_stray[, month]), adult_en_route_surv[, month])
+      } else {
+        round(hatch_adults_after_stray[, month] * adult_en_route_surv[, month])
+      }
+    })
     surviving_hatchery_adults_by_month <- sapply(1:3, function(month) {
       if (stochastic) {
-        rbinom(31, round(hatchery_by_month[, month]), adult_en_route_surv[, month])
+        rbinom(31, round(adults_survived_to_spawning[, month]), adult_en_route_surv[, month])
       } else {
-        round(hatchery_by_month[, month] * adult_en_route_surv[, month])
+        round(adults_survived_to_spawning[, month] * adult_en_route_surv[, month])
       }
     })
 
-    surviving_natural_adults <- rowSums(surviving_natural_adults_by_month)
+    surviving_natural_adults <- ifelse(rowSums(surviving_natural_adults_by_month) < 0, 0, rowSums(surviving_natural_adults_by_month))
     surviving_hatchery_adults <- rowSums(surviving_hatchery_adults_by_month)
     init_adults <- surviving_natural_adults + surviving_hatchery_adults
     init_adults_by_month <- surviving_natural_adults_by_month + surviving_hatchery_adults_by_month

@@ -11,7 +11,7 @@ fall_run_model(
   scenario = NULL,
   mode = c("seed", "simulate", "calibrate"),
   seeds = NULL,
-  ..params = fallRunDSM::params,
+  ..params = fallRunDSM::r_to_r_baseline_params,
   stochastic = FALSE
 )
 }

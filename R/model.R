@@ -1,5 +1,5 @@
 #' @title Fall Run Chinook Model
-#' @description Fall Run Chinook life cycle model used for CVPIA's Structured
+#' @description Fall Run Chinook life cycle model used for Reorienting to Recovery's Structured
 #' Decision Making Process
 #' @param scenario Model inputs, can be modified to test management actions
 #' @param mode The mode to run model in. Can be \code{"seed"}, \code{"simulate"}, \code{"calibrate"}
@@ -16,13 +16,8 @@
 #'                            seeds = fall_run_seeds)
 #' @export
 fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibrate"),
-                           seeds = NULL, ..params = fallRunDSM::params,
-                           stochastic = FALSE, r_to_r_sensi = c("prespawn surv",
-                                                                "ocean surv",
-                                                                "spawning habitat",
-                                                                "spawning and ocean",
-                                                                "prespawn and ocean"),
-                           sensi_increase = c(1.05, 1.10, 1.20)){
+                           seeds = NULL, ..params = fallRunDSM::r_to_r_baseline_params,
+                           stochastic = FALSE){
 
   mode <- match.arg(mode)
 
@@ -40,12 +35,25 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       weeks_flooded = ..params$weeks_flooded
     )
 
-    scenario_data <- DSMscenario::load_scenario(scenario,
-                                                habitat_inputs = habitats,
-                                                species = DSMscenario::species$FALL_RUN,
-                                                spawn_decay_rate = ..params$spawn_decay_rate,
-                                                rear_decay_rate = ..params$rear_decay_rate,
-                                                stochastic = stochastic)
+    # check if the params has the new decay element, if yes use new function applying decay
+    # to spawning, if not then use the old method. This is a temporary bit of code to allow
+    # for quick comparison between two versions of the model.
+    if ("spawn_decay_multiplier" %in% names(..params)) {
+      scenario_data <- DSMscenario::load_scenario(scenario,
+                                                  habitat_inputs = habitats,
+                                                  species = DSMscenario::species$FALL_RUN,
+                                                  spawn_decay_rate = ..params$spawn_decay_rate,
+                                                  rear_decay_rate = ..params$rear_decay_rate,
+                                                  spawn_decay_multiplier = ..params$spawn_decay_multiplier,
+                                                  stochastic = stochastic)
+    } else {
+      scenario_data <- DSMscenario::load_scenario(scenario,
+                                                  habitat_inputs = habitats,
+                                                  species = DSMscenario::species$FALL_RUN,
+                                                  spawn_decay_rate = ..params$spawn_decay_rate,
+                                                  rear_decay_rate = ..params$rear_decay_rate,
+                                                  stochastic = stochastic)
+    }
 
     ..params$spawning_habitat <- scenario_data$spawning_habitat
     ..params$inchannel_habitat_fry <- scenario_data$inchannel_habitat_fry
@@ -62,17 +70,26 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                    1980:2000)))
   }
 
+  simulation_length <- switch(mode,
+                              "seed" = 6,
+                              "simulate" = 20,
+                              "calibrate" = 20)
+
   output <- list(
 
     # SIT METRICS
     spawners = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juvenile_biomass = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    proportion_natural = matrix(NA_real_, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     returning_adults = tibble::tibble(),
 
-    # R2R
+    # R2R METRICS
     adults_in_ocean = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    juveniles = data.frame()
+    juveniles = data.frame(),
+    juveniles_at_chipps = data.frame(),
+    proportion_natural_at_spawning = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    proportion_natural_juves_in_tribs = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    phos = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
+    limiting_habitat = data.frame()
   )
 
 
@@ -82,14 +99,11 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
   adults <- switch (mode,
                     "seed" = fallRunDSM::adult_seeds,
-                    "simulate" = seeds,
+                    "simulate" = seeds$adults,
                     "calibrate" = seeds,
   )
 
-  simulation_length <- switch(mode,
-                              "seed" = 5,
-                              "simulate" = 20,
-                              "calibrate" = 20)
+
 
   for (year in 1:simulation_length) {
     adults_in_ocean <- numeric(31)
@@ -103,48 +117,192 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     north_delta_fish <- matrix(0, nrow = 23, ncol = 4, dimnames = list(fallRunDSM::watershed_labels[1:23], fallRunDSM::size_class_labels))
     south_delta_fish <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
     juveniles_at_chipps <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
+    natural_adults <- round(adults * (1 - ..params$proportion_hatchery))
 
     avg_ocean_transition_month <- ocean_transition_month(stochastic = stochastic) # 2
-
-    hatch_adults <- if (stochastic) {
-      rmultinom(1, size = round(runif(1, 83097.01,532203.1)), prob = ..params$hatchery_allocation)[ , 1]
+    # R2R logic updates #
+    # R2R logic to add fish size as an input -----------------------------------
+    default_hatch_age_dist <- tibble(watershed = fallRunDSM::watershed_labels,
+                                     prop_2 = rep(.3, 31),
+                                     prop_3 = rep(.6, 31),
+                                     prop_4 = rep(.1, 31),
+                                     prop_5 = rep(0, 31))
+    default_nat_age_dist <- tibble(watershed = fallRunDSM::watershed_labels,
+                                   prop_2 = rep(.22, 31),
+                                   prop_3 = rep(.47, 31),
+                                   prop_4 = rep(.26, 31),
+                                   prop_5 = rep(.05, 31))
+    if (year %in% c(1:6)) {
+      hatch_age_dist <- default_hatch_age_dist
+      natural_age_dist <- default_nat_age_dist
     } else {
-      round(mean(c(83097.01,532203.1)) * ..params$hatchery_allocation)
+      # TODO would be good to functionalize this age_dist - takes in origin, output$returning_adults, year
+      # TODO move to base r logic / remove dependencides on tidyverse
+      hatch_age_dist <- output$returning_adults |>
+        dplyr::filter(return_sim_year == year, origin == "hatchery") |>
+        dplyr::mutate(age = return_sim_year - sim_year,
+                      return_total = ifelse(is.nan(return_total), 0, return_total)) |>
+        dplyr::group_by(watershed, age) |>
+        dplyr::summarise(total = sum(return_total, na.rm = TRUE)) |>
+        tidyr::pivot_wider(names_from = age, values_from = total) |>
+        dplyr::mutate(total = `2` + `3` + `4`,
+                      prop_2 = ifelse(total == 0, .3, `2`/total), #need to allow for straying fish even if total pop was initially 0
+                      prop_3 = ifelse(total == 0, .6, `3`/total),
+                      prop_4 = ifelse(total == 0, .1, `4`/total),
+                      prop_5 = 0) |>
+        dplyr::select(-c(`2`, `3`, `4`, total))
+
+      # find natural age distribution
+      natural_age_dist <- output$returning_adults |>
+        dplyr::filter(return_sim_year == year, origin == "natural") |>
+        dplyr::mutate(age = return_sim_year - sim_year,
+                      return_total = ifelse(is.nan(return_total), 0, return_total)) |>
+        dplyr::group_by(watershed, age) |>
+        dplyr::summarise(total = sum(return_total, na.rm = TRUE)) |>
+        tidyr::pivot_wider(names_from = age, values_from = total) |>
+        dplyr::mutate(total = `2` + `3` + `4` + `5`,
+                      prop_2 = ifelse(total == 0, .22, `2`/total), #need to allow for straying fish even if total pop was initially 0
+                      prop_3 = ifelse(total == 0, .47, `3`/total),
+                      prop_4 = ifelse(total == 0, .26, `4`/total),
+                      prop_5 = ifelse(total == 0, .05, `5`/total)) |>
+        dplyr::select(-c(`2`, `3`, `4`, `5`, total))
+    }
+    # Begin adult logic --------------------------------------------------------
+    # In seed and calibrate just use adults
+    # Do not need to apply harvest, or survival because starting with GrandTab values
+    if (mode %in% c("seed", "calibrate")) {
+      adult_index <- ifelse(mode == "seed", 1, year)
+      adults_by_month <- t(sapply(1:31, function(watershed) {
+        if (stochastic) {
+          rmultinom(1, adults[watershed, adult_index], month_return_proportions)
+        } else {
+          round(adults[watershed, adult_index] * month_return_proportions)
+        }
+      }))
+
+      adults_by_month_hatchery_removed <- sapply(1:3, function(month) {
+        if (stochastic) {
+          rbinom(n = 31,
+                 size = round(adults_by_month[, month]),
+                 prob = 1 - natural_adult_removal_rate)
+        } else {
+          round(adults_by_month[, month] * (1 - natural_adult_removal_rate))
+        }
+      })
+      spawners = list(init_adults = rowSums(adults_by_month_hatchery_removed),
+                      proportion_natural = 1 - fallRunDSM::params$proportion_hatchery)
     }
 
-    # returning adults are here: round(adults)
+    # Harvest
+    if (year <= 5 & mode == "simulate") {
+      # TODO add terminal hatchery logic here
+      # HATCH
+      # Confirm with tech team that harvest logic doesn't start fully until year 2
+      hatch_adults <- adults[, year] * seeds$proportion_hatchery
+      # Default to base harvest levels .57 most tribs
+      adults_after_harvest <- hatch_adults * (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage)
+      hatch_after_harvest_by_age <- round(unname(adults_after_harvest) * as.matrix(default_hatch_age_dist[2:5]))
+      row.names(hatch_after_harvest_by_age) = fallRunDSM::watershed_labels
+      colnames(hatch_after_harvest_by_age) = c(2, 3, 4, 5)
+      # NATURAL
+      if (..params$restrict_harvest_to_hatchery) {
+        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
+        natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
+        # THINK about if we need an else if for no comercial here
+      } else {
+        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
+        natutal_adults_after_harvest <- nat_adults * (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage)
+        natutal_adults_by_age <- round(unname(natutal_adults_after_harvest) * as.matrix(default_nat_age_dist[2:5]))
+      }
+      row.names(natutal_adults_by_age) = fallRunDSM::watershed_labels
+      colnames(natutal_adults_by_age) = c(2, 3, 4, 5)
+      adults_after_harvest <- list(hatchery_adults = hatch_after_harvest_by_age,
+                                   natural_adults = natutal_adults_by_age)
+    }
+    # TODO THIS IS SOURCE OF LOW FEATHER NUMBERS
+    if (year > 5 & mode == "simulate") {
+     adults_after_harvest <- harvest_adults(output$returning_adults,
+                                            output$spawners, year,
+                                            ..params$spawning_habitat,
+                                            terminal_hatchery_logic = ..params$terminal_hatchery_logic,
+                                            ocean_harvest_percentage = ..params$ocean_harvest_percentage,
+                                            tributary_harvest_percentage = ..params$tributary_harvest_percentage,
+                                            restrict_harvest_to_hatchery = ..params$restrict_harvest_to_hatchery,
+                                            no_cohort_harvest_years = ..params$no_cohort_harvest_years,
+                                            intelligent_crr_harvest = ..params$intelligent_crr_harvest,
+                                            intelligent_habitat_harvest = ..params$intelligent_habitat_harvest,
+                                            crr_scaling = ..params$crr_scaling
 
-    spawners <- get_spawning_adults(year, round(adults), hatch_adults, mode = mode,
-                                    month_return_proportions = ..params$month_return_proportions,
-                                    prop_flow_natal = ..params$prop_flow_natal,
-                                    south_delta_routed_watersheds = ..params$south_delta_routed_watersheds,
-                                    cc_gates_days_closed = ..params$cc_gates_days_closed,
-                                    gates_overtopped = ..params$gates_overtopped,
-                                    tisdale_bypass_watershed = ..params$tisdale_bypass_watershed,
-                                    yolo_bypass_watershed = ..params$yolo_bypass_watershed,
-                                    migratory_temperature_proportion_over_20 = ..params$migratory_temperature_proportion_over_20,
-                                    natural_adult_removal_rate = ..params$natural_adult_removal_rate,
-                                    cross_channel_stray_rate = ..params$cross_channel_stray_rate,
-                                    stray_rate = ..params$stray_rate,
-                                    ..surv_adult_enroute_int = ..params$..surv_adult_enroute_int,
-                                    .adult_stray_intercept = ..params$.adult_stray_intercept,
-                                    .adult_stray_wild = ..params$.adult_stray_wild,
-                                    .adult_stray_natal_flow = ..params$.adult_stray_natal_flow,
-                                    .adult_stray_cross_channel_gates_closed = ..params$.adult_stray_cross_channel_gates_closed,
-                                    .adult_stray_prop_bay_trans = ..params$.adult_stray_prop_bay_trans,
-                                    .adult_stray_prop_delta_trans = ..params$.adult_stray_prop_delta_trans,
-                                    .adult_en_route_migratory_temp = ..params$.adult_en_route_migratory_temp,
-                                    .adult_en_route_bypass_overtopped = ..params$.adult_en_route_bypass_overtopped,
-                                    .adult_en_route_adult_harvest_rate = ..params$.adult_en_route_adult_harvest_rate,
-                                    stochastic = stochastic)
+      )
+
+    }
+    # STRAY
+    if (mode == "simulate") {
+    adults_after_stray <- apply_straying(year, adults_after_harvest$natural_adults,
+                                         adults_after_harvest$hatchery_adults,
+                                         total_releases = ..params$hatchery_release,
+                                         release_month = 1,
+                                         flows_oct_nov = ..params$flows_oct_nov,
+                                         flows_apr_may = ..params$flows_apr_may,
+                                         fallRunDSM::monthly_mean_pdo)
+    }
+    # TODO apply natural adults removal rate for hatcheris (apply to hatchery fish or natural fish)
+    # - why is this logic currently just in calibration and seeding
+
+    # APPLY EN ROUTE SURVIAL ---------------------------------------------------
+    if (mode == "simulate") {
+    spawners <- apply_enroute_survival(year,
+                                       adults = adults_after_stray,
+                                       month_return_proportions = ..params$month_return_proportions,
+                                       gates_overtopped = ..params$gates_overtopped,
+                                       tisdale_bypass_watershed = ..params$tisdale_bypass_watershed,
+                                       yolo_bypass_watershed = ..params$yolo_bypass_watershed,
+                                       migratory_temperature_proportion_over_20 = ..params$migratory_temperature_proportion_over_20,
+                                       ..surv_adult_enroute_int = ..params$..surv_adult_enroute_int,
+                                       .adult_en_route_migratory_temp = ..params$.adult_en_route_migratory_temp,
+                                       .adult_en_route_bypass_overtopped = ..params$.adult_en_route_bypass_overtopped,
+                                       .adult_en_route_adult_harvest_rate = .params$.adult_en_route_adult_harvest_rate,
+                                       stochastic = stochastic)
+    }
+
+
 
     init_adults <- spawners$init_adults
-
     output$spawners[ , year] <- init_adults
-    output$proportion_natural[ , year] <- spawners$proportion_natural
+
+    # # For use in the r2r metrics ---------------------------------------------
+    # TODO add conditional here for if hatch release == 0
+    # TODO fix handeling for PHOS on non spawn and 0 fish watersheds
+    phos <- ifelse(is.na(1 - spawners$proportion_natural), 0, 1 - spawners$proportion_natural)
+    if (year > 5 & (sum(..params$hatchery_release) + sum(..params$hatchery_releases_at_chipps)) == 0) {
+      natural_proportion_with_renat <- rep(1, 31)
+      names(natural_proportion_with_renat) <- fallRunDSM::watershed_labels
+    } else if (year > 3){
+      phos_diff_two_years <- ifelse(is.na(phos - output$phos[, (year - 2)]), 0, phos - output$phos[, (year - 2)])
+      phos_diff_last_year <- ifelse(is.na(phos - output$phos[, (year - 1)]), 0, phos - output$phos[, (year - 1)])
+      if (any(phos_diff_two_years < 0 & phos_diff_last_year < 0)) {
+        perc_diff <- (phos - output$phos[, (year - 2)]) /  output$phos[, (year - 2)]
+        renaturing_tribs <- which(phos_diff_two_years < 0 & phos_diff_last_year < 0)
+        proportion_renaturing <- ifelse(names(phos_diff_two_years) %in% names(renaturing_tribs), abs(phos_diff_two_years), 0)
+
+        total_renaturing_in_year <- spawners$init_adults * (1 - spawners$proportion_natural) * proportion_renaturing
+        total_natural_with_renaturing <- total_renaturing_in_year + spawners$init_adults * spawners$proportion_natural
+        natural_proportion_with_renat <-  total_natural_with_renaturing / spawners$init_adults
+        natural_proportion_with_renat <- ifelse(is.nan(natural_proportion_with_renat), 0, natural_proportion_with_renat)
+      } else {
+        natural_proportion_with_renat <-  spawners$proportion_natural
+      }
+      } else {
+      natural_proportion_with_renat <-  spawners$proportion_natural
+      }
+
+
+    output$proportion_natural_at_spawning[ , year] <- natural_proportion_with_renat
+    output$phos[ , year] <- 1 - natural_proportion_with_renat
+    # end R2R metric logic -----------------------------------------------------
 
     egg_to_fry_surv <- surv_egg_to_fry(
-      proportion_natural = spawners$proportion_natural,
+      proportion_natural = natural_proportion_with_renat, # update to new prop nat (renaturing logic applied)
       scour = ..params$prob_nest_scoured,
       temperature_effect = ..params$mean_egg_temp_effect,
       .proportion_natural = ..params$.surv_egg_to_fry_proportion_natural,
@@ -153,10 +311,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     )
 
     min_spawn_habitat <- apply(..params$spawning_habitat[ , 10:12, year], 1, min)
-
-    if (grepl("spawning", r_to_r_sensi)) {
-      min_spawn_habitat <- min_spawn_habitat * sensi_increase
-    }
 
     accumulated_degree_days <- cbind(oct = rowSums(..params$degree_days[ , 10:12, year]),
                                      nov = rowSums(..params$degree_days[ , 11:12, year]),
@@ -167,11 +321,26 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     prespawn_survival <- surv_adult_prespawn(average_degree_days,
                                              ..surv_adult_prespawn_int = ..params$..surv_adult_prespawn_int,
                                              .deg_day = ..params$.adult_prespawn_deg_day)
-    if (grepl("prespawn", r_to_r_sensi)) {
-      prespawn_survival <- prespawn_survival * sensi_increase
-    }
 
+    # # For use in the r2r metrics ---------------------------------------------
+    # Adding in limiting spawning habitat here
+    capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
+    at_cap <- ifelse(capacity - init_adults <= 0, TRUE, FALSE)
+    # TODO fix given age
+    lim_hab <- tibble(watershed = names(capacity),
+                      capacity = capacity,
+                      init_adults = init_adults,
+                      habitat_limited = at_cap,
+                      month = NA) |>
+      dplyr::mutate(habitat_type = "spawning")
+    output$limiting_habitat   <- dplyr::bind_rows(output$limiting_habitat, lim_hab)
+    # end R2R metric -----------------------------------------------------------
+    # end R2R logic ------------------------------------------------------------
     juveniles <- spawn_success(escapement = init_adults,
+                               proportion_natural = natural_proportion_with_renat, # R2R ADDS NEW PARAM
+                               hatchery_age_distribution = hatch_age_dist, # R2R ADDS NEW PARAM
+                               natural_age_distribution = natural_age_dist, # R2R ADDS NEW PARAM
+                               fecundity_lookup = ..params$fecundity_lookup, # R2R ADDS NEW PARAM
                                adult_prespawn_survival = prespawn_survival,
                                egg_to_fry_survival = egg_to_fry_surv,
                                prob_scour = ..params$prob_nest_scoured,
@@ -181,15 +350,53 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                fecundity = ..params$spawn_success_fecundity,
                                stochastic = stochastic)
 
-    # # For use in the r2r metrics
+    # R2R hatchery logic -------------------------------------------------------
+    # Currently adds only on major hatchery rivers (American, Battle, Feather, Merced, Moke)
+    # Add all as large fish
+    total_juves_pre_hatchery <- rowSums(juveniles)
+    natural_juveniles <- total_juves_pre_hatchery  * natural_proportion_with_renat
+    total_juves_pre_hatchery <- rowSums(juveniles)
+    # TODO add ability to vary release per year
+    # TODO(stray) capture parameters for calculating straying
+    juveniles <- juveniles + ..params$hatchery_release
+    # stray_rates_in_river_releases <- hatchery_adult_stray(hatchery = )
+
+    stopifnot(nrow(juveniles) == 31)
+
+    # Create new prop natural including hatch releases that we can use to apply to adult returns
+    proportion_natural_juves_in_tribs <- natural_juveniles / rowSums(juveniles)
+    output$proportion_natural_juves_in_tribs[ , year] <- proportion_natural_juves_in_tribs
+
+    # # For use in the r2r metrics ---------------------------------------------
     d <- data.frame(juveniles)
     colnames(d) <- c("s", "m", "l", "vl")
     d$watershed <- fallRunDSM::watershed_labels
     d <- d |> tidyr::pivot_longer(names_to = "size", values_to = "juveniles", -watershed)
     d$year <- year
     output$juveniles <- dplyr::bind_rows(output$juveniles, d)
+    # end R2R metric -----------------------------------------------------------
 
-    for (month in 1:8) {
+    # TODO Some temperatures are over the 28C limit, for now I am going to
+    # just make these be 28. Both of these cases in the 20 years of data
+    # are barely over 28 so I think for now this is justified. With that
+    # said we need to make this change in the cached data itself and make
+    # a note of it.
+
+    growth_temps <- ..params$avg_temp
+    growth_temps[which(growth_temps > 28)] <- 28
+
+    for (month in 1:7) { # Change to move out by July
+
+      growth_rates_ic <- get_growth_rates(growth_temps[,month, year],
+                                          prey_density = ..params$prey_density)
+
+      growth_rates_fp <- get_growth_rates(growth_temps[,month, year],
+                                          prey_density = ..params$prey_density,
+                                          floodplain = TRUE)
+
+      growth_rates_delta <- get_growth_rates(..params$avg_temp_delta[month, year,],
+                                             prey_density = ..params$prey_density_delta)
+
       habitat <- get_habitat(year, month,
                              inchannel_habitat_fry = ..params$inchannel_habitat_fry,
                              inchannel_habitat_juvenile = ..params$inchannel_habitat_juvenile,
@@ -197,15 +404,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                              sutter_habitat = ..params$sutter_habitat,
                              yolo_habitat = ..params$yolo_habitat,
                              delta_habitat = ..params$delta_habitat)
-
-      if (grepl("rearing", r_to_r_sensi)) {
-        habitat$inchannel <- habitat$inchannel * sensi_increase
-        habitat$floodplain <- habitat$floodplain * sensi_increase
-        habitat$sutter <- habitat$sutter * sensi_increase
-        habitat$yolo <- habitat$yolo * sensi_increase
-        habitat$north_delta <- habitat$north_delta * sensi_increase
-        habitat$south_delta <- habitat$south_delta * sensi_increase
-      }
 
       rearing_survival <- get_rearing_survival(year, month,
                                                survival_adjustment = scenario_data$survival_adjustment,
@@ -277,10 +475,14 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
       migrants <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
 
-      if (month == 8) {
+      if (month == 7) {
 
         # all remaining fish outmigrate
         migrants <- juveniles
+
+        #TODO find where the names are lost and make sure they persist all way to this
+        # part of the code
+        colnames(migrants) <- c("s", "m", "l", "vl")
 
         sutter_fish <- migrate(sutter_fish, migratory_survival$sutter, stochastic = stochastic)
         upper_mid_sac_fish <- migrate(upper_mid_sac_fish + migrants[1:15, ], migratory_survival$uppermid_sac, stochastic = stochastic)
@@ -307,13 +509,15 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                             migratory_survival_delta = migratory_survival$delta,
                                             migratory_survival_bay_delta = migratory_survival$bay_delta,
                                             juveniles_at_chipps = juveniles_at_chipps,
-                                            growth_rates = ..params$growth_rates,
+                                            growth_rates = growth_rates_delta,
                                             territory_size = ..params$territory_size,
                                             stochastic = stochastic)
 
-        juveniles_at_chipps <- delta_fish$juveniles_at_chipps
+
         migrants_at_golden_gate <- delta_fish$migrants_at_golden_gate
 
+        juveniles_at_chipps <- delta_fish$juveniles_at_chipps
+        migrants_at_golden_gate <- delta_fish$migrants_at_golden_gate
       } else {
         # if month < 8
         # route northern natal fish stay and rear or migrate downstream ------
@@ -336,10 +540,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         upper_sac_trib_rear <- rear(juveniles = upper_sac_trib_fish$inchannel,
                                     survival_rate = rearing_survival$inchannel[1:15, ],
-                                    growth = ..params$growth_rates,
+                                    growth = growth_rates_ic[,,1:15],
                                     floodplain_juveniles = upper_sac_trib_fish$floodplain,
                                     floodplain_survival_rate = rearing_survival$floodplain[1:15, ],
-                                    floodplain_growth = ..params$growth_rates_floodplain,
+                                    floodplain_growth = growth_rates_fp[,,1:15],
                                     weeks_flooded = ..params$weeks_flooded[1:15, month, year],
                                     stochastic = stochastic)
 
@@ -361,7 +565,6 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                              territory_size = ..params$territory_size,
                                              stochastic = stochastic)
 
-
         sutter_fish <- route_bypass(bypass_fish = sutter_fish + upper_mid_sac_fish$detoured,
                                     bypass_habitat = habitat$sutter,
                                     migration_survival_rate = migratory_survival$sutter,
@@ -372,10 +575,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         upper_mid_sac_fish <- rear(juveniles = upper_mid_sac_fish$inchannel,
                                    survival_rate = rearing_survival$inchannel[16, ],
-                                   growth = ..params$growth_rates,
+                                   growth = growth_rates_ic[,,16],
                                    floodplain_juveniles = upper_mid_sac_fish$floodplain,
                                    floodplain_survival_rate = rearing_survival$floodplain[16, ],
-                                   floodplain_growth = ..params$growth_rates_floodplain,
+                                   floodplain_growth = growth_rates_fp[,,16],
                                    weeks_flooded = rep(..params$weeks_flooded[16, month, year], nrow(upper_mid_sac_fish$inchannel)),
                                    stochastic = stochastic)
 
@@ -383,7 +586,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         sutter_fish <- rear(juveniles = sutter_fish$inchannel,
                             survival_rate = matrix(rep(rearing_survival$sutter, nrow(sutter_fish$inchannel)), ncol = 4, byrow = TRUE),
-                            growth = ..params$growth_rates,
+                            growth = growth_rates_ic[,,17],
                             stochastic = stochastic)
 
 
@@ -410,10 +613,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         lower_mid_sac_trib_rear <- rear(juveniles = lower_mid_sac_trib_fish$inchannel,
                                         survival_rate = rearing_survival$inchannel[18:20, ],
-                                        growth = ..params$growth_rates,
+                                        growth = growth_rates_ic[,,18:20],
                                         floodplain_juveniles = lower_mid_sac_trib_fish$floodplain,
                                         floodplain_survival_rate = rearing_survival$floodplain[18:20, ],
-                                        floodplain_growth = ..params$growth_rates_floodplain,
+                                        floodplain_growth = growth_rates_fp[,,18:20],
                                         weeks_flooded = ..params$weeks_flooded[18:20, month, year],
                                         stochastic = stochastic)
 
@@ -442,10 +645,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         lower_mid_sac_fish <- rear(juveniles = lower_mid_sac_fish$inchannel,
                                    survival_rate = rearing_survival$inchannel[21, ],
-                                   growth = ..params$growth_rates,
+                                   growth = growth_rates_ic[,,21],
                                    floodplain_juveniles = lower_mid_sac_fish$floodplain,
                                    floodplain_survival_rate = rearing_survival$floodplain[21, ],
-                                   floodplain_growth = ..params$growth_rates_floodplain,
+                                   floodplain_growth = growth_rates_fp[,,21],
                                    weeks_flooded = rep(..params$weeks_flooded[21, month, year], nrow(lower_mid_sac_fish$inchannel)),
                                    stochastic = stochastic)
 
@@ -453,7 +656,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         yolo_fish <- rear(juveniles = yolo_fish$inchannel,
                           survival_rate = matrix(rep(rearing_survival$yolo, nrow(yolo_fish$inchannel)), ncol = 4, byrow = TRUE),
-                          growth = ..params$growth_rates,
+                          growth = growth_rates_ic[,,22],
                           stochastic = stochastic)
 
 
@@ -479,10 +682,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         lower_sac_trib_rear <- rear(juveniles = lower_sac_trib_fish$inchannel,
                                     survival_rate = rearing_survival$inchannel[23, , drop = FALSE],
-                                    growth = ..params$growth_rates,
+                                    growth = growth_rates_ic[,,23],
                                     floodplain_juveniles = lower_sac_trib_fish$floodplain,
                                     floodplain_survival_rate = rearing_survival$floodplain[23, , drop = FALSE],
-                                    floodplain_growth = ..params$growth_rates_floodplain,
+                                    floodplain_growth = growth_rates_fp[,,23],
                                     weeks_flooded = ..params$weeks_flooded[23, month, year],
                                     stochastic = stochastic)
 
@@ -504,10 +707,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         lower_sac_fish <- rear(juveniles = lower_sac_fish$inchannel,
                                survival_rate = rearing_survival$inchannel[24, ],
-                               growth = ..params$growth_rates,
+                               growth = growth_rates_ic[,,24],
                                floodplain_juveniles = lower_sac_fish$floodplain,
                                floodplain_survival_rate = rearing_survival$floodplain[24, ],
-                               floodplain_growth = ..params$growth_rates_floodplain,
+                               floodplain_growth = growth_rates_fp[,,24],
                                weeks_flooded = rep(..params$weeks_flooded[24, month, year], nrow(lower_sac_fish$inchannel)),
                                stochastic = stochastic)
 
@@ -537,10 +740,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         south_delta_trib_rear <- rear(juveniles = south_delta_trib_fish$inchannel,
                                       survival_rate = rearing_survival$inchannel[25:27, ],
-                                      growth = ..params$growth_rates,
+                                      growth = growth_rates_ic[,,25:27],
                                       floodplain_juveniles = south_delta_trib_fish$floodplain,
                                       floodplain_survival_rate = rearing_survival$floodplain[25:27, ],
-                                      floodplain_growth = ..params$growth_rates_floodplain,
+                                      floodplain_growth = growth_rates_fp[,,25:27],
                                       weeks_flooded = ..params$weeks_flooded[25:27, month, year],
                                       stochastic = stochastic)
 
@@ -571,10 +774,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         san_joaquin_trib_rear <- rear(juveniles = san_joaquin_trib_fish$inchannel,
                                       survival_rate = rearing_survival$inchannel[28:30, ],
-                                      growth = ..params$growth_rates,
+                                      growth = growth_rates_ic[,,28:30],
                                       floodplain_juveniles = san_joaquin_trib_fish$floodplain,
                                       floodplain_survival_rate = rearing_survival$floodplain[28:30, ],
-                                      floodplain_growth = ..params$growth_rates_floodplain,
+                                      floodplain_growth = growth_rates_fp[,,28:30],
                                       weeks_flooded = ..params$weeks_flooded[28:30, month, year],
                                       stochastic = stochastic)
 
@@ -594,10 +797,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
         san_joaquin_fish <- rear(juveniles = san_joaquin_fish$inchannel,
                                  survival_rate = rearing_survival$inchannel[31, ],
-                                 growth = ..params$growth_rates,
+                                 growth = growth_rates_ic[,,31],
                                  floodplain_juveniles = san_joaquin_fish$floodplain,
                                  floodplain_survival_rate = rearing_survival$floodplain[31, ],
-                                 floodplain_growth = ..params$growth_rates_floodplain,
+                                 floodplain_growth = growth_rates_fp[,,31],
                                  weeks_flooded = rep(..params$weeks_flooded[31, month, year], nrow(san_joaquin_fish$inchannel)),
                                  stochastic = stochastic)
 
@@ -615,9 +818,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                             migratory_survival_delta = migratory_survival$delta,
                                             migratory_survival_bay_delta = migratory_survival$bay_delta,
                                             juveniles_at_chipps = juveniles_at_chipps,
-                                            growth_rates = ..params$growth_rates,
+                                            growth_rates = growth_rates_delta,
                                             territory_size = ..params$territory_size,
                                             stochastic = stochastic)
+
 
         migrants_at_golden_gate <- delta_fish$migrants_at_golden_gate
 
@@ -627,6 +831,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
         juveniles_at_chipps <- delta_fish$juveniles_at_chipps
       }
 
+      # migrants at golden gate is a init adults(hatchery+natural) -> juvs -> survival+migration -> ocean
+
       ocean_entry_success <- ocean_entry_success(migrants = migrants_at_golden_gate,
                                                  month = month,
                                                  avg_ocean_transition_month = avg_ocean_transition_month,
@@ -635,51 +841,95 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                  .ocean_entry_success_months = ..params$.ocean_entry_success_months,
                                                  stochastic = stochastic)
 
-      if (grepl("ocean", r_to_r_sensi)) {
-        ocean_entry_success <- ocean_entry_success * sensi_increase
-      }
       adults_in_ocean <- adults_in_ocean + ocean_entry_success
 
+      # # For use in the r2r metrics ---------------------------------------------
+      d <- data.frame(juveniles_at_chipps)
+      colnames(d) <- c("s", "m", "l", "vl")
+      d$watershed <- fallRunDSM::watershed_labels
+      d <- d |> tidyr::pivot_longer(names_to = "size",
+                                    values_to = "juveniles_at_chipps", -watershed)
+      d$year <- year
+      d$month <- month
+      output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
+      # end R2R metric -----------------------------------------------------------
     } # end month loop
 
     output$juvenile_biomass[ , year] <- juveniles_at_chipps %*% fallRunDSM::params$mass_by_size_class
-
-    adults_returning <- t(sapply(1:31, function(i) {
+    # Updated logic here for R2R so that natural adults and hatchery adults return separately
+    natural_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {
-        rmultinom(1, adults_in_ocean[i], prob = c(.25, .5, .25))
+        rmultinom(1, (adults_in_ocean[i]), prob = c(.22, .47, .26, .05))
       } else {
-        round(adults_in_ocean[i] * c(.25, .5, .25))
+        round((adults_in_ocean[i])* c(.22, .47, .26, .05))
       }
-    }))
+    })) * output$proportion_natural_juves_in_tribs[ , year]
+
+    natural_adults_returning[is.na(natural_adults_returning)] = NaN
+
+   # R2R release at chipps logic
+    # TODO(stray) capture parameter for calculating straying
+    # stray_rates_in_bay_releases <- hatchery_adult_stray()
+    hatchery_releases_at_chipps <- ocean_entry_success(migrants = ..params$hatchery_releases_at_chipps,
+                                               month = 8, # set to final month
+                                               avg_ocean_transition_month = avg_ocean_transition_month,
+                                               .ocean_entry_success_length = ..params$.ocean_entry_success_length,
+                                               ..ocean_entry_success_int = ..params$..ocean_entry_success_int,
+                                               .ocean_entry_success_months = ..params$.ocean_entry_success_months,
+                                               stochastic = stochastic)
+
+   hatchery_adults_returning <- t(sapply(1:31, function(i) {
+     if (stochastic) {
+       rmultinom(1, (adults_in_ocean[i]), prob = c(.30, .60, .10)) * (1 - output$proportion_natural_juves_in_tribs[ , year][i]) +
+         rmultinom(1, (hatchery_releases_at_chipps[i]), prob = c(.30, .60, .10))
+       } else {
+         round((adults_in_ocean[i] * c(.30, .60, .10)) * (1 - output$proportion_natural_juves_in_tribs[, year][i])) +
+           round((hatchery_releases_at_chipps[i]) * c(.30, .60, .10))}
+     }))
+
+   hatchery_adults_returning[is.na(hatchery_adults_returning)] = NaN
+
+    # # For use in the r2r metrics ---------------------------------------------
+    colnames(natural_adults_returning) <- c("V1", "V2", "V3", "V4")
+    colnames(hatchery_adults_returning) <- c("V1", "V2", "V3")
 
     output$returning_adults <- bind_rows(
       output$returning_adults,
-      adults_returning |>
-        as_tibble() |>
-        mutate(watershed = watershed_labels,
+      natural_adults_returning |>
+        dplyr::as_tibble(.name_repair = "universal") |>
+        dplyr::mutate(watershed = watershed_labels,
                sim_year = year,
-               natural_adults = init_adults * spawners$proportion_natural) |>
-        pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
-        mutate(return_year = readr::parse_number(return_year)) |>
-        group_by(watershed) |>
-        mutate(return_total_nat = return_total * spawners$proportion_natural[watershed])
-
+               origin = "natural") |>
+        tidyr::pivot_longer(V1:V4, names_to = "return_year", values_to = "return_total") |>
+        dplyr::mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year)),
+      hatchery_adults_returning |>
+        dplyr::as_tibble(.name_repair = "universal") |>
+        dplyr::mutate(watershed = watershed_labels,
+               sim_year = year,
+               origin = "hatchery") |>
+        tidyr::pivot_longer(V1:V3, names_to = "return_year", values_to = "return_total") |>
+        dplyr::mutate(return_sim_year = readr::parse_number(return_year) + 1 + as.numeric(sim_year))
     )
+    # End R2R metric logic -----------------------------------------------------
 
     output$adults_in_ocean[,year] <- adults_in_ocean
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
-      calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + adults_returning
+      calculated_adults[1:31, (year + 1):(year + 4)] <- calculated_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
+      calculated_adults[1:31, (year + 1):(year + 3)] <- calculated_adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
     } else {
-      adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + adults_returning
+      adults[1:31, (year + 1):(year + 4)] <- adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
+      adults[1:31, (year + 1):(year + 3)] <- adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
+      adults[is.na(adults)] = 0
     }
-
 
   } # end year for loop
 
   if (mode == "seed") {
-    return(adults[ , 6:30])
+    # browser()
+    return(list(adults = adults[ , 6:30],
+                proportion_hatchery = 1 - proportion_natural_juves_in_tribs))
   } else if (mode == "calibrate") {
     return(calculated_adults[, 6:20])
   }
@@ -688,7 +938,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     output$spawners[ , year] / (output$spawners[ , year + 1] + 1)
   })
 
-  viable <- spawn_change >= 1 & output$proportion_natural[ , -1] >= 0.9 & output$spawners[ , -1] >= 833
+  viable <- spawn_change >= 1 & output$proportion_natural_juves_in_tribs[ , -1] >= 0.9 & output$spawners[ , -1] >= 833
 
   output$viability_metrics <- sapply(1:4, function(group) {
     colSums(viable[which(fallRunDSM::params$diversity_group == group), ])

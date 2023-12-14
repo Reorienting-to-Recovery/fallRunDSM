@@ -37,6 +37,10 @@ reference:
   desc: Functions that calculate growth and movement
   contents:
   - adult_stray
+  - apply_straying
+  - compute_adult_stray_rates
+  - stray_returning_adults
+  - harvest_adults
   - pulse_movement
   - fill
   - route
@@ -49,6 +53,9 @@ reference:
   - rear
   - migrate
   - ocean_transition_month
+  - bioenergetics_transitions
+  - get_growth_rates
+
 
 - title: Datasets
   desc: Data used by the lifecycle model
@@ -64,6 +71,12 @@ reference:
   - natural_adult_removal_rate
   - proportion_hatchery
   - stray_rate
+  - hatchery_release_proportion_bay
+  - hatchery_stray_betareg
+  - hatchery_to_bay_distance
+  - prey_density
+  - prey_density_delta
+  - straying_destinations
 
 - title: Wrapper and Helper Functions
   desc: Convenience functions that call multiple sub-models or are used within submodels.

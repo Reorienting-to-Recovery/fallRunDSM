@@ -1,10 +1,17 @@
 library(tidyverse)
+library(DSMflow)
+library(DSMtemperature)
 
-# 2021
-calib_results <- read_rds("calibration/calibration-results.rds")
+remotes::install_github("Reorienting-to-Recovery/DSMhabitat", force = TRUE)
+library(DSMhabitat)
+
+# updated params
+# loads calibration data
+calib_results <- read_rds("calibration/result-test-known-nats-2.rds")
 solution <- calib_results@solution
 
-r_to_r_baseline_params <- list(
+r_to_r_tmh_params <- list(
+  spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$biop_itp_2018_2019$fr,
 
   # Data from DSMscenarios
   spawn_decay_rate = DSMscenario::spawn_decay_rate,
@@ -31,7 +38,7 @@ r_to_r_baseline_params <- list(
   .adult_stray_prop_delta_trans = 2.89,
   .adult_en_route_migratory_temp = -0.26,
   .adult_en_route_bypass_overtopped = -0.019,
-  .adult_en_route_adult_harvest_rate = fallRunDSM::adult_harvest_rate, # varies by run
+  .adult_en_route_adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate, # varies by run
   .adult_prespawn_deg_day = -0.000669526,
 
   # Ocean entry success coefficient and variable
@@ -120,12 +127,12 @@ r_to_r_baseline_params <- list(
   migratory_temperature_proportion_over_20 = DSMtemperature::migratory_temperature_proportion_over_20,
 
   # DSMhabitat variables -----
-  spawning_habitat = DSMhabitat::fr_spawn$r_to_r_baseline,
-  inchannel_habitat_fry = DSMhabitat::fr_fry$r_to_r_baseline, # vary by run
-  inchannel_habitat_juvenile = DSMhabitat::fr_juv$r_to_r_baseline, # vary by run
-  floodplain_habitat = DSMhabitat::fr_fp$r_to_r_baseline, # vary by run
+  spawning_habitat = DSMhabitat::fr_spawn$r_to_r_tmh,
+  inchannel_habitat_fry = DSMhabitat::fr_fry$r_to_r_tmh, # vary by run
+  inchannel_habitat_juvenile = DSMhabitat::fr_juv$r_to_r_tmh, # vary by run
+  floodplain_habitat = DSMhabitat::fr_fp$r_to_r_tmh, # vary by run
   weeks_flooded = DSMhabitat::weeks_flooded$biop_itp_2018_2019,
-  delta_habitat = DSMhabitat::delta_habitat$r_to_r_baseline,
+  delta_habitat = DSMhabitat::delta_habitat$r_to_r_tmh,
   sutter_habitat = DSMhabitat::sutter_habitat$biop_itp_2018_2019,
   yolo_habitat = DSMhabitat::yolo_habitat$biop_itp_2018_2019,
   tisdale_bypass_watershed = DSMhabitat::tisdale_bypass_watershed,
@@ -138,6 +145,9 @@ r_to_r_baseline_params <- list(
   prob_strand_early = DSMhabitat::prob_strand_early,
   prob_strand_late = DSMhabitat::prob_strand_late,
   prob_nest_scoured = DSMhabitat::prob_nest_scoured,
+
+  prey_density = fallRunDSM::prey_density,
+  prey_density_delta = fallRunDSM::prey_density_delta,
 
   # Calibration Variables (vary by run)
   ..surv_adult_enroute_int = solution[1],
@@ -213,10 +223,17 @@ r_to_r_baseline_params <- list(
     `Merced River` = solution[38],
     `Stanislaus River` = solution[39],
     `Tuolumne River` = solution[40],
-    `San Joaquin River` = solution[28])
+    `San Joaquin River` = solution[28]),
+
+  # R2R specific metrics
+  hatchery_release = fallRunDSM::fall_hatchery_release,
+  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
+  fecundity_lookup = fallRunDSM::fecundity_by_age
 )
 
-usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)
+usethis::use_data(r_to_r_tmh_params, overwrite = TRUE)
+
+
 
 
 

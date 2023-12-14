@@ -67,6 +67,23 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="3.0.0" id="fallrundsm-v300">fallRunDSM v3.0.0<a class="anchor" aria-label="anchor" href="#fallrundsm-v300"></a></h2>
+<p>fallRunDSM v3.0.0 is the Fall-run life cycle model used by the Science Integration Team as part of <a href="http://cvpia.scienceintegrationteam.com/" class="external-link">CVPIA Structured Decision Making</a> process to evaluate priorities and information needs for management of anadromous fish in the Central Valley. A complete description of the model, model parameters and their source can be found in <a href="https://onlinelibrary.wiley.com/doi/10.1111/rec.13244" class="external-link">Peterson and Duarte (2020)</a>.</p>
+<div class="section level4">
+<h4 id="model-updates-3-0-0">Model Updates<a class="anchor" aria-label="anchor" href="#model-updates-3-0-0"></a></h4>
+<p>The 3.0.0 release of the fallRunDSM introduces several notable changes:</p>
+<ul><li><p>Growth rates are now calculated using transition matrices produced by Bioenergetics. These changes have been incorporated into the new <code>get_growth_rates</code> function in the file <code>R/growth.R</code>. The new matrices enable the simulation to take into account both temperature and prey density in order to determine the appropriate transition to use for either perennial or floodplain growth.</p></li>
+<li><p>CALSIM data is now updated to incorporate 2019 BiOp and 2020 ITP rulesets. The changes are introduced in the latest version of the <a href="https://github.com/CVPIA-OSC/DSMflow" class="external-link">DSMflow</a> package and cached in this model package. Users are still able to run the model using previous rulesets by using the 2021 model <code>params</code>.</p></li>
+<li><p>Spawning habitat decay has been updated and transitioned away from a probabilistic decay to a flow-driven approach. Details on the analysis for these changes can be found <a href="https://cvpia-osc.github.io/DSMhabitat/articles/flow-driven-spawning-decay.html" class="external-link">here</a>.</p></li>
+<li><p>Yuba Fall Run adult estimates have been updated based on analysis from the <a href="https://cvpia-meeting-slides.s3.us-west-2.amazonaws.com/2020-Update_LYR-Chinook-Salmon-Run-Differentiation_December-2020.pdf" class="external-link">Lower Yuba river Vaki Riverwatcher™ Chinook Salmon passage and run differentiation analyses</a></p></li>
+</ul><p>fallRunDSM v3.0.0 was run with the following data package releases to inform the <a href="https://cvpia-documents.s3-us-west-1.amazonaws.com/CVPIA_Near-term-Restoration-Strategy_FY21-FY25_FINAL.pdf" class="external-link">Near-term Restoration Strategy FY2021-2025</a>:</p>
+<ul><li><a href="https://github.com/CVPIA-OSC/DSMtemperature/tree/v3.0" class="external-link">DSMtemperatue v3.0</a></li>
+<li><a href="https://github.com/CVPIA-OSC/DSMhabitat/tree/v3.0" class="external-link">DSMhabitat v3.0</a></li>
+<li><a href="https://github.com/CVPIA-OSC/DSMflow/tree/v3.0" class="external-link">DSMflow v3.0</a></li>
+<li><a href="https://github.com/CVPIA-OSC/DSMCalibrationData" class="external-link">DSMCalibration</a></li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="1.0.0" id="fallrundsm-v100">fallRunDSM v1.0.0<a class="anchor" aria-label="anchor" href="#fallrundsm-v100"></a></h2>
 <p>fallRunDSM v1.0.0 is the Fall-run life cycle model used by the Science Integration Team as part of <a href="http://cvpia.scienceintegrationteam.com/" class="external-link">CVPIA Structured Decision Making</a> process to evaluate priorities and information needs for management of anadromous fish in the Central Valley. A complete description of the model, model parameters and their source can be found in <a href="https://onlinelibrary.wiley.com/doi/10.1111/rec.13244" class="external-link">Peterson and Duarte (2020)</a>.</p>
 <p>fallRunDSM v1.0.0 was run with the following data package releases to inform the <a href="https://cvpia-documents.s3-us-west-1.amazonaws.com/CVPIA_Near-term-Restoration-Strategy_FY21-FY25_FINAL.pdf" class="external-link">Near-term Restoration Strategy FY2021-2025</a>:</p>

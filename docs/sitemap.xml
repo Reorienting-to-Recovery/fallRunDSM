@@ -4,6 +4,12 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/404.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/CODE_OF_CONDUCT.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/CONTRIBUTING.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/LICENSE.html</loc>
   </url>
   <url>
@@ -49,6 +55,15 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/adult_stray.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/apply_straying.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/bioenergetics_transitions.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/compute_adult_stray_rates.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/cross_channel_stray_rate.html</loc>
   </url>
   <url>
@@ -71,6 +86,9 @@
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/gamma_MOM.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/get_growth_rates.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/get_habitat.html</loc>
@@ -100,7 +118,19 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/growth_rates.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/harvest_adults.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/hatchery_allocation.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/hatchery_release_proportion_bay.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/hatchery_stray_betareg.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/hatchery_to_bay_distance.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/index.html</loc>
@@ -121,6 +151,12 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/natural_adult_removal_rate.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/normalize_with_context.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/normalize_with_params.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/ocean_entry_success.html</loc>
   </url>
   <url>
@@ -130,7 +166,16 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/params.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/prepare_stray_model_data.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/pretty_num.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/prey_density.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/prey_density_delta.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/proportion_hatchery.html</loc>
@@ -164,6 +209,12 @@
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/stray_rate.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/stray_returning_adults.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/straying_destinations.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/surv_adult_enroute.html</loc>

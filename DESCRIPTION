@@ -6,7 +6,7 @@ Authors@R: c(
     person("James", "Petterson", email = "jt.peterson@oregonstate.edu", role = "aut"),
     person("Adam", "Duarte", email = "adam.duarte@oregonstate.edu", role = "aut"), 
     person("Sadie", "Gill", email = "sgill@flowwest.com", role = "aut"), 
-    person("Emanuel", "Rodriguez", email = "erodriguez@flowwest.com", role = "cre"),
+    person("Emanuel", "Rodriguez", email = "erodriguez@flowwest.com", role = "aut"),
     person("Erin", "Cain", email = "ecain@flowwest.com", role = "cre"))
 Description: This package contains the R2R life cycle model. This model was adapted from the CVPIA-OSC and updated to account for Reorienting to Recovery values. This model is used to compare the affects of different scenarios on salmonid populations. 
 License: GPL-3

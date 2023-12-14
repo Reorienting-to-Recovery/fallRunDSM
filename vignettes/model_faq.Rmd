@@ -30,7 +30,6 @@ A: The calibration, sensitivity analysis, and reference materials are found on t
 -   [Spting-run documentation site](https://reorienting-to-recovery.github.io/springRunDSM)
 -   [Winter-run documentation site](https://reorienting-to-recovery.github.io/winterRunDSM)
 
-
 The reference tab includes the details for model parameters, sub-models, datasets, and helper functions. The Articles tab contains the details regarding calibration and sensitivity analysis.
 
 #### Q: What is the code repository's analysis folder?
@@ -122,5 +121,6 @@ remotes::install_github("reorienting-to-recovery/fallRunDSM@v1.0")
 #### Q: I found something within the code or inputs that seems like an error, how can I notify model developers?
 
 A: When you find n error, you can open an [issue on GitHub](https://github.com/Reorienting-to-Recovery/fallRunDSM/issues). In the comments section of the issue please describe the problem in detail, and if possible paste code that reproduces this error. Maintainers will be notified of this issue and communicate with you on the issue tracker page. 
+
 
 

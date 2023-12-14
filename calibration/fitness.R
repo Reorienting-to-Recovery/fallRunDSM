@@ -13,7 +13,7 @@ fall_run_fitness <- function(
   deer_surv_juv,
   mill_surv_juv,
   sac_surv_juv,
-  feather_and_bear_surv_juv,
+  feather_surv_juv,
   yuba_surv_juv,
   american_surv_juv,
   deltatribs_surv_juv,
@@ -66,8 +66,8 @@ fall_run_fitness <- function(
                                       `Thomes Creek` = deer_surv_juv,
                                       `Upper-mid Sacramento River` = sac_surv_juv,
                                       `Sutter Bypass` = bypass_surv_juv,
-                                      `Bear River` = feather_and_bear_surv_juv,
-                                      `Feather River` = feather_and_bear_surv_juv,
+                                      `Bear River` = deer_surv_juv,
+                                      `Feather River` = feather_surv_juv,
                                       `Yuba River` = yuba_surv_juv,
                                       `Lower-mid Sacramento River` = sac_surv_juv,
                                       `Yolo Bypass` = bypass_surv_juv,
@@ -134,7 +134,7 @@ fall_run_fitness <- function(
                             stochastic = FALSE,
                             ..params = params_init)
 
-    known_nats <- known_adults[keep, 6:20] * (1 - params_init$proportion_hatchery[keep])
+    known_nats <- known_adults[keep, 6:20]
     mean_escapent <-rowMeans(known_nats, na.rm = TRUE)
 
     sse <- sum(((preds[keep,] - known_nats)^2 * weights)/mean_escapent, na.rm = TRUE)
@@ -145,4 +145,30 @@ fall_run_fitness <- function(
   warning = function(w) return(1e12)
   )
 }
+
+# x<- 1:40
+# params_init <- DSMCalibrationData::set_synth_years(fallRunDSM::r_to_r_baseline_params)
+# seeds <- DSMCalibrationData::grandtab_imputed$fall
+#
+# fall_run_fitness(
+#   known_adults = DSMCalibrationData::grandtab_observed$fall,
+#   seeds = DSMCalibrationData::grandtab_imputed$fall,
+#   params = params_init,
+#   x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10],
+#   x[11], x[12], x[13], x[14], x[15], x[16], x[17], x[18], x[19],
+#   x[20], x[21], x[22], x[23], x[24], x[25], x[26], x[27], x[28],
+#   x[29], x[30], x[31], x[32], x[33], x[34], x[35], x[36], x[37],
+#   x[38], x[39], x[40]
+# )
+#
+#
+#
+#
+# preds <- fall_run_model(mode = "calibrate",
+#                         seeds = seeds,
+#                         stochastic = FALSE,
+#                         ..params = params_init)
+#
+
+
 

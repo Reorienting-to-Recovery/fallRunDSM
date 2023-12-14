@@ -195,6 +195,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # Harvest
     if (year <= 5 & mode == "simulate") {
+      # TODO add terminal hatchery logic here
       # HATCH
       # Confirm with tech team that harvest logic doesn't start fully until year 2
       hatch_adults <- adults[, year] * seeds$proportion_hatchery
@@ -220,7 +221,8 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     }
     # TODO THIS IS SOURCE OF LOW FEATHER NUMBERS
     if (year > 5 & mode == "simulate") {
-     adults_after_harvest <- harvest_adults(output$returning_adults, output$spawners, year,
+     adults_after_harvest <- harvest_adults(output$returning_adults,
+                                            output$spawners, year,
                                             ..params$spawning_habitat,
                                             terminal_hatchery_logic = ..params$terminal_hatchery_logic,
                                             ocean_harvest_percentage = ..params$ocean_harvest_percentage,
@@ -272,7 +274,10 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # TODO add conditional here for if hatch release == 0
     # TODO fix handeling for PHOS on non spawn and 0 fish watersheds
     phos <- ifelse(is.na(1 - spawners$proportion_natural), 0, 1 - spawners$proportion_natural)
-    if (year > 3){
+    if (year > 5 & (sum(..params$hatchery_release) + sum(..params$hatchery_releases_at_chipps)) == 0) {
+      natural_proportion_with_renat <- rep(1, 31)
+      names(natural_proportion_with_renat) <- fallRunDSM::watershed_labels
+    } else if (year > 3){
       phos_diff_two_years <- ifelse(is.na(phos - output$phos[, (year - 2)]), 0, phos - output$phos[, (year - 2)])
       phos_diff_last_year <- ifelse(is.na(phos - output$phos[, (year - 1)]), 0, phos - output$phos[, (year - 1)])
       if (any(phos_diff_two_years < 0 & phos_diff_last_year < 0)) {
@@ -284,14 +289,13 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
         total_natural_with_renaturing <- total_renaturing_in_year + spawners$init_adults * spawners$proportion_natural
         natural_proportion_with_renat <-  total_natural_with_renaturing / spawners$init_adults
         natural_proportion_with_renat <- ifelse(is.nan(natural_proportion_with_renat), 0, natural_proportion_with_renat)
-    #TODO add elseif if no hatch release
       } else {
         natural_proportion_with_renat <-  spawners$proportion_natural
       }
-    } else {
+      } else {
       natural_proportion_with_renat <-  spawners$proportion_natural
+      }
 
-    }
 
     output$proportion_natural_at_spawning[ , year] <- natural_proportion_with_renat
     output$phos[ , year] <- 1 - natural_proportion_with_renat
@@ -381,7 +385,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     growth_temps <- ..params$avg_temp
     growth_temps[which(growth_temps > 28)] <- 28
 
-    for (month in 1:8) {
+    for (month in 1:7) { # Change to move out by July
 
       growth_rates_ic <- get_growth_rates(growth_temps[,month, year],
                                           prey_density = ..params$prey_density)
@@ -471,7 +475,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
       migrants <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
 
-      if (month == 8) {
+      if (month == 7) {
 
         # all remaining fish outmigrate
         migrants <- juveniles

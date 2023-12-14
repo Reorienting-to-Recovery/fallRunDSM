@@ -1,5 +1,6 @@
 library(tidyverse)
-remotes::install_github("Reorienting-to-Recovery/DSMflow")
+remotes::install_github("Reorienting-to-Recovery/DSMflow@eff")
+remotes::install_github("Reorienting-to-Recovery/DSMhabitat@eff_sac_hab")
 library(DSMhabitat)
 library(DSMflow)
 
@@ -11,9 +12,18 @@ harvest_percentage <- fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31)
 harvest_percentage[harvest_percentage < 0] <- 0
 
 
+# What did I change from baseline
+# Use max hab eff
+# Use eff flows for sac
+# scale contact points by .3
+# scale high pred by .3
+# release 0 hatch fish in river
+#
+
+
 # initial params
-r_to_r_baseline_params <- list(
-  #TODO add updated spawn decay multiplier for 2019 biop
+r_to_r_kitchen_sink_params <- list(
+  #TODO add updated spawn decay multiplier for eff stuff
   spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$biop_itp_2018_2019$fr,
 
   # Data from DSMscenarios
@@ -112,8 +122,8 @@ r_to_r_baseline_params <- list(
   delta_proportion_diverted = DSMflow::delta_proportion_diverted$biop_itp_2018_2019,
   delta_total_diverted = DSMflow::delta_total_diverted$biop_itp_2018_2019,
   prop_pulse_flows = DSMflow::proportion_pulse_flows$biop_itp_2018_2019,
-  prop_flow_natal = DSMflow::proportion_flow_natal$biop_itp_2018_2019,
-  upper_sacramento_flows = DSMflow::upper_sacramento_flows$biop_itp_2018_2019,
+  prop_flow_natal = DSMflow::proportion_flow_natal$eff_sac,
+  upper_sacramento_flows = DSMflow::upper_sacramento_flows$eff_sac,
   delta_inflow = DSMflow::delta_inflow$biop_itp_2018_2019,
   cc_gates_days_closed = DSMflow::delta_cross_channel_closed$biop_itp_2018_2019["count", ],
   cc_gates_prop_days_closed = DSMflow::delta_cross_channel_closed$biop_itp_2018_2019["proportion", ],
@@ -131,26 +141,27 @@ r_to_r_baseline_params <- list(
   migratory_temperature_proportion_over_20 = DSMtemperature::migratory_temperature_proportion_over_20,
 
   # DSMhabitat variables -----
-  spawning_habitat = DSMhabitat::fr_spawn$r_to_r_baseline,
-  inchannel_habitat_fry = DSMhabitat::fr_fry$r_to_r_baseline, # vary by run
-  inchannel_habitat_juvenile = DSMhabitat::fr_juv$r_to_r_baseline, # vary by run
-  floodplain_habitat = DSMhabitat::fr_fp$r_to_r_baseline, # vary by run
-  weeks_flooded = DSMhabitat::weeks_flooded$biop_itp_2018_2019,
+  spawning_habitat = DSMhabitat::fr_spawn$r_to_r_tmh_eff,
+  # TODO remove nas here
+  inchannel_habitat_fry = DSMhabitat::fr_fry$r_to_r_tmh_eff, # vary by run
+  inchannel_habitat_juvenile = DSMhabitat::fr_juv$r_to_r_tmh_eff, # vary by run
+  floodplain_habitat = DSMhabitat::fr_fp$r_to_r_tmh_eff, # vary by run
+  weeks_flooded = DSMhabitat::weeks_flooded$eff_sac,
   delta_habitat = DSMhabitat::delta_habitat$r_to_r_baseline,
   sutter_habitat = DSMhabitat::sutter_habitat$biop_itp_2018_2019,
   yolo_habitat = DSMhabitat::yolo_habitat$biop_itp_2018_2019,
   tisdale_bypass_watershed = DSMhabitat::tisdale_bypass_watershed,
   yolo_bypass_watershed = DSMhabitat::yolo_bypass_watershed,
   south_delta_routed_watersheds = DSMhabitat::south_delta_routed_watersheds,
-  prop_high_predation = DSMhabitat::prop_high_predation,
-  contact_points = DSMhabitat::contact_points,
+  prop_high_predation = DSMhabitat::prop_high_predation * .3,
+  contact_points = DSMhabitat::contact_points * .3,
   delta_contact_points = DSMhabitat::delta_contact_points,
   delta_prop_high_predation = DSMhabitat::delta_prop_high_predation,
   prob_strand_early = DSMhabitat::prob_strand_early,
   prob_strand_late = DSMhabitat::prob_strand_late,
   prob_nest_scoured = DSMhabitat::prob_nest_scoured,
 
-  prey_density = fallRunDSM::prey_density,
+  prey_density =  rep("hi", 31), # fallRunDSM::prey_density,
   prey_density_delta = fallRunDSM::prey_density_delta,
 
   # Calibration Variables (vary by run)
@@ -230,24 +241,24 @@ r_to_r_baseline_params <- list(
     `San Joaquin River` = solution[28]),
 
   # R2R specific metrics
-  hatchery_release = fallRunDSM::fall_hatchery_release,
+  hatchery_release = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
   hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
   fecundity_lookup = fallRunDSM::fecundity_by_age,
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
-  restrict_harvest_to_hatchery = FALSE,
+  restrict_harvest_to_hatchery = TRUE,
   ocean_harvest_percentage = .5,
   tributary_harvest_percentage = harvest_percentage,
   no_cohort_harvest_years = c(),
   intelligent_crr_harvest = FALSE,
   intelligent_habitat_harvest = FALSE,
-  terminal_hatchery_logic = FALSE,
+  terminal_hatchery_logic = TRUE,
 
   # stray model
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,
   flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019
 )
 
-usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)
+usethis::use_data(r_to_r_kitchen_sink_params, overwrite = TRUE)
 
 
 

@@ -110,7 +110,8 @@ NULL
 #' @format 4 x 4 x 28 x 8 array [4 size classes x 4 size classes x 28 temperatures x 8 rear/flood and level combinations]
 #' @source TODO
 "bioenergetics_transitions"
-
+#TODO add all the parameters that are missing
+#TODO update links to pull form R2R packages
 #' @title Model Parameters
 #' @description A list containing all parameters needed for running the \code{\link{fall_run_model}}. Parameters with a single
 #' period in front are model or submodel coefficients. Parameters with double periods in front of them are calibrated model parameters.

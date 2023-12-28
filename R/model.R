@@ -17,7 +17,7 @@
 #' @export
 fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibrate"),
                            seeds = NULL, ..params = fallRunDSM::r_to_r_baseline_params,
-                           stochastic = FALSE){
+                           stochastic = FALSE, delta_surv_inflation = TRUE){
 
   mode <- match.arg(mode)
 
@@ -89,7 +89,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     proportion_natural_at_spawning = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     proportion_natural_juves_in_tribs = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     phos = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    limiting_habitat = data.frame()
+    limiting_habitat = data.frame(),
+    harvested_adults = data.frame()
+
   )
 
 
@@ -195,29 +197,30 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     # Harvest
     if (year <= 5 & mode == "simulate") {
-      # TODO add terminal hatchery logic here
-      # HATCH
-      # Confirm with tech team that harvest logic doesn't start fully until year 2
       hatch_adults <- adults[, year] * seeds$proportion_hatchery
       # Default to base harvest levels .57 most tribs
       adults_after_harvest <- hatch_adults * (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage)
       hatch_after_harvest_by_age <- round(unname(adults_after_harvest) * as.matrix(default_hatch_age_dist[2:5]))
       row.names(hatch_after_harvest_by_age) = fallRunDSM::watershed_labels
       colnames(hatch_after_harvest_by_age) = c(2, 3, 4, 5)
+      harvested_hatchery_adults = hatch_adults - adults_after_harvest
       # NATURAL
       if (..params$restrict_harvest_to_hatchery) {
-        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
+        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery) * .9 # hooking mortality
         natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
-        # THINK about if we need an else if for no comercial here
+        harvested_natural_adults = rep(0, 31)
       } else {
         nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
         natutal_adults_after_harvest <- nat_adults * (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage)
         natutal_adults_by_age <- round(unname(natutal_adults_after_harvest) * as.matrix(default_nat_age_dist[2:5]))
+        harvested_natural_adults = nat_adults - natutal_adults_after_harvest
       }
       row.names(natutal_adults_by_age) = fallRunDSM::watershed_labels
       colnames(natutal_adults_by_age) = c(2, 3, 4, 5)
       adults_after_harvest <- list(hatchery_adults = hatch_after_harvest_by_age,
-                                   natural_adults = natutal_adults_by_age)
+                                   natural_adults = natutal_adults_by_age,
+                                   harvested_hatchery_adults = harvested_hatchery_adults,
+                                   harvested_natural_adults = harvested_natural_adults)
     }
     # TODO THIS IS SOURCE OF LOW FEATHER NUMBERS
     if (year > 5 & mode == "simulate") {
@@ -235,6 +238,15 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
       )
 
+    }
+    if (mode == "simulate") {
+    natural_adult_harvest <- sum(adults_after_harvest$harvested_natural_adults, na.rm = TRUE)
+    hatchery_adult_harvest <- sum(adults_after_harvest$harvested_hatchery_adults, na.rm = TRUE)
+    harvest <- tibble(year = year,
+                      hatchery_harvest = hatchery_adult_harvest,
+                      natural_harvest = natural_adult_harvest,
+                      total_harvest = hatchery_harvest + natural_harvest)
+    output$harvested_adults <- bind_rows(output$harvested_adults, harvest)
     }
     # STRAY
     if (mode == "simulate") {
@@ -274,7 +286,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # TODO add conditional here for if hatch release == 0
     # TODO fix handeling for PHOS on non spawn and 0 fish watersheds
     phos <- ifelse(is.na(1 - spawners$proportion_natural), 0, 1 - spawners$proportion_natural)
-    if (year > 5 & (sum(..params$hatchery_release) + sum(..params$hatchery_releases_at_chipps)) == 0) {
+    if (mode == "simulate" & year > 5 & (sum(..params$hatchery_release) + sum(..params$hatchery_releases_at_chipps)) == 0) {
       natural_proportion_with_renat <- rep(1, 31)
       names(natural_proportion_with_renat) <- fallRunDSM::watershed_labels
     } else if (year > 3){
@@ -472,6 +484,13 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
                                                    .surv_juv_outmigration_san_joaquin_large = ..params$.surv_juv_outmigration_san_joaquin_large,
                                                    min_survival_rate = ..params$min_survival_rate,
                                                    stochastic = stochastic)
+      if (delta_surv_inflation == TRUE){
+        migratory_survival$bay_delta <- migratory_survival$bay_delt * 2
+        migratory_survival$sutter <- migratory_survival$sutter * 2
+        migratory_survival$yolo <- migratory_survival$yolo * 2
+        migratory_survival$delta <- migratory_survival$delta * 2
+
+      }
 
       migrants <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
 
@@ -871,7 +890,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     # TODO(stray) capture parameter for calculating straying
     # stray_rates_in_bay_releases <- hatchery_adult_stray()
     hatchery_releases_at_chipps <- ocean_entry_success(migrants = ..params$hatchery_releases_at_chipps,
-                                               month = 8, # set to final month
+                                               month = 7, # set to final month
                                                avg_ocean_transition_month = avg_ocean_transition_month,
                                                .ocean_entry_success_length = ..params$.ocean_entry_success_length,
                                                ..ocean_entry_success_int = ..params$..ocean_entry_success_int,

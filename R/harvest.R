@@ -38,64 +38,65 @@ harvest_adults <- function(adult_df,
   min_spawn_habitat <- apply(spawn_habitat[ , 10:12, year], 1, min)
   capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
   hab_capacity <- tibble(watershed = fallRunDSM::watershed_labels,
-                         capacity = capacity)
+                         habitat_capacity = capacity)
 
   watershed_order <- tibble(watershed = watershed_attributes$watershed,
                             order = watershed_attributes$order)
-  # Apply ocean harvest --------------------------------------------------------
-  # TODO think about adding min spawn habitat into intelligent CRR
-  # OCEAN HARVEST
-  # Set no harvest adultBs based on no cohort years and no hatchery only harvest restrictions
+  total_harvest <- rep(ocean_harvest_percentage, 31) + tributary_harvest_percentage
+  # Apply harvest ---------------------------------------------------------------
+  # Set no harvest adults based on no cohort years and no hatchery only harvest restrictions
   no_harvest_adults <- adult_df |>
     filter(return_sim_year == year) |>
     mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well? follow up with technical team
            no_harvest = ifelse(restrict_harvest_to_hatchery & origin == "natural", T, no_harvest),
-           no_harvest = ifelse(terminal_hatchery_logic, T, F),
            age = return_sim_year - sim_year) |>
     filter(no_harvest) |>
     group_by(watershed, origin, age) |>
     summarise(remaining_adults = round(sum(return_total, na.rm = TRUE) * .9, 0)) # multipiles by .9 to remove 10 percent bycatch/hook mortality (high estimate)
 
-  if (intelligent_habitat_harvest) {
-    # Create harvested adults for crr = true
-    # ocean_harvested_adults <-
-  } else {
-  # allow harvest in harvest region and of hatchery (or natural if also desired)
-  # harvest older adults more than non
-    ocean_harvest_adults <- adult_df |>
-      filter(return_sim_year == year) |>
-      mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well
-             no_harvest = ifelse(restrict_harvest_to_hatchery & origin == "natural", T, no_harvest),
-             no_harvest = ifelse(terminal_hatchery_logic, T, F)) |>
-      filter(!no_harvest) |>
-      rowwise() |>
-      mutate(num_adults_required_after_harvest = ifelse(intelligent_crr_harvest,
-                                                        round(spawner_df[watershed, sim_year] *
-                                                                return_prop[origin, return_year] * crr_scaling, 0), 0), # this is capturing total
-             age = return_sim_year - sim_year,
-             harvested_adults = case_when(age == 2 ~ round(return_total *
-                                                             ocean_harvest_percentage, 0) ,
-                                          age == 3 ~ round(return_total *
-                                                             ocean_harvest_percentage *
-                                                             ocean_harvest_percentage, 0),
-                                          age == 4 ~ round(return_total *
-                                                             ocean_harvest_percentage *
-                                                             ocean_harvest_percentage *
-                                                             ocean_harvest_percentage, 0),
-                                          age == 5 ~ round(return_total *
-                                                             ocean_harvest_percentage *
-                                                             ocean_harvest_percentage *
-                                                             ocean_harvest_percentage *
-                                                             ocean_harvest_percentage, 0)),
-             utalize_crr_totals = ifelse(num_adults_required_after_harvest < (return_total - harvested_adults) & intelligent_crr_harvest, TRUE, FALSE),
-             remaining_adults = round(ifelse(utalize_crr_totals, num_adults_required_after_harvest, return_total - harvested_adults), 0),
-             actual_harvest = round(ifelse(utalize_crr_totals, return_total - num_adults_required_after_harvest, harvested_adults), 0)) |>
-      select(watershed, origin, age, remaining_adults)
-  }
+  ocean_and_trib_harvest_adults <- adult_df |>
+    filter(return_sim_year == year) |>
+    left_join(hab_capacity, by = "watershed") |>
+    mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well
+           no_harvest = ifelse(restrict_harvest_to_hatchery & origin == "natural", T, no_harvest)) |>
+    filter(!no_harvest) |>
+    rowwise() |>
+    mutate(num_adults_required_after_harvest = ifelse(intelligent_crr_harvest,
+                                                      round(spawner_df[watershed, sim_year] *
+                                                              return_prop[origin, return_year] * crr_scaling, 0), 0), # this is capturing total
+           age = return_sim_year - sim_year,
+           trib_harvest = tributary_harvest_percentage[watershed],
+           adults_after_harvest = case_when(age == 2 ~ round((return_total *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - trib_harvest), 0) ,
+                                        age == 3 ~ round(((return_total *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - trib_harvest), 0),
+                                        age == 4 ~ round((((return_total *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - trib_harvest), 0),
+                                        age == 5 ~ round(((((return_total *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - ocean_harvest_percentage)) *
+                                                           (1 - trib_harvest), 0)),
+           utalize_crr_totals = ifelse(num_adults_required_after_harvest > adults_after_harvest & intelligent_crr_harvest, TRUE, FALSE),
+           utalize_hab_totals = ifelse(habitat_capacity > adults_after_harvest & intelligent_habitat_harvest, TRUE, FALSE),
+           remaining_adults = round(case_when(utalize_crr_totals ~ min(num_adults_required_after_harvest, return_total),
+                                              utalize_hab_totals ~ min(habitat_capacity, return_total),
+                                              T ~ adults_after_harvest), 0),
+           actual_harvest = round(case_when(utalize_crr_totals ~ max(return_total - num_adults_required_after_harvest, 0),
+                                            utalize_hab_totals ~ max(return_total - habitat_capacity, 0),
+                                            T ~ max(return_total - adults_after_harvest, 0)), 0)) |>
+    select(watershed, origin, age, remaining_adults, actual_harvest)
   # Set to always allow - apply to no harvest and harvest adults, this will break crr logic (TODO talk with rene about that)
   # Recombine and synthesis
   hatchery_adults <- bind_rows(no_harvest_adults,
-                               ocean_harvest_adults) |>
+                               ocean_and_trib_harvest_adults) |>
     filter(origin == "hatchery") |>
     group_by(watershed, age) |>
     summarise(remaining_adults = round(sum(remaining_adults, na.rm = TRUE), 0)) |>
@@ -107,11 +108,23 @@ harvest_adults <- function(adult_df,
     as.matrix()
   rownames(hatchery_adults) <- watershed_labels
 
-  # Apply trib harvest (to all fish)
-  hatch_adults_apply_trib_harvest <- round(hatchery_adults * (1 - tributary_harvest_percentage))
+  # harvested hatch_adults
+  harvested_hatchery_adults <- bind_rows(no_harvest_adults,
+                                         ocean_and_trib_harvest_adults) |>
+    filter(origin == "hatchery") |>
+    group_by(watershed, age) |>
+    summarise(actual_harvest = round(sum(actual_harvest, na.rm = TRUE), 0)) |>
+    ungroup() |>
+    pivot_wider(names_from = age, values_from = actual_harvest) |>
+    left_join(watershed_order, by = "watershed") |>
+    arrange(order) |>
+    select(-watershed, -order) |>
+    as.matrix()
+  rownames(harvested_hatchery_adults) <- watershed_labels
 
+  # Nat adults remaining
   natural_adults <- bind_rows(no_harvest_adults,
-                              ocean_harvest_adults) |>
+                              ocean_and_trib_harvest_adults) |>
     filter(origin == "natural") |>
     group_by(watershed, age) |>
     summarise(remaining_adults = round(sum(remaining_adults, na.rm = TRUE), 0)) |>
@@ -123,12 +136,23 @@ harvest_adults <- function(adult_df,
     as.matrix()
   rownames(natural_adults) <- watershed_labels
 
-  # Apply trib harvest (to all fish)
-  natural_adults_apply_trib_harvest <- round(natural_adults * (1 - tributary_harvest_percentage))
+  # harvested natural
+  harvested_natural_adults <- bind_rows(no_harvest_adults,
+                                        ocean_and_trib_harvest_adults) |>
+    filter(origin == "natural") |>
+    group_by(watershed, age) |>
+    summarise(actual_harvest = round(sum(actual_harvest, na.rm = TRUE), 0)) |>
+    ungroup() |>
+    pivot_wider(names_from = age, values_from = actual_harvest) |>
+    left_join(watershed_order, by = "watershed") |>
+    arrange(order) |>
+    select(-watershed, -order) |>
+    as.matrix()
+  rownames(harvested_hatchery_adults) <- watershed_labels
 
   # Total adults (non confirming arrays so have to do differently)
   total_adults <- bind_rows(no_harvest_adults,
-                              ocean_harvest_adults) |>
+                            ocean_and_trib_harvest_adults) |>
     group_by(watershed, age) |>
     summarise(remaining_adults = round(sum(remaining_adults, na.rm = TRUE), 0)) |>
     ungroup() |>
@@ -139,18 +163,17 @@ harvest_adults <- function(adult_df,
     as.matrix()
   rownames(total_adults) <- watershed_labels
 
-  # Apply trib harvest (to all fish)
-  total_adults_apply_trib_harvest <- round(total_adults * (1 - tributary_harvest_percentage))
-
   # prepare outpults
-  total_adults <- total_adults_apply_trib_harvest
-  hatchery_adults <- hatch_adults_apply_trib_harvest
-  natural_adults <- natural_adults_apply_trib_harvest
-  proportion_natural <- natural_adults_apply_trib_harvest / total_adults
+  total_adults <- total_adults
+  hatchery_adults <- hatchery_adults
+  natural_adults <- natural_adults
+  proportion_natural <- natural_adults / total_adults
 
   # change nan to 0 for non spawn regions
   # recalculate pHOS
   list(hatchery_adults = replace(hatchery_adults, is.nan(hatchery_adults), 0),
        natural_adults = replace(natural_adults, is.nan(natural_adults), 0),
+       harvested_hatchery_adults = harvested_hatchery_adults,
+       harvested_natural_adults = harvested_natural_adults,
        proportion_natural = replace(proportion_natural, is.nan(proportion_natural), 0))
 }

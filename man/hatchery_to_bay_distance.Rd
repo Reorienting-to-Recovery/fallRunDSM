@@ -5,12 +5,16 @@
 \alias{hatchery_to_bay_distance}
 \title{Hatchery to Chipps Island (rkm)}
 \format{
-An object of class \code{numeric} of length 5.
+Named vector of length five corresponding to hatchery locations [5 hatchery names]
+}
+\source{
+Distance from hatchery to Chipps Island pulled from table 1 of
+ \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019}
 }
 \usage{
 hatchery_to_bay_distance
 }
 \description{
-Lookup for distances from hatchery to the Chipps Island, measured in river kilometers
+Lookup table for distances from hatchery to the Chipps Island, measured in river kilometers
 }
 \keyword{datasets}

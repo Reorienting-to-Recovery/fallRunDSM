@@ -6,21 +6,23 @@
 \usage{
 harvest_adults(
   adult_df,
+  spawner_df,
   year = year,
-  hatchery_allocation = ..params$hatchery_allocation,
+  spawn_habitat,
+  terminal_hatchery_logic = c(T, F),
   ocean_harvest_percentage,
   tributary_harvest_percentage,
   restrict_harvest_to_hatchery = c(F, T),
-  no_cohort_harvest_years,
-  intelligent_crr_harvest = c(F, T)
+  no_cohort_harvest_years = NULL,
+  intelligent_habitat_harvest = c(F, T),
+  intelligent_crr_harvest = c(F, T),
+  crr_scaling = 2
 )
 }
 \arguments{
 \item{adult_df}{A data frame containing information about adult salmon.}
 
 \item{year}{The target year for the harvest calculation.}
-
-\item{hatchery_allocation}{The allocation of harvest to hatcheries.}
 
 \item{ocean_harvest_percentage}{The percentage of harvest from the ocean, same for all tributaries.}
 

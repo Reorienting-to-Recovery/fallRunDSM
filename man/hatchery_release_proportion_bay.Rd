@@ -11,7 +11,7 @@ An object of class \code{numeric} of length 31.
 hatchery_release_proportion_bay
 }
 \description{
-The proporiton of hatchery releases occuring at the Bay. Note that the complement
-\code{1 - hatchery_release_proportion_bay} is the proportion of releases occuring in-river.
+The proportion of hatchery releases occurring at the Bay. Note that the complement
+\code{1 - hatchery_release_proportion_bay} is the proportion of releases occurring in-river.
 }
 \keyword{datasets}

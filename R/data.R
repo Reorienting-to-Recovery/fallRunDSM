@@ -34,7 +34,7 @@
 #' Adult Seeds
 #' @title Adult Seeds
 #' @description Adult fish for the initial 5 years of the simulations.
-#' @format A matrix with dimension 31 x 30 (watershed x year)
+#'
 #' @source Derived from average escapement estimates from 2013 to 2017 \href{https://dsm-docs.s3.us-west-2.amazonaws.com/Azat+2019.pdf}{Azat 2019}.
 "adult_seeds"
 
@@ -309,23 +309,32 @@ NULL
 #' @title Hatchery Stray Model
 #' @description
 #' A serialized version of the beta-regression model for hatchery origin fish straying
+#' @source Model from
+#'  \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019}
 "hatchery_stray_betareg"
 
 
 #' @title Hatchery to Chipps Island (rkm)
 #' @description
-#' Lookup for distances from hatchery to the Chipps Island, measured in river kilometers
+#' Lookup table for distances from hatchery to the Chipps Island, measured in river kilometers
+#' @format Named vector of length five corresponding to hatchery locations [5 hatchery names]
+#' @source Distance from hatchery to Chipps Island pulled from table 1 of
+#'  \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019}
 "hatchery_to_bay_distance"
 
 #' @title Bay Proportion Hatchery Releases
 #' @description
-#' The proporiton of hatchery releases occuring at the Bay. Note that the complement
-#' `1 - hatchery_release_proportion_bay` is the proportion of releases occuring in-river.
+#' The proportion of hatchery releases occurring at the Bay. Note that the complement
+#' `1 - hatchery_release_proportion_bay` is the proportion of releases occurring in-river.
 #'@md
 "hatchery_release_proportion_bay"
 
 
-#' @title Straying Destnations
+#' @title Straying Destinations
 #' @description
-#' Given a hatchery this matrix returns as rows the proportion of fish to stray at perticular watersheds.
+#' Given a hatchery this matrix returns as rows the proportion of fish to stray at particular watersheds.
+#' @format A matrix with dimension 31 x 6 (watershed x hatchery)
+#' @source Top 3 straying destination pulled from table 1 of
+#' \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019.}
+#' Additional proportion of stays equally allocated to remaining tributaries based on expert opinion
 "straying_destinations"

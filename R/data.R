@@ -160,6 +160,13 @@ NULL
 #'   \item \code{spawn_success_fecundity}: Variable describing the number of eggs per female, default value 5522, source: \href{https://www.ucpress.edu/book/9780520227545/inland-fishes-of-california}{Moyle, P. B. 2002. Inland Fishes of California. University of California Press, Berkeley CA}
 #'   \item \code{hatchery_allocation}: More details at \code{\link{hatchery_allocation}}
 #'   \item \code{natural_adult_removal_rate}: More details at \code{\link{natural_adult_removal_rate}}
+#'   \item \code{adult_harvest_rate}: More details at \code{\link{r2r_adult_harvest_rate}
+#'   \item \code{restrict_harvest_to_hatchery}: Boolean value describing if harvest should be restricted to hatchery fish. Defaults to FALSE
+#'   \item \code{ocean_harvest_percentage}: Numeric value describing the proportion of ocean fish that are harvested. Defaults to .5 based on \href{https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf}{Table II-1}
+#'   \item \code{tributary_harvest_percentage}: Numeric value describing the proportion of in-river fish that are harvested. Quantities vary by tributary as described by \href{https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf}{Table II-1}
+#'   \item \code{no_cohort_harvest_years}: Vector listing cohort of fish with restricted harvest.
+#'   \item \code{intelligent_crr_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on cohort replacement rate. Defaults to FALSE
+#'   \item \code{intelligent_habitat_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on habitat. Defaults to FALSE
 #'
 #' }
 #' @section Egg to Fry Survival:
@@ -171,6 +178,14 @@ NULL
 #'   \item \code{.surv_egg_to_fry_scour}: Coefficient for \code{scour} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/montogemery_1996.pdf}{Montgomery et al. (1996)}
 #'   \item \code{..surv_egg_to_fry_int}:  Intercept, source: Calibration
 #' }
+#' @section Hatchery Releases:
+#' \itemize{
+#'   \item \code{hatchery_release}: More details at \code{\link[fallRunDSM]{fall_hatchery_release}}
+#'   \item \code{hatchery_releases_at_chipps}: More details at \code{\link[fallRunDSM]{hatchery_releases_at_chipps}}
+#'   \item \code{terminal_hatchery_logic}: Boolean value describing if terminal hatchery exist
+#'
+#' }
+#'
 #' @section Tributary Rearing Survival:
 #' \itemize{
 #'   \item \code{avg_temp}: More details at \code{\link[DSMtemperature]{stream_temperature}}
@@ -338,3 +353,33 @@ NULL
 #' \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019.}
 #' Additional proportion of stays equally allocated to remaining tributaries based on expert opinion
 "straying_destinations"
+
+
+#' @title Fall Hatchery Release
+#' @description Hatchery release by size class and hatchery
+#' @format A matrix with dimension 31 x 4 (watershed x size class)
+#' @source Hatchery return data comes from the production targets defined in the
+#' \href {https://swfsc-publications.fisheries.noaa.gov/publications/CR/2012/2012California.pdf}{California HSRG(Pages 65 - 95)}
+"fall_hatchery_release"
+
+#' @title Hatchery Release at Chipps
+#' @description
+#' @format character
+#' @source
+#' \href
+"hatchery_releases_at_chipps"
+
+#' @title Fecundity Lookup
+#' @description
+#' @format character
+#' @source
+#' \href
+"fecundity_by_age"
+
+#' @title Adult Harvest Rate
+#' @description
+#' @format character
+#' @source
+#' \href
+"r2r_adult_harvest_rate"
+

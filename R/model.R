@@ -81,6 +81,7 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     spawners = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     juvenile_biomass = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     returning_adults = tibble::tibble(),
+    north_delta_fish = data.frame(),
 
     # R2R METRICS
     adults_in_ocean = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
@@ -373,6 +374,20 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
     juveniles <- juveniles + ..params$hatchery_release
     # stray_rates_in_river_releases <- hatchery_adult_stray(hatchery = )
 
+    fish_list <- lapply(1:8, function(i) list(juveniles = juveniles,
+                                              lower_mid_sac_fish = lower_mid_sac_fish,
+                                              lower_sac_fish = lower_sac_fish,
+                                              upper_mid_sac_fish = upper_mid_sac_fish,
+                                              sutter_fish = sutter_fish,
+                                              yolo_fish = yolo_fish,
+                                              san_joaquin_fish = san_joaquin_fish,
+                                              north_delta_fish = north_delta_fish,
+                                              south_delta_fish = south_delta_fish,
+                                              juveniles_at_chipps = juveniles_at_chipps,
+                                              adults_in_ocean = adults_in_ocean))
+
+    names(fish_list) <- c(paste0("route_", 1:8, "_fish"))
+
     stopifnot(nrow(juveniles) == 31)
 
     # Create new prop natural including hatch releases that we can use to apply to adult returns
@@ -399,469 +414,191 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     for (month in 1:7) { # Change to move out by July
 
-      growth_rates_ic <- get_growth_rates(growth_temps[,month, year],
-                                          prey_density = ..params$prey_density)
-
-      growth_rates_fp <- get_growth_rates(growth_temps[,month, year],
-                                          prey_density = ..params$prey_density,
-                                          floodplain = TRUE)
-
-      growth_rates_delta <- get_growth_rates(..params$avg_temp_delta[month, year,],
-                                             prey_density = ..params$prey_density_delta)
-
-      habitat <- get_habitat(year, month,
-                             inchannel_habitat_fry = ..params$inchannel_habitat_fry,
-                             inchannel_habitat_juvenile = ..params$inchannel_habitat_juvenile,
-                             floodplain_habitat = ..params$floodplain_habitat,
-                             sutter_habitat = ..params$sutter_habitat,
-                             yolo_habitat = ..params$yolo_habitat,
-                             delta_habitat = ..params$delta_habitat)
-
-      rearing_survival <- get_rearing_survival(year, month,
-                                               survival_adjustment = scenario_data$survival_adjustment,
-                                               mode = mode,
-                                               avg_temp = ..params$avg_temp,
-                                               avg_temp_delta = ..params$avg_temp_delta,
-                                               prob_strand_early = ..params$prob_strand_early,
-                                               prob_strand_late = ..params$prob_strand_late,
-                                               proportion_diverted = ..params$proportion_diverted,
-                                               total_diverted = ..params$total_diverted,
-                                               delta_proportion_diverted = ..params$delta_proportion_diverted,
-                                               delta_total_diverted = ..params$delta_total_diverted,
-                                               weeks_flooded = ..params$weeks_flooded,
-                                               prop_high_predation = ..params$prop_high_predation,
-                                               contact_points = ..params$contact_points,
-                                               delta_contact_points = ..params$delta_contact_points,
-                                               delta_prop_high_predation = ..params$delta_prop_high_predation,
-                                               ..surv_juv_rear_int= ..params$..surv_juv_rear_int,
-                                               .surv_juv_rear_contact_points = ..params$.surv_juv_rear_contact_points,
-                                               ..surv_juv_rear_contact_points = ..params$..surv_juv_rear_contact_points,
-                                               .surv_juv_rear_prop_diversions = ..params$.surv_juv_rear_prop_diversions,
-                                               ..surv_juv_rear_prop_diversions = ..params$..surv_juv_rear_prop_diversions,
-                                               .surv_juv_rear_total_diversions = ..params$.surv_juv_rear_total_diversions,
-                                               ..surv_juv_rear_total_diversions = ..params$..surv_juv_rear_total_diversions,
-                                               ..surv_juv_bypass_int = ..params$..surv_juv_bypass_int,
-                                               ..surv_juv_delta_int = ..params$..surv_juv_delta_int,
-                                               .surv_juv_delta_contact_points = ..params$.surv_juv_delta_contact_points,
-                                               ..surv_juv_delta_contact_points = ..params$..surv_juv_delta_contact_points,
-                                               .surv_juv_delta_total_diverted = ..params$.surv_juv_delta_total_diverted,
-                                               ..surv_juv_delta_total_diverted = ..params$..surv_juv_delta_total_diverted,
-                                               .surv_juv_rear_avg_temp_thresh = ..params$.surv_juv_rear_avg_temp_thresh,
-                                               .surv_juv_rear_high_predation = ..params$.surv_juv_rear_high_predation,
-                                               .surv_juv_rear_stranded = ..params$.surv_juv_rear_stranded,
-                                               .surv_juv_rear_medium = ..params$.surv_juv_rear_medium,
-                                               .surv_juv_rear_large = ..params$.surv_juv_rear_large,
-                                               .surv_juv_rear_floodplain = ..params$.surv_juv_rear_floodplain,
-                                               .surv_juv_bypass_avg_temp_thresh = ..params$.surv_juv_bypass_avg_temp_thresh,
-                                               .surv_juv_bypass_high_predation = ..params$.surv_juv_bypass_high_predation,
-                                               .surv_juv_bypass_medium = ..params$.surv_juv_bypass_medium,
-                                               .surv_juv_bypass_large = ..params$.surv_juv_bypass_large,
-                                               .surv_juv_bypass_floodplain = ..params$.surv_juv_bypass_floodplain,
-                                               .surv_juv_delta_avg_temp_thresh = ..params$.surv_juv_delta_avg_temp_thresh,
-                                               .surv_juv_delta_high_predation = ..params$.surv_juv_delta_high_predation,
-                                               .surv_juv_delta_prop_diverted = ..params$.surv_juv_delta_prop_diverted,
-                                               .surv_juv_delta_medium = ..params$.surv_juv_delta_medium,
-                                               .surv_juv_delta_large = ..params$.surv_juv_delta_large,
-                                               min_survival_rate = ..params$min_survival_rate,
-                                               stochastic = stochastic)
-
-      migratory_survival <- get_migratory_survival(year, month,
-                                                   cc_gates_prop_days_closed = ..params$cc_gates_prop_days_closed,
-                                                   freeport_flows = ..params$freeport_flows,
-                                                   vernalis_flows = ..params$vernalis_flows,
-                                                   stockton_flows = ..params$stockton_flows,
-                                                   vernalis_temps = ..params$vernalis_temps,
-                                                   prisoners_point_temps = ..params$prisoners_point_temps,
-                                                   CVP_exports = ..params$CVP_exports,
-                                                   SWP_exports = ..params$SWP_exports,
-                                                   upper_sacramento_flows = ..params$upper_sacramento_flows,
-                                                   delta_inflow = ..params$delta_inflow,
-                                                   avg_temp_delta = ..params$avg_temp_delta,
-                                                   avg_temp = ..params$avg_temp,
-                                                   delta_proportion_diverted = ..params$delta_proportion_diverted,
-                                                   ..surv_juv_outmigration_sj_int = ..params$..surv_juv_outmigration_sj_int,
-                                                   .surv_juv_outmigration_san_joaquin_medium = ..params$.surv_juv_outmigration_san_joaquin_medium,
-                                                   .surv_juv_outmigration_san_joaquin_large = ..params$.surv_juv_outmigration_san_joaquin_large,
-                                                   min_survival_rate = ..params$min_survival_rate,
-                                                   stochastic = stochastic)
-      if (delta_surv_inflation == TRUE){
-        migratory_survival$bay_delta <- migratory_survival$bay_delt * 2
-        migratory_survival$sutter <- migratory_survival$sutter * 2
-        migratory_survival$yolo <- migratory_survival$yolo * 2
-        migratory_survival$delta <- migratory_survival$delta * 2
-
-      }
-
-      migrants <- matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
-
-      if (month == 7) {
-
-        # all remaining fish outmigrate
-        migrants <- juveniles
-
-        #TODO find where the names are lost and make sure they persist all way to this
-        # part of the code
-        colnames(migrants) <- c("s", "m", "l", "vl")
-
-        sutter_fish <- migrate(sutter_fish, migratory_survival$sutter, stochastic = stochastic)
-        upper_mid_sac_fish <- migrate(upper_mid_sac_fish + migrants[1:15, ], migratory_survival$uppermid_sac, stochastic = stochastic)
-        migrants[1:15, ] <- upper_mid_sac_fish + sutter_fish
-
-        lower_mid_sac_fish <- migrate(lower_mid_sac_fish + migrants[1:20, ], migratory_survival$lowermid_sac, stochastic = stochastic)
-        yolo_fish <- migrate(yolo_fish, migratory_survival$yolo, stochastic = stochastic)
-        migrants[1:20, ] <- lower_mid_sac_fish + yolo_fish
-
-        lower_sac_fish <- migrate(lower_sac_fish + migrants[1:27, ], migratory_survival$lower_sac, stochastic = stochastic)
-
-        san_joaquin_fish <- migrate(migrants[28:30, ] + san_joaquin_fish, migratory_survival$san_joaquin, stochastic = stochastic)
-        migrants[28:30, ] <- san_joaquin_fish
-
-        delta_fish <- route_and_rear_deltas(year = year, month = month,
-                                            migrants = round(migrants),
-                                            north_delta_fish = north_delta_fish,
-                                            south_delta_fish = south_delta_fish,
-                                            north_delta_habitat = habitat$north_delta,
-                                            south_delta_habitat = habitat$south_delta,
-                                            freeport_flows = ..params$freeport_flows,
-                                            cc_gates_days_closed = ..params$cc_gates_days_closed,
-                                            rearing_survival_delta = rearing_survival$delta,
-                                            migratory_survival_delta = migratory_survival$delta,
-                                            migratory_survival_bay_delta = migratory_survival$bay_delta,
-                                            juveniles_at_chipps = juveniles_at_chipps,
-                                            growth_rates = growth_rates_delta,
-                                            territory_size = ..params$territory_size,
-                                            stochastic = stochastic)
-
-
-        migrants_at_golden_gate <- delta_fish$migrants_at_golden_gate
-
-        juveniles_at_chipps <- delta_fish$juveniles_at_chipps
-        migrants_at_golden_gate <- delta_fish$migrants_at_golden_gate
-      } else {
-        # if month < 8
-        # route northern natal fish stay and rear or migrate downstream ------
-        upper_sac_trib_fish <-  route(year = year,
-                                      month = month,
-                                      juveniles = juveniles[1:15, ],
-                                      inchannel_habitat = habitat$inchannel[1:15],
-                                      floodplain_habitat = habitat$floodplain[1:15],
-                                      prop_pulse_flows = ..params$prop_pulse_flows[1:15, ],
-                                      .pulse_movement_intercept = ..params$.pulse_movement_intercept,
-                                      .pulse_movement_proportion_pulse = ..params$.pulse_movement_proportion_pulse,
-                                      .pulse_movement_medium = ..params$.pulse_movement_medium,
-                                      .pulse_movement_large = ..params$.pulse_movement_large,
-                                      .pulse_movement_vlarge = ..params$.pulse_movement_vlarge,
-                                      .pulse_movement_medium_pulse = ..params$.pulse_movement_medium_pulse,
-                                      .pulse_movement_large_pulse = ..params$.pulse_movement_large_pulse,
-                                      .pulse_movement_very_large_pulse = ..params$.pulse_movement_very_large_pulse,
-                                      territory_size = ..params$territory_size,
-                                      stochastic = stochastic)
-
-        upper_sac_trib_rear <- rear(juveniles = upper_sac_trib_fish$inchannel,
-                                    survival_rate = rearing_survival$inchannel[1:15, ],
-                                    growth = growth_rates_ic[,,1:15],
-                                    floodplain_juveniles = upper_sac_trib_fish$floodplain,
-                                    floodplain_survival_rate = rearing_survival$floodplain[1:15, ],
-                                    floodplain_growth = growth_rates_fp[,,1:15],
-                                    weeks_flooded = ..params$weeks_flooded[1:15, month, year],
-                                    stochastic = stochastic)
-
-        juveniles[1:15, ] <- upper_sac_trib_rear$inchannel + upper_sac_trib_rear$floodplain
-
-        # route migrant fish into Upper-mid Sac Region (fish from watersheds 1:15)
-        # regional fish stay and rear
-        # or migrate further downstream or in sutter bypass
-
-        upper_mid_sac_fish <- route_regional(month = month,
-                                             year = year,
-                                             migrants = upper_mid_sac_fish + upper_sac_trib_fish$migrants,
-                                             inchannel_habitat = habitat$inchannel[16],
-                                             floodplain_habitat = habitat$floodplain[16],
-                                             prop_pulse_flows = ..params$prop_pulse_flows[16, , drop = FALSE],
-                                             migration_survival_rate = migratory_survival$uppermid_sac,
-                                             proportion_flow_bypass = ..params$proportion_flow_bypass,
-                                             detour = 'sutter',
-                                             territory_size = ..params$territory_size,
-                                             stochastic = stochastic)
-
-        sutter_fish <- route_bypass(bypass_fish = sutter_fish + upper_mid_sac_fish$detoured,
-                                    bypass_habitat = habitat$sutter,
-                                    migration_survival_rate = migratory_survival$sutter,
-                                    territory_size = ..params$territory_size,
-                                    stochastic = stochastic)
-
-        migrants[1:15, ] <- upper_mid_sac_fish$migrants + sutter_fish$migrants
-
-        upper_mid_sac_fish <- rear(juveniles = upper_mid_sac_fish$inchannel,
-                                   survival_rate = rearing_survival$inchannel[16, ],
-                                   growth = growth_rates_ic[,,16],
-                                   floodplain_juveniles = upper_mid_sac_fish$floodplain,
-                                   floodplain_survival_rate = rearing_survival$floodplain[16, ],
-                                   floodplain_growth = growth_rates_fp[,,16],
-                                   weeks_flooded = rep(..params$weeks_flooded[16, month, year], nrow(upper_mid_sac_fish$inchannel)),
-                                   stochastic = stochastic)
-
-        upper_mid_sac_fish <- upper_mid_sac_fish$inchannel + upper_mid_sac_fish$floodplain
-
-        sutter_fish <- rear(juveniles = sutter_fish$inchannel,
-                            survival_rate = matrix(rep(rearing_survival$sutter, nrow(sutter_fish$inchannel)), ncol = 4, byrow = TRUE),
-                            growth = growth_rates_ic[,,17],
-                            stochastic = stochastic)
-
-
-
-        # route migrant fish into Lower-mid Sac Region (fish from watersheds 18:20, and migrants from Upper-mid Sac Region)
-        # regional fish stay and rear
-        # or migrate further downstream  or in yolo bypass
-        lower_mid_sac_trib_fish <- route(year = year,
-                                         month = month,
-                                         juveniles = juveniles[18:20, ],
-                                         inchannel_habitat = habitat$inchannel[18:20],
-                                         floodplain_habitat = habitat$floodplain[18:20],
-                                         prop_pulse_flows =  ..params$prop_pulse_flows[18:20, ],
-                                         .pulse_movement_intercept = ..params$.pulse_movement_intercept,
-                                         .pulse_movement_proportion_pulse = ..params$.pulse_movement_proportion_pulse,
-                                         .pulse_movement_medium = ..params$.pulse_movement_medium,
-                                         .pulse_movement_large = ..params$.pulse_movement_large,
-                                         .pulse_movement_vlarge = ..params$.pulse_movement_vlarge,
-                                         .pulse_movement_medium_pulse = ..params$.pulse_movement_medium_pulse,
-                                         .pulse_movement_large_pulse = ..params$.pulse_movement_large_pulse,
-                                         .pulse_movement_very_large_pulse = ..params$.pulse_movement_very_large_pulse,
-                                         territory_size = ..params$territory_size,
-                                         stochastic = stochastic)
-
-        lower_mid_sac_trib_rear <- rear(juveniles = lower_mid_sac_trib_fish$inchannel,
-                                        survival_rate = rearing_survival$inchannel[18:20, ],
-                                        growth = growth_rates_ic[,,18:20],
-                                        floodplain_juveniles = lower_mid_sac_trib_fish$floodplain,
-                                        floodplain_survival_rate = rearing_survival$floodplain[18:20, ],
-                                        floodplain_growth = growth_rates_fp[,,18:20],
-                                        weeks_flooded = ..params$weeks_flooded[18:20, month, year],
-                                        stochastic = stochastic)
-
-        juveniles[18:20, ] <- lower_mid_sac_trib_rear$inchannel + lower_mid_sac_trib_rear$floodplain
-        migrants[18:20, ] <- lower_mid_sac_trib_fish$migrants
-
-        lower_mid_sac_fish <- route_regional(month = month,
-                                             year = year,
-                                             migrants = lower_mid_sac_fish + migrants[1:20, ],
-                                             inchannel_habitat = habitat$inchannel[21],
-                                             floodplain_habitat = habitat$floodplain[21],
-                                             prop_pulse_flows = ..params$prop_pulse_flows[21, , drop = FALSE],
-                                             migration_survival_rate = migratory_survival$lowermid_sac,
-                                             proportion_flow_bypass = ..params$proportion_flow_bypass,
-                                             detour = 'yolo',
-                                             territory_size = ..params$territory_size,
-                                             stochastic = stochastic)
-
-        yolo_fish <- route_bypass(bypass_fish = yolo_fish + lower_mid_sac_fish$detoured,
-                                  bypass_habitat = habitat$yolo,
-                                  migration_survival_rate = migratory_survival$yolo,
-                                  territory_size = ..params$territory_size,
-                                  stochastic = stochastic)
-
-        migrants[1:20, ] <- lower_mid_sac_fish$migrants + yolo_fish$migrants
-
-        lower_mid_sac_fish <- rear(juveniles = lower_mid_sac_fish$inchannel,
-                                   survival_rate = rearing_survival$inchannel[21, ],
-                                   growth = growth_rates_ic[,,21],
-                                   floodplain_juveniles = lower_mid_sac_fish$floodplain,
-                                   floodplain_survival_rate = rearing_survival$floodplain[21, ],
-                                   floodplain_growth = growth_rates_fp[,,21],
-                                   weeks_flooded = rep(..params$weeks_flooded[21, month, year], nrow(lower_mid_sac_fish$inchannel)),
-                                   stochastic = stochastic)
-
-        lower_mid_sac_fish <- lower_mid_sac_fish$inchannel + lower_mid_sac_fish$floodplain
-
-        yolo_fish <- rear(juveniles = yolo_fish$inchannel,
-                          survival_rate = matrix(rep(rearing_survival$yolo, nrow(yolo_fish$inchannel)), ncol = 4, byrow = TRUE),
-                          growth = growth_rates_ic[,,22],
-                          stochastic = stochastic)
-
-
-        # route migrant fish into Lower Sac Region (fish from watershed 23, and migrants from Lower-mid Sac Region)
-        # regional fish stay and rear
-        # or migrate north delta
-        lower_sac_trib_fish <- route(year = year,
-                                     month = month,
-                                     juveniles = juveniles[23, , drop = FALSE],
-                                     inchannel_habitat = habitat$inchannel[23],
-                                     floodplain_habitat = habitat$floodplain[23],
-                                     prop_pulse_flows =  ..params$prop_pulse_flows[23, , drop = FALSE],
-                                     .pulse_movement_intercept = ..params$.pulse_movement_intercept,
-                                     .pulse_movement_proportion_pulse = ..params$.pulse_movement_proportion_pulse,
-                                     .pulse_movement_medium = ..params$.pulse_movement_medium,
-                                     .pulse_movement_large = ..params$.pulse_movement_large,
-                                     .pulse_movement_vlarge = ..params$.pulse_movement_vlarge,
-                                     .pulse_movement_medium_pulse = ..params$.pulse_movement_medium_pulse,
-                                     .pulse_movement_large_pulse = ..params$.pulse_movement_large_pulse,
-                                     .pulse_movement_very_large_pulse = ..params$.pulse_movement_very_large_pulse,
-                                     territory_size = ..params$territory_size,
-                                     stochastic = stochastic)
-
-        lower_sac_trib_rear <- rear(juveniles = lower_sac_trib_fish$inchannel,
-                                    survival_rate = rearing_survival$inchannel[23, , drop = FALSE],
-                                    growth = growth_rates_ic[,,23],
-                                    floodplain_juveniles = lower_sac_trib_fish$floodplain,
-                                    floodplain_survival_rate = rearing_survival$floodplain[23, , drop = FALSE],
-                                    floodplain_growth = growth_rates_fp[,,23],
-                                    weeks_flooded = ..params$weeks_flooded[23, month, year],
-                                    stochastic = stochastic)
-
-        juveniles[23, ] <- lower_sac_trib_rear$inchannel + lower_sac_trib_rear$floodplain
-
-        migrants[23, ] <- lower_sac_trib_fish$migrants
-
-        lower_sac_fish <- route_regional(month = month,
-                                         year = year,
-                                         migrants = lower_sac_fish + migrants[1:27, ],
-                                         inchannel_habitat = habitat$inchannel[24],
-                                         floodplain_habitat = habitat$floodplain[24],
-                                         prop_pulse_flows = ..params$prop_pulse_flows[24, , drop = FALSE],
-                                         migration_survival_rate = migratory_survival$lower_sac,
-                                         territory_size = ..params$territory_size,
-                                         stochastic = stochastic)
-
-        migrants[1:27, ] <- lower_sac_fish$migrants
-
-        lower_sac_fish <- rear(juveniles = lower_sac_fish$inchannel,
-                               survival_rate = rearing_survival$inchannel[24, ],
-                               growth = growth_rates_ic[,,24],
-                               floodplain_juveniles = lower_sac_fish$floodplain,
-                               floodplain_survival_rate = rearing_survival$floodplain[24, ],
-                               floodplain_growth = growth_rates_fp[,,24],
-                               weeks_flooded = rep(..params$weeks_flooded[24, month, year], nrow(lower_sac_fish$inchannel)),
-                               stochastic = stochastic)
-
-        lower_sac_fish <- lower_sac_fish$inchannel + lower_sac_fish$floodplain
-
-        # route southern natal fish stay and rear or migrate downstream ------
-
-        # route migrant fish into South Delta Region (fish from watersheds 25:27)
-        # regional fish stay and rear
-        # or migrate to south delta
-        south_delta_trib_fish <- route(year = year,
-                                       month = month,
-                                       juveniles = juveniles[25:27, ],
-                                       inchannel_habitat = habitat$inchannel[25:27],
-                                       floodplain_habitat = habitat$floodplain[25:27],
-                                       prop_pulse_flows =  ..params$prop_pulse_flows[25:27, ],
-                                       .pulse_movement_intercept = ..params$.pulse_movement_intercept,
-                                       .pulse_movement_proportion_pulse = ..params$.pulse_movement_proportion_pulse,
-                                       .pulse_movement_medium = ..params$.pulse_movement_medium,
-                                       .pulse_movement_large = ..params$.pulse_movement_large,
-                                       .pulse_movement_vlarge = ..params$.pulse_movement_vlarge,
-                                       .pulse_movement_medium_pulse = ..params$.pulse_movement_medium_pulse,
-                                       .pulse_movement_large_pulse = ..params$.pulse_movement_large_pulse,
-                                       .pulse_movement_very_large_pulse = ..params$.pulse_movement_very_large_pulse,
-                                       territory_size = ..params$territory_size,
-                                       stochastic = stochastic)
-
-        south_delta_trib_rear <- rear(juveniles = south_delta_trib_fish$inchannel,
-                                      survival_rate = rearing_survival$inchannel[25:27, ],
-                                      growth = growth_rates_ic[,,25:27],
-                                      floodplain_juveniles = south_delta_trib_fish$floodplain,
-                                      floodplain_survival_rate = rearing_survival$floodplain[25:27, ],
-                                      floodplain_growth = growth_rates_fp[,,25:27],
-                                      weeks_flooded = ..params$weeks_flooded[25:27, month, year],
-                                      stochastic = stochastic)
-
-        juveniles[25:27, ] <- south_delta_trib_rear$inchannel + south_delta_trib_rear$floodplain
-
-        migrants[25:27, ] <- south_delta_trib_fish$migrants
-
-        # route migrant fish into San Joquin River (fish from watersheds 28:30)
-        # regional fish stay and rear
-        # or migrate to south delta
-
-        san_joaquin_trib_fish <- route(year = year,
-                                       month = month,
-                                       juveniles = juveniles[28:30, ],
-                                       inchannel_habitat = habitat$inchannel[28:30],
-                                       floodplain_habitat = habitat$floodplain[28:30],
-                                       prop_pulse_flows =  ..params$prop_pulse_flows[28:30, ],
-                                       .pulse_movement_intercept = ..params$.pulse_movement_intercept,
-                                       .pulse_movement_proportion_pulse = ..params$.pulse_movement_proportion_pulse,
-                                       .pulse_movement_medium = ..params$.pulse_movement_medium,
-                                       .pulse_movement_large = ..params$.pulse_movement_large,
-                                       .pulse_movement_vlarge = ..params$.pulse_movement_vlarge,
-                                       .pulse_movement_medium_pulse = ..params$.pulse_movement_medium_pulse,
-                                       .pulse_movement_large_pulse = ..params$.pulse_movement_large_pulse,
-                                       .pulse_movement_very_large_pulse = ..params$.pulse_movement_very_large_pulse,
-                                       territory_size = ..params$territory_size,
-                                       stochastic = stochastic)
-
-        san_joaquin_trib_rear <- rear(juveniles = san_joaquin_trib_fish$inchannel,
-                                      survival_rate = rearing_survival$inchannel[28:30, ],
-                                      growth = growth_rates_ic[,,28:30],
-                                      floodplain_juveniles = san_joaquin_trib_fish$floodplain,
-                                      floodplain_survival_rate = rearing_survival$floodplain[28:30, ],
-                                      floodplain_growth = growth_rates_fp[,,28:30],
-                                      weeks_flooded = ..params$weeks_flooded[28:30, month, year],
-                                      stochastic = stochastic)
-
-        juveniles[28:30, ] <- san_joaquin_trib_rear$inchannel + san_joaquin_trib_rear$floodplain
-
-        san_joaquin_fish <- route_regional(month = month,
-                                           year = year,
-                                           migrants = san_joaquin_fish + san_joaquin_trib_fish$migrants,
-                                           inchannel_habitat = habitat$inchannel[31],
-                                           floodplain_habitat = habitat$floodplain[31],
-                                           prop_pulse_flows = ..params$prop_pulse_flows[31, , drop = FALSE],
-                                           migration_survival_rate = migratory_survival$san_joaquin,
-                                           territory_size = ..params$territory_size,
-                                           stochastic = stochastic)
-
-        migrants[28:30, ] <- san_joaquin_fish$migrants
-
-        san_joaquin_fish <- rear(juveniles = san_joaquin_fish$inchannel,
-                                 survival_rate = rearing_survival$inchannel[31, ],
-                                 growth = growth_rates_ic[,,31],
-                                 floodplain_juveniles = san_joaquin_fish$floodplain,
-                                 floodplain_survival_rate = rearing_survival$floodplain[31, ],
-                                 floodplain_growth = growth_rates_fp[,,31],
-                                 weeks_flooded = rep(..params$weeks_flooded[31, month, year], nrow(san_joaquin_fish$inchannel)),
-                                 stochastic = stochastic)
-
-        san_joaquin_fish <- san_joaquin_fish$inchannel + san_joaquin_fish$floodplain
-
-        delta_fish <- route_and_rear_deltas(year = year, month = month,
-                                            migrants = round(migrants),
-                                            north_delta_fish = north_delta_fish,
-                                            south_delta_fish = south_delta_fish,
-                                            north_delta_habitat = habitat$north_delta,
-                                            south_delta_habitat = habitat$south_delta,
-                                            freeport_flows = ..params$freeport_flows,
-                                            cc_gates_days_closed = ..params$cc_gates_days_closed,
-                                            rearing_survival_delta = rearing_survival$delta,
-                                            migratory_survival_delta = migratory_survival$delta,
-                                            migratory_survival_bay_delta = migratory_survival$bay_delta,
-                                            juveniles_at_chipps = juveniles_at_chipps,
-                                            growth_rates = growth_rates_delta,
-                                            territory_size = ..params$territory_size,
-                                            stochastic = stochastic)
-
-
-        migrants_at_golden_gate <- delta_fish$migrants_at_golden_gate
-
-
-        north_delta_fish <- delta_fish$north_delta_fish
-        south_delta_fish <- delta_fish$south_delta_fish
-        juveniles_at_chipps <- delta_fish$juveniles_at_chipps
-      }
-
-      # migrants at golden gate is a init adults(hatchery+natural) -> juvs -> survival+migration -> ocean
-
-      ocean_entry_success <- ocean_entry_success(migrants = migrants_at_golden_gate,
-                                                 month = month,
-                                                 avg_ocean_transition_month = avg_ocean_transition_month,
-                                                 .ocean_entry_success_length = ..params$.ocean_entry_success_length,
-                                                 ..ocean_entry_success_int = ..params$..ocean_entry_success_int,
-                                                 .ocean_entry_success_months = ..params$.ocean_entry_success_months,
-                                                 stochastic = stochastic)
-
-      adults_in_ocean <- adults_in_ocean + ocean_entry_success
-
+      # hypothesis are layed out as follows:
+      # 1. base filling + base
+      # 2. base filling + snow
+      # 3. base filling + genetics
+      # 4. base filling + temperature
+      # 5. dens filling + base
+      # 6. dens filling + snow
+      # 7. dens filling + genetics
+      # 8. dens filling + temperature
+
+
+      fish_list$route_1_fish <- juvenile_month_dynamic(
+        fish_list$route_1_fish,
+        year = year, month = month,
+        rearing_survival = rearing_survival,
+        migratory_survival = migratory_survival,
+        habitat = habitat, ..params = ..params,
+        avg_ocean_transition_month = avg_ocean_transition_month,
+        stochastic = stochastic,
+        ic_growth = growth_rates_ic,
+        fp_growth = growth_rates_fp,
+        delta_growth = growth_rates_delta
+      )
+
+      fish_list$route_2_fish <- juvenile_month_dynamic(
+        fish_list$route_2_fish,
+        year = year, month = month,
+        rearing_survival = rearing_survival,
+        migratory_survival = migratory_survival,
+        habitat = habitat, ..params = ..params,
+        avg_ocean_transition_month = avg_ocean_transition_month,
+        stochastic = stochastic,
+        ic_growth = growth_rates_ic,
+        fp_growth = growth_rates_fp,
+        delta_growth = growth_rates_delta,
+        movement_fn = fallRunDSM::snow_globe_movement,
+        movement_months = 1:2,
+        movement_args = list(freeport_flow = ..params$freeport_flows[month, year],
+                             vernalis_flow = ..params$vernalis_flows[month, year],
+                             threshold = 1000, p_leave = 0.3, stochastic = stochastic)
+      )
+
+      fish_list$route_3_fish <- juvenile_month_dynamic(
+        fish_list$route_3_fish,
+        year = year, month = month,
+        rearing_survival = rearing_survival,
+        migratory_survival = migratory_survival,
+        habitat = habitat, ..params = ..params,
+        avg_ocean_transition_month = avg_ocean_transition_month,
+        stochastic = stochastic,
+        ic_growth = growth_rates_ic,
+        fp_growth = growth_rates_fp,
+        delta_growth = growth_rates_delta,
+        movement_fn = fallRunDSM::genetic_movement,
+        movement_months = 1:2,
+        movement_args = list(p_leave = 0.25, stochastic = stochastic)
+      )
+
+      fish_list$route_4_fish <- juvenile_month_dynamic(
+        fish_list$route_4_fish,
+        year = year, month = month,
+        rearing_survival = rearing_survival,
+        migratory_survival = migratory_survival,
+        habitat = habitat, ..params = ..params,
+        avg_ocean_transition_month = avg_ocean_transition_month,
+        stochastic = stochastic,
+        ic_growth = growth_rates_ic,
+        fp_growth = growth_rates_fp,
+        delta_growth = growth_rates_delta,
+        movement_fn = fallRunDSM::temperature_movement,
+        movement_months = 1:2,
+        movement_args = list(movement_month = 3, movement_temp = 15, stochastic = stochastic)
+      )
+
+
+      fish_list$route_5_fish <- juvenile_month_dynamic(
+        fish_list$route_5_fish,
+        year = year, month = month,
+        rearing_survival = rearing_survival,
+        migratory_survival = migratory_survival,
+        habitat = habitat, ..params = ..params,
+        avg_ocean_transition_month = avg_ocean_transition_month,
+        stochastic = stochastic,
+        ic_growth = growth_rates_ic,
+        fp_growth = growth_rates_fp,
+        delta_growth = growth_rates_delta,
+        filling_fn = fallRunDSM::fill_natal_dens_depend, # filling using density dependence
+        filling_args = list(up_to_size_class = 2,
+                            ..floodplain_capacity = ..params$..floodplain_capacity,
+                            ..habitat_capacity = ..params$..habitat_capacity),
+        filling_regional_fn = fallRunDSM::fill_regional_dens_depend,
+        filling_regional_args = list(up_to_size_class = 3, ..floodplain_capacity = ..params$..floodplain_capacity,
+                                     ..habitat_capacity = ..params$..habitat_capacity)
+      )
+
+
+      fish_list$route_6_fish <- juvenile_month_dynamic(
+        fish_list$route_6_fish,
+        year = year, month = month,
+        rearing_survival = rearing_survival,
+        migratory_survival = migratory_survival,
+        habitat = habitat, ..params = ..params,
+        avg_ocean_transition_month = avg_ocean_transition_month,
+        stochastic = stochastic,
+        ic_growth = growth_rates_ic,
+        fp_growth = growth_rates_fp,
+        delta_growth = growth_rates_delta,
+        filling_fn = fallRunDSM::fill_natal_dens_depend, # filling using density dependence
+        filling_args = list(up_to_size_class = 2, ..floodplain_capacity = ..params$..floodplain_capacity,
+                            ..habitat_capacity = ..params$..habitat_capacity),
+        filling_regional_fn = fallRunDSM::fill_regional_dens_depend,
+        filling_regional_args = list(up_to_size_class = 3, ..floodplain_capacity = ..params$..floodplain_capacity,
+                                     ..habitat_capacity = ..params$..habitat_capacity),
+        movement_fn = fallRunDSM::snow_globe_movement,
+        movement_months = 1:2,
+        movement_args = list(freeport_flow = ..params$freeport_flows[month, year],
+                             vernalis_flow = ..params$vernalis_flows[month, year],
+                             threshold = 1000, p_leave = 0.3, stochastic = stochastic)
+      )
+
+      fish_list$route_7_fish <- juvenile_month_dynamic(
+        fish_list$route_7_fish,
+        year = year, month = month,
+        rearing_survival = rearing_survival,
+        migratory_survival = migratory_survival,
+        habitat = habitat, ..params = ..params,
+        avg_ocean_transition_month = avg_ocean_transition_month,
+        stochastic = stochastic,
+        ic_growth = growth_rates_ic,
+        fp_growth = growth_rates_fp,
+        delta_growth = growth_rates_delta,
+        filling_fn = fallRunDSM::fill_natal_dens_depend, # filling using density dependence
+        filling_args = list(up_to_size_class = 2, ..floodplain_capacity = ..params$..floodplain_capacity,
+                            ..habitat_capacity = ..params$..habitat_capacity),
+        filling_regional_fn = fallRunDSM::fill_regional_dens_depend,
+        filling_regional_args = list(up_to_size_class = 3, ..floodplain_capacity = ..params$..floodplain_capacity,
+                                     ..habitat_capacity = ..params$..habitat_capacity),
+        movement_fn = fallRunDSM::genetic_movement,
+        movement_months = 1:2,
+        movement_args = list(p_leave = 0.25, stochastic = stochastic)
+      )
+
+      fish_list$route_8_fish <- juvenile_month_dynamic(
+        fish_list$route_8_fish,
+        year = year, month = month,
+        rearing_survival = rearing_survival,
+        migratory_survival = migratory_survival,
+        habitat = habitat, ..params = ..params,
+        avg_ocean_transition_month = avg_ocean_transition_month,
+        stochastic = stochastic,
+        ic_growth = growth_rates_ic,
+        fp_growth = growth_rates_fp,
+        delta_growth = growth_rates_delta,
+        filling_fn = fallRunDSM::fill_natal_dens_depend, # filling using density dependence
+        filling_args = list(up_to_size_class = 2, ..floodplain_capacity = ..params$..floodplain_capacity,
+                            ..habitat_capacity = ..params$..habitat_capacity),
+        filling_regional_fn = fallRunDSM::fill_regional_dens_depend,
+        filling_regional_args = list(up_to_size_class = 3, ..floodplain_capacity = ..params$..floodplain_capacity,
+                                     ..habitat_capacity = ..params$..habitat_capacity),
+        movement_fn = fallRunDSM::temperature_movement,
+        movement_months = 1:2,
+        movement_args = list(movement_month = 3, movement_temp = 15, stochastic = stochastic)
+      )
+
+      if (FALSE) {
+        fish_1_df <- create_fish_df(fish_df = fish_list$route_1_fish, month = month, year = year)
+        fish_2_df <- create_fish_df(fish_df = fish_list$route_2_fish, month = month, year = year)
+        fish_3_df <- create_fish_df(fish_df = fish_list$route_3_fish, month = month, year = year)
+        fish_4_df <- create_fish_df(fish_df = fish_list$route_4_fish, month = month, year = year)
+        fish_5_df <- create_fish_df(fish_df = fish_list$route_5_fish, month = month, year = year)
+        fish_6_df <- create_fish_df(fish_df = fish_list$route_6_fish, month = month, year = year)
+        fish_7_df <- create_fish_df(fish_df = fish_list$route_7_fish, month = month, year = year)
+        fish_8_df <- create_fish_df(fish_df = fish_list$route_8_fish, month = month, year = year)
+
+        output$north_delta_fish <- dplyr::bind_rows(
+          output$north_delta_fish,
+          fish_1_df,
+          fish_2_df,
+          fish_3_df,
+          fish_4_df,
+          fish_5_df,
+          fish_6_df,
+          fish_7_df,
+          fish_8_df
+        )
       # # For use in the r2r metrics ---------------------------------------------
       d <- data.frame(juveniles_at_chipps)
       colnames(d) <- c("s", "m", "l", "vl")
@@ -872,8 +609,19 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       d$month <- month
       output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
       # end R2R metric -----------------------------------------------------------
+      }
     } # end month loop
+    adults_in_ocean <-
+      (1/8) * fish_list$route_1_fish$adults_in_ocean +
+      (1/8) * fish_list$route_2_fish$adults_in_ocean +
+      (1/8) * fish_list$route_3_fish$adults_in_ocean +
+      (1/8) * fish_list$route_4_fish$adults_in_ocean +
+      (1/8) * fish_list$route_5_fish$adults_in_ocean +
+      (1/8) * fish_list$route_6_fish$adults_in_ocean +
+      (1/8) * fish_list$route_7_fish$adults_in_ocean +
+      (1/8) * fish_list$route_8_fish$adults_in_ocean
 
+    #still need adults in ocean and adult in ocean weights
     output$juvenile_biomass[ , year] <- juveniles_at_chipps %*% fallRunDSM::params$mass_by_size_class
     # Updated logic here for R2R so that natural adults and hatchery adults return separately
     natural_adults_returning <- t(sapply(1:31, function(i) {

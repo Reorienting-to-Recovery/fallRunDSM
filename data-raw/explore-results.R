@@ -9,17 +9,19 @@ source("data-raw/helper_graph_functions.R")
 
 # seed
 # Baseline
+new_params <- fallRunDSM::r_to_r_baseline_params
+new_params$..adult_in_ocean_weights <- c(1, rep(0, 7))
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
-                                        ..params = fallRunDSM::r_to_r_kitchen_sink_params,
+                                        ..params =  new_params,
                                         delta_surv_inflation = TRUE)
 
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
-                                                ..params = fallRunDSM::r_to_r_kitchen_sink_params,
+                                                ..params =  new_params,
                                                 seeds = r2r_seeds,
                                                 delta_surv_inflation = TRUE)
-r2r_model_results$spawners
-r2r_model_results$harvested_adults
+old_res <- read_rds("data-raw/og_model_results.rds")
+old_res$spawners - r2r_model_results$spawners
 #   r2r_model_results$proportion_natural_at_spawning
 
 non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",

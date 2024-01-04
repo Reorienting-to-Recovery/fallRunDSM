@@ -15,9 +15,12 @@
 #'                            mode = "simulate",
 #'                            seeds = fall_run_seeds)
 #' @export
-fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibrate"),
-                           seeds = NULL, ..params = fallRunDSM::r_to_r_baseline_params,
-                           stochastic = FALSE, delta_surv_inflation = TRUE){
+fall_run_model <- function(scenario = NULL,
+                           mode = c("seed", "simulate", "calibrate"),
+                           seeds = NULL,
+                           ..params = fallRunDSM::r_to_r_baseline_params,
+                           stochastic = FALSE,
+                           delta_surv_inflation = FALSE){
 
   mode <- match.arg(mode)
 
@@ -177,9 +180,9 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       adult_index <- ifelse(mode == "seed", 1, year)
       adults_by_month <- t(sapply(1:31, function(watershed) {
         if (stochastic) {
-          rmultinom(1, adults[watershed, adult_index], month_return_proportions)
+          rmultinom(1, adults[watershed, adult_index], fallRunDSM::month_return_proportions)
         } else {
-          round(adults[watershed, adult_index] * month_return_proportions)
+          round(adults[watershed, adult_index] * fallRunDSM::month_return_proportions)
         }
       }))
 
@@ -414,6 +417,99 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
 
     for (month in 1:7) { # Change to move out by July
 
+      growth_rates_ic <- get_growth_rates(growth_temps[,month, year],
+                                          prey_density = ..params$prey_density)
+
+      growth_rates_fp <- get_growth_rates(growth_temps[,month, year],
+                                          prey_density = ..params$prey_density,
+                                          floodplain = TRUE)
+
+      growth_rates_delta <- get_growth_rates(..params$avg_temp_delta[month, year,],
+                                             prey_density = ..params$prey_density_delta)
+
+      habitat <- get_habitat(year, month,
+                             inchannel_habitat_fry = ..params$inchannel_habitat_fry,
+                             inchannel_habitat_juvenile = ..params$inchannel_habitat_juvenile,
+                             floodplain_habitat = ..params$floodplain_habitat,
+                             sutter_habitat = ..params$sutter_habitat,
+                             yolo_habitat = ..params$yolo_habitat,
+                             delta_habitat = ..params$delta_habitat)
+
+      rearing_survival <- get_rearing_survival(year, month,
+                                               survival_adjustment = scenario_data$survival_adjustment,
+                                               mode = mode,
+                                               avg_temp = ..params$avg_temp,
+                                               avg_temp_delta = ..params$avg_temp_delta,
+                                               prob_strand_early = ..params$prob_strand_early,
+                                               prob_strand_late = ..params$prob_strand_late,
+                                               proportion_diverted = ..params$proportion_diverted,
+                                               total_diverted = ..params$total_diverted,
+                                               delta_proportion_diverted = ..params$delta_proportion_diverted,
+                                               delta_total_diverted = ..params$delta_total_diverted,
+                                               weeks_flooded = ..params$weeks_flooded,
+                                               prop_high_predation = ..params$prop_high_predation,
+                                               contact_points = ..params$contact_points,
+                                               delta_contact_points = ..params$delta_contact_points,
+                                               delta_prop_high_predation = ..params$delta_prop_high_predation,
+                                               ..surv_juv_rear_int= ..params$..surv_juv_rear_int,
+                                               .surv_juv_rear_contact_points = ..params$.surv_juv_rear_contact_points,
+                                               ..surv_juv_rear_contact_points = ..params$..surv_juv_rear_contact_points,
+                                               .surv_juv_rear_prop_diversions = ..params$.surv_juv_rear_prop_diversions,
+                                               ..surv_juv_rear_prop_diversions = ..params$..surv_juv_rear_prop_diversions,
+                                               .surv_juv_rear_total_diversions = ..params$.surv_juv_rear_total_diversions,
+                                               ..surv_juv_rear_total_diversions = ..params$..surv_juv_rear_total_diversions,
+                                               ..surv_juv_bypass_int = ..params$..surv_juv_bypass_int,
+                                               ..surv_juv_delta_int = ..params$..surv_juv_delta_int,
+                                               .surv_juv_delta_contact_points = ..params$.surv_juv_delta_contact_points,
+                                               ..surv_juv_delta_contact_points = ..params$..surv_juv_delta_contact_points,
+                                               .surv_juv_delta_total_diverted = ..params$.surv_juv_delta_total_diverted,
+                                               ..surv_juv_delta_total_diverted = ..params$..surv_juv_delta_total_diverted,
+                                               .surv_juv_rear_avg_temp_thresh = ..params$.surv_juv_rear_avg_temp_thresh,
+                                               .surv_juv_rear_high_predation = ..params$.surv_juv_rear_high_predation,
+                                               .surv_juv_rear_stranded = ..params$.surv_juv_rear_stranded,
+                                               .surv_juv_rear_medium = ..params$.surv_juv_rear_medium,
+                                               .surv_juv_rear_large = ..params$.surv_juv_rear_large,
+                                               .surv_juv_rear_floodplain = ..params$.surv_juv_rear_floodplain,
+                                               .surv_juv_bypass_avg_temp_thresh = ..params$.surv_juv_bypass_avg_temp_thresh,
+                                               .surv_juv_bypass_high_predation = ..params$.surv_juv_bypass_high_predation,
+                                               .surv_juv_bypass_medium = ..params$.surv_juv_bypass_medium,
+                                               .surv_juv_bypass_large = ..params$.surv_juv_bypass_large,
+                                               .surv_juv_bypass_floodplain = ..params$.surv_juv_bypass_floodplain,
+                                               .surv_juv_delta_avg_temp_thresh = ..params$.surv_juv_delta_avg_temp_thresh,
+                                               .surv_juv_delta_high_predation = ..params$.surv_juv_delta_high_predation,
+                                               .surv_juv_delta_prop_diverted = ..params$.surv_juv_delta_prop_diverted,
+                                               .surv_juv_delta_medium = ..params$.surv_juv_delta_medium,
+                                               .surv_juv_delta_large = ..params$.surv_juv_delta_large,
+                                               min_survival_rate = ..params$min_survival_rate,
+                                               stochastic = stochastic)
+
+      migratory_survival <- get_migratory_survival(year, month,
+                                                   cc_gates_prop_days_closed = ..params$cc_gates_prop_days_closed,
+                                                   freeport_flows = ..params$freeport_flows,
+                                                   vernalis_flows = ..params$vernalis_flows,
+                                                   stockton_flows = ..params$stockton_flows,
+                                                   vernalis_temps = ..params$vernalis_temps,
+                                                   prisoners_point_temps = ..params$prisoners_point_temps,
+                                                   CVP_exports = ..params$CVP_exports,
+                                                   SWP_exports = ..params$SWP_exports,
+                                                   upper_sacramento_flows = ..params$upper_sacramento_flows,
+                                                   delta_inflow = ..params$delta_inflow,
+                                                   avg_temp_delta = ..params$avg_temp_delta,
+                                                   avg_temp = ..params$avg_temp,
+                                                   delta_proportion_diverted = ..params$delta_proportion_diverted,
+                                                   ..surv_juv_outmigration_sj_int = ..params$..surv_juv_outmigration_sj_int,
+                                                   .surv_juv_outmigration_san_joaquin_medium = ..params$.surv_juv_outmigration_san_joaquin_medium,
+                                                   .surv_juv_outmigration_san_joaquin_large = ..params$.surv_juv_outmigration_san_joaquin_large,
+                                                   min_survival_rate = ..params$min_survival_rate,
+                                                   stochastic = stochastic)
+      if (delta_surv_inflation == TRUE){
+        migratory_survival$bay_delta <- migratory_survival$bay_delt * 2
+        migratory_survival$sutter <- migratory_survival$sutter * 2
+        migratory_survival$yolo <- migratory_survival$yolo * 2
+        migratory_survival$delta <- migratory_survival$delta * 2
+
+      }
+
       # hypothesis are layed out as follows:
       # 1. base filling + base
       # 2. base filling + snow
@@ -610,16 +706,16 @@ fall_run_model <- function(scenario = NULL, mode = c("seed", "simulate", "calibr
       output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
       # end R2R metric -----------------------------------------------------------
       }
+      adults_in_ocean <-
+        ..params$..adults_in_ocean_weights[1] * fish_list$route_1_fish$adults_in_ocean +
+        ..params$..adults_in_ocean_weights[2] * fish_list$route_2_fish$adults_in_ocean +
+        ..params$..adults_in_ocean_weights[3] * fish_list$route_3_fish$adults_in_ocean +
+        ..params$..adults_in_ocean_weights[4] * fish_list$route_4_fish$adults_in_ocean +
+        ..params$..adults_in_ocean_weights[5] * fish_list$route_5_fish$adults_in_ocean +
+        ..params$..adults_in_ocean_weights[6] * fish_list$route_6_fish$adults_in_ocean +
+        ..params$..adults_in_ocean_weights[7] * fish_list$route_7_fish$adults_in_ocean +
+        ..params$..adults_in_ocean_weights[8] * fish_list$route_8_fish$adults_in_ocean
     } # end month loop
-    adults_in_ocean <-
-      (1/8) * fish_list$route_1_fish$adults_in_ocean +
-      (1/8) * fish_list$route_2_fish$adults_in_ocean +
-      (1/8) * fish_list$route_3_fish$adults_in_ocean +
-      (1/8) * fish_list$route_4_fish$adults_in_ocean +
-      (1/8) * fish_list$route_5_fish$adults_in_ocean +
-      (1/8) * fish_list$route_6_fish$adults_in_ocean +
-      (1/8) * fish_list$route_7_fish$adults_in_ocean +
-      (1/8) * fish_list$route_8_fish$adults_in_ocean
 
     #still need adults in ocean and adult in ocean weights
     output$juvenile_biomass[ , year] <- juveniles_at_chipps %*% fallRunDSM::params$mass_by_size_class

@@ -244,10 +244,19 @@ r_to_r_baseline_params <- list(
 
   # stray model
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,
-  flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019
+  flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019,
+
+  # multi route params
+  # TODO update nomenclature to refelct if calibrated or not (remove..)
+  ..adults_in_ocean_weights = rep(1/8, 8),
+  ..habitat_capacity = 5,
+  ..floodplain_capacity = 5
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)
+
+
+
 
 
 

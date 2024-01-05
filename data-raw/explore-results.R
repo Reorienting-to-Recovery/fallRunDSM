@@ -23,7 +23,7 @@ r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
                                                 delta_surv_inflation = FALSE)
 # KITCHEN SINK ---
 new_ks_params <- fallRunDSM::r_to_r_kitchen_sink_params
-new_ks_params$..adults_in_ocean_weights <- c(1, rep(0, 7))
+new_ks_params$..adults_in_ocean_weights <- c(rep(1/8, 8))
 r2r_kitchen_sink_seeds <- fallRunDSM::fall_run_model(mode = "seed",
                                         ..params =  new_ks_params,
                                         delta_surv_inflation = TRUE)
@@ -33,14 +33,14 @@ r2r_kitchen_sink_results <- fallRunDSM::fall_run_model(mode = "simulate",
                                                 ..params =  new_ks_params,
                                                 seeds = r2r_kitchen_sink_seeds,
                                                 delta_surv_inflation = TRUE)
+# write_rds(r2r_kitchen_sink_results, "data-raw/r2r_kitchen_sink_results_base_movement.rds")
 old_res <- read_rds("data-raw/kitchen_sink_old_eff.rds")
 old_res$spawners - r2r_kitchen_sink_results$spawners
 #   r2r_model_results$proportion_natural_at_spawning
 
 non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
                        "Lower-mid Sacramento River", "Yolo Bypass",
-                       "Lower Sacramento River", "San Joaquin River",
-                       "American River", "Feather River") # remove american river (hab too high)
+                       "Lower Sacramento River", "San Joaquin River") # remove american river (hab too high)
 
 spawn <- dplyr::as_tibble(r2r_kitchen_sink_results$spawners) |> #change which results to look at diff plots
   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
@@ -98,7 +98,7 @@ ind_pops <- results_df |>
 # View(ind_pops)
 
 ind_pops |>
-  filter(year < 17, year > 1) |> # removes last three years because CRR is NA,
+  filter(year <= 17, year > 1) |> # removes last three years because CRR is NA,
   # first year because growth rate is NA
   ggplot(aes(x = year, y = location, color = independent_population)) +
   geom_point(size = 4) +

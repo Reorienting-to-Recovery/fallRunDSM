@@ -110,8 +110,7 @@ NULL
 #' @format 4 x 4 x 28 x 8 array [4 size classes x 4 size classes x 28 temperatures x 8 rear/flood and level combinations]
 #' @source TODO
 "bioenergetics_transitions"
-#TODO add all the parameters that are missing
-#TODO update links to pull form R2R packages
+
 #' @title Model Parameters
 #' @description A list containing all parameters needed for running the \code{\link{fall_run_model}}. Parameters with a single
 #' period in front are model or submodel coefficients. Parameters with double periods in front of them are calibrated model parameters.
@@ -167,7 +166,6 @@ NULL
 #'   \item \code{no_cohort_harvest_years}: Vector listing cohort of fish with restricted harvest.
 #'   \item \code{intelligent_crr_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on cohort replacement rate. Defaults to FALSE
 #'   \item \code{intelligent_habitat_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on habitat. Defaults to FALSE
-#'
 #' }
 #' @section Egg to Fry Survival:
 #' \itemize{
@@ -183,9 +181,7 @@ NULL
 #'   \item \code{hatchery_release}: More details at \code{\link[fallRunDSM]{fall_hatchery_release}}
 #'   \item \code{hatchery_releases_at_chipps}: More details at \code{\link[fallRunDSM]{hatchery_releases_at_chipps}}
 #'   \item \code{terminal_hatchery_logic}: Boolean value describing if terminal hatchery exist
-#'
 #' }
-#'
 #' @section Tributary Rearing Survival:
 #' \itemize{
 #'   \item \code{avg_temp}: More details at \code{\link[DSMtemperature]{stream_temperature}}
@@ -322,32 +318,27 @@ NULL
 "params_2022"
 
 #' @title Hatchery Stray Model
-#' @description
-#' A serialized version of the beta-regression model for hatchery origin fish straying
+#' @description A serialized version of the beta-regression model for hatchery origin fish straying
 #' @source Model from
 #'  \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019}
 "hatchery_stray_betareg"
 
 
 #' @title Hatchery to Chipps Island (rkm)
-#' @description
-#' Lookup table for distances from hatchery to the Chipps Island, measured in river kilometers
+#' @description Lookup table for distances from hatchery to the Chipps Island, measured in river kilometers
 #' @format Named vector of length five corresponding to hatchery locations [5 hatchery names]
 #' @source Distance from hatchery to Chipps Island pulled from table 1 of
 #'  \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019}
 "hatchery_to_bay_distance"
 
 #' @title Bay Proportion Hatchery Releases
-#' @description
-#' The proportion of hatchery releases occurring at the Bay. Note that the complement
-#' `1 - hatchery_release_proportion_bay` is the proportion of releases occurring in-river.
-#'@md
+#' @description The proportion of hatchery releases occurring at the Bay. Note that the complement
+#' 1 - hatchery_release_proportion_bay is the proportion of releases occurring in-river.
 "hatchery_release_proportion_bay"
 
 
 #' @title Straying Destinations
-#' @description
-#' Given a hatchery this matrix returns as rows the proportion of fish to stray at particular watersheds.
+#' @description Given a hatchery this matrix returns as rows the proportion of fish to stray at particular watersheds.
 #' @format A matrix with dimension 31 x 6 (watershed x hatchery)
 #' @source Top 3 straying destination pulled from table 1 of
 #' \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019.}
@@ -363,23 +354,23 @@ NULL
 "fall_hatchery_release"
 
 #' @title Hatchery Release at Chipps
-#' @description
-#' @format character
-#' @source
-#' \href
+#' @description Hatchery release at Chipps by size class and hatchery
+#' @format A matrix with dimension 31 x 4 (watershed x size class)
+#' @source Hatchery return data comes from the production targets defined in the
+#' \href {https://swfsc-publications.fisheries.noaa.gov/publications/CR/2012/2012California.pdf}{California HSRG(Pages 65 - 95)}
 "hatchery_releases_at_chipps"
 
 #' @title Fecundity Lookup
-#' @description
-#' @format character
-#' @source
-#' \href
+#' @description a lookup table describing the fecundity of fish by age and origin
+#' @format a data frame with 7 rows and 3 columns (age, origin, fecundity)
+#' @source \href {https://www.x-mol.net/paper/article/1664889742509719552}{Roni and Quinn 1995} logic was used to map age to size. Then we scaled fecundity by size using logic from
+#' \href {https://reorienting-to-recovery.s3.us-west-1.amazonaws.com/RoniandQuinn1995.pdf}{Malick et all 2023}
 "fecundity_by_age"
 
 #' @title Adult Harvest Rate
-#' @description
-#' @format character
-#' @source
-#' \href
+#' @description Adult harvest rate percentage by watershed
+#' @format Named vector of length 31 corresponding to watersheds [31 watershed names]
+#' @source average exploitation rate over the past ten years from the
+#' \href {https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf/}{Ocean Salmon fishery preseason report 2022 tableII-1}
 "r2r_adult_harvest_rate"
 

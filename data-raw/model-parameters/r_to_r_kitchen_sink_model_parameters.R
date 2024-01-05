@@ -1,6 +1,6 @@
 library(tidyverse)
-remotes::install_github("Reorienting-to-Recovery/DSMflow@eff")
-remotes::install_github("Reorienting-to-Recovery/DSMhabitat@eff_sac_hab")
+remotes::install_github("Reorienting-to-Recovery/DSMflow@eff", force = TRUE)
+remotes::install_github("Reorienting-to-Recovery/DSMhabitat@eff_sac_hab", force = TRUE)
 library(DSMhabitat)
 library(DSMflow)
 
@@ -140,13 +140,13 @@ r_to_r_kitchen_sink_params <- list(
   migratory_temperature_proportion_over_20 = DSMtemperature::migratory_temperature_proportion_over_20,
 
   # DSMhabitat variables -----
-  spawning_habitat = DSMhabitat::fr_spawn$r_to_r_tmh,
+  spawning_habitat = DSMhabitat::fr_spawn$r_to_r_tmh_eff,
   # TODO remove nas here
-  inchannel_habitat_fry = DSMhabitat::fr_fry$r_to_r_tmh, # vary by run
-  inchannel_habitat_juvenile = DSMhabitat::fr_juv$r_to_r_tmh, # vary by run
-  floodplain_habitat = DSMhabitat::fr_fp$r_to_r_tmh, # vary by run
+  inchannel_habitat_fry = DSMhabitat::fr_fry$r_to_r_tmh_eff, # vary by run
+  inchannel_habitat_juvenile = DSMhabitat::fr_juv$r_to_r_tmh_eff, # vary by run
+  floodplain_habitat = DSMhabitat::fr_fp$r_to_r_tmh_eff, # vary by run
   weeks_flooded = DSMhabitat::weeks_flooded$biop_itp_2018_2019,
-  delta_habitat = DSMhabitat::delta_habitat$r_to_r_tmh,
+  delta_habitat = DSMhabitat::delta_habitat$r_to_r_tmh_eff,
   sutter_habitat = DSMhabitat::sutter_habitat$biop_itp_2018_2019,
   yolo_habitat = DSMhabitat::yolo_habitat$biop_itp_2018_2019,
   tisdale_bypass_watershed = DSMhabitat::tisdale_bypass_watershed,
@@ -255,7 +255,13 @@ r_to_r_kitchen_sink_params <- list(
 
   # stray model
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,
-  flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019
+  flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019,
+
+  # multi route params
+  # TODO update nomenclature to refelct if calibrated or not (remove..)
+  ..adults_in_ocean_weights = rep(1/8, 8),
+  ..habitat_capacity = 5,
+  ..floodplain_capacity = 5
 )
 
 usethis::use_data(r_to_r_kitchen_sink_params, overwrite = TRUE)

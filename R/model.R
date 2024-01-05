@@ -503,11 +503,10 @@ fall_run_model <- function(scenario = NULL,
                                                    min_survival_rate = ..params$min_survival_rate,
                                                    stochastic = stochastic)
       if (delta_surv_inflation == TRUE){
-        migratory_survival$bay_delta <- migratory_survival$bay_delt * 2
-        migratory_survival$sutter <- migratory_survival$sutter * 2
-        migratory_survival$yolo <- migratory_survival$yolo * 2
-        migratory_survival$delta <- migratory_survival$delta * 2
-
+        migratory_survival$bay_delta <- min(1, migratory_survival$bay_delt * 2)
+        migratory_survival$sutter <-  min(1, migratory_survival$sutter * 2)
+        migratory_survival$yolo <- pmin(1, migratory_survival$yolo * 2)
+        migratory_survival$delta[which(migratory_survival$delta * 2 > 1)] <- 1
       }
 
       # hypothesis are layed out as follows:
@@ -695,7 +694,17 @@ fall_run_model <- function(scenario = NULL,
           fish_7_df,
           fish_8_df
         )
+      }
       # # For use in the r2r metrics ---------------------------------------------
+      juveniles_at_chipps <-
+        ..params$..adults_in_ocean_weights[1] * fish_list$route_1_fish$juveniles_at_chipps +
+        ..params$..adults_in_ocean_weights[2] * fish_list$route_2_fish$juveniles_at_chipps +
+        ..params$..adults_in_ocean_weights[3] * fish_list$route_3_fish$juveniles_at_chipps +
+        ..params$..adults_in_ocean_weights[4] * fish_list$route_4_fish$juveniles_at_chipps +
+        ..params$..adults_in_ocean_weights[5] * fish_list$route_5_fish$juveniles_at_chipps +
+        ..params$..adults_in_ocean_weights[6] * fish_list$route_6_fish$juveniles_at_chipps +
+        ..params$..adults_in_ocean_weights[7] * fish_list$route_7_fish$juveniles_at_chipps +
+        ..params$..adults_in_ocean_weights[8] * fish_list$route_8_fish$juveniles_at_chipps
       d <- data.frame(juveniles_at_chipps)
       colnames(d) <- c("s", "m", "l", "vl")
       d$watershed <- fallRunDSM::watershed_labels
@@ -705,7 +714,6 @@ fall_run_model <- function(scenario = NULL,
       d$month <- month
       output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
       # end R2R metric -----------------------------------------------------------
-      }
       adults_in_ocean <-
         ..params$..adults_in_ocean_weights[1] * fish_list$route_1_fish$adults_in_ocean +
         ..params$..adults_in_ocean_weights[2] * fish_list$route_2_fish$adults_in_ocean +

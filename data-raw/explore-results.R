@@ -8,30 +8,44 @@ source("data-raw/helper_graph_functions.R")
 # View prelim R2R results
 
 # seed
-# Baseline
+# BASELINE ---
 new_params <- fallRunDSM::r_to_r_baseline_params
-new_params$..adult_in_ocean_weights <- c(1, rep(0, 7))
+new_params$..adults_in_ocean_weights <- c(1, rep(0, 7))
+# seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
                                         ..params =  new_params,
-                                        delta_surv_inflation = TRUE)
+                                        delta_surv_inflation = FALSE)
 
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
+                                                delta_surv_inflation = FALSE)
+# KITCHEN SINK ---
+new_ks_params <- fallRunDSM::r_to_r_kitchen_sink_params
+new_ks_params$..adults_in_ocean_weights <- c(1, rep(0, 7))
+r2r_kitchen_sink_seeds <- fallRunDSM::fall_run_model(mode = "seed",
+                                        ..params =  new_ks_params,
+                                        delta_surv_inflation = TRUE)
+
+# run model
+r2r_kitchen_sink_results <- fallRunDSM::fall_run_model(mode = "simulate",
+                                                ..params =  new_ks_params,
+                                                seeds = r2r_kitchen_sink_seeds,
                                                 delta_surv_inflation = TRUE)
-old_res <- read_rds("data-raw/og_model_results.rds")
-old_res$spawners - r2r_model_results$spawners
+old_res <- read_rds("data-raw/kitchen_sink_old_eff.rds")
+old_res$spawners - r2r_kitchen_sink_results$spawners
 #   r2r_model_results$proportion_natural_at_spawning
 
 non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
                        "Lower-mid Sacramento River", "Yolo Bypass",
                        "Lower Sacramento River", "San Joaquin River",
-                       "American River") # remove american river (hab too high)
+                       "American River", "Feather River") # remove american river (hab too high)
 
-spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
+spawn <- dplyr::as_tibble(r2r_kitchen_sink_results$spawners) |> #change which results to look at diff plots
   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
   pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
+  filter(!location %in% non_spawn_regions) |>
   group_by(year, location) |>
   summarize(total_spawners = sum(spawners)) |>
   filter(!location %in% non_spawn_regions) |>
@@ -44,7 +58,6 @@ spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
   scale_y_continuous(labels = scales::comma) +
   scale_x_continuous(breaks = 1:20) +
   theme(text = element_text(size = 20))
-
 
 ggplotly(spawn)
 
@@ -59,7 +72,9 @@ ggplotly(spawn)
 
 
 # IND POP CHECK
-results_df <- create_model_results_dataframe(r2r_model_results, scenario = "recovery", model_parameters = fallRunDSM::r_to_r_baseline_params, selected_run = "fall")
+results_df <- create_model_results_dataframe(r2r_kitchen_sink_results,
+                                             scenario = "recovery",
+                                             model_parameters = fallRunDSM::r_to_r_baseline_params, selected_run = "fall")
 potential_dependent_pops <- c("Bear River", "Big Chico Creek", "Elder Creek", "Paynes Creek",  "Stoney Creek", "Thomes Creek")
 
 ind_pops <- results_df |>

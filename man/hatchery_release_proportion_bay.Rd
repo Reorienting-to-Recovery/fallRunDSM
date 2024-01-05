@@ -12,6 +12,6 @@ hatchery_release_proportion_bay
 }
 \description{
 The proportion of hatchery releases occurring at the Bay. Note that the complement
-\code{1 - hatchery_release_proportion_bay} is the proportion of releases occurring in-river.
+1 - hatchery_release_proportion_bay is the proportion of releases occurring in-river.
 }
 \keyword{datasets}

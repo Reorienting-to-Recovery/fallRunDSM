@@ -128,6 +128,13 @@ period in front are model or submodel coefficients. Parameters with double perio
 <li><p><code>spawn_success_fecundity</code>: Variable describing the number of eggs per female, default value 5522, source: <a href="https://www.ucpress.edu/book/9780520227545/inland-fishes-of-california" class="external-link">Moyle, P. B. 2002. Inland Fishes of California. University of California Press, Berkeley CA</a></p></li>
 <li><p><code>hatchery_allocation</code>: More details at <code><a href="hatchery_allocation.html">hatchery_allocation</a></code></p></li>
 <li><p><code>natural_adult_removal_rate</code>: More details at <code><a href="natural_adult_removal_rate.html">natural_adult_removal_rate</a></code></p></li>
+<li><p><code>adult_harvest_rate</code>: More details at <code><a href="r2r_adult_harvest_rate.html">r2r_adult_harvest_rate</a></code></p></li>
+<li><p><code>restrict_harvest_to_hatchery</code>: Boolean value describing if harvest should be restricted to hatchery fish. Defaults to FALSE</p></li>
+<li><p><code>ocean_harvest_percentage</code>: Numeric value describing the proportion of ocean fish that are harvested. Defaults to .5 based on <a href="https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf" class="external-link">Table II-1</a></p></li>
+<li><p><code>tributary_harvest_percentage</code>: Numeric value describing the proportion of in-river fish that are harvested. Quantities vary by tributary as described by <a href="https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf" class="external-link">Table II-1</a></p></li>
+<li><p><code>no_cohort_harvest_years</code>: Vector listing cohort of fish with restricted harvest.</p></li>
+<li><p><code>intelligent_crr_harvest</code>: Boolean value describing if harvest should be restricted to limit quantities based on cohort replacement rate. Defaults to FALSE</p></li>
+<li><p><code>intelligent_habitat_harvest</code>: Boolean value describing if harvest should be restricted to limit quantities based on habitat. Defaults to FALSE</p></li>
 </ul></div>
     <div id="egg-to-fry-survival">
     <h2>Egg to Fry Survival</h2>
@@ -136,9 +143,17 @@ period in front are model or submodel coefficients. Parameters with double perio
 <ul><li><p><code>proportion_hatchery</code>: More details at <code><a href="proportion_hatchery.html">proportion_hatchery</a></code></p></li>
 <li><p><code>prob_nest_scoured</code>: More details at <code><a href="https://reorienting-to-recovery.github.io/DSMhabitat/reference/estimated_probs.html" class="external-link">prob_nest_scoured</a></code></p></li>
 <li><p><code>mean_egg_temp_effect</code>: More details at <code><a href="https://reorienting-to-recovery.github.io/DSMtemperature/reference/egg_temperature_effect.html" class="external-link">egg_temperature_effect</a></code></p></li>
-<li><p><code>.surv_egg_to_fry_proportion_natural</code>: Coefficient for <code>proportion_natural</code> variable, source: <a href="https://cdnsciencepub.com/doi/abs/10.1139/F10-168" class="external-link">Chilcote et al. (2011)</a></p></li>
-<li><p><code>.surv_egg_to_fry_scour</code>: Coefficient for <code>scour</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/montogemery_1996.pdf" class="external-link">Montgomery et al. (1996)</a></p></li>
+<li><p><code>.surv_egg_to_fry_proportion_natural</code>: Coefficient for <code>proportion_natural</code> variable, source: <a href="https://cdnsciencepub.com/doi/abs/10.1139/F10-168" class="external-link">Chilcote et al. 2011</a></p></li>
+<li><p><code>.surv_egg_to_fry_scour</code>: Coefficient for <code>scour</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/montogemery_1996.pdf" class="external-link">Montgomery et al. 1996</a></p></li>
 <li><p><code>..surv_egg_to_fry_int</code>:  Intercept, source: Calibration</p></li>
+</ul></div>
+    <div id="hatchery-releases">
+    <h2>Hatchery Releases</h2>
+    
+
+<ul><li><p><code>hatchery_release</code>: More details at <code><a href="fall_hatchery_release.html">fall_hatchery_release</a></code></p></li>
+<li><p><code>hatchery_releases_at_chipps</code>: More details at <code><a href="hatchery_releases_at_chipps.html">hatchery_releases_at_chipps</a></code></p></li>
+<li><p><code>terminal_hatchery_logic</code>: Boolean value describing if terminal hatchery exist</p></li>
 </ul></div>
     <div id="tributary-rearing-survival">
     <h2>Tributary Rearing Survival</h2>
@@ -155,15 +170,15 @@ period in front are model or submodel coefficients. Parameters with double perio
 <li><p><code>..surv_juv_rear_int</code>: Intercept, source: calibration (varies by tributary)</p></li>
 <li><p><code>.surv_juv_rear_contact_points</code>: Coefficient for <code>contact_points</code> variable, source: inherited from previous calibration</p></li>
 <li><p><code>..surv_juv_rear_contact_points</code>: Coefficient for <code>contact_points</code> variable, source: calibration</p></li>
-<li><p><code>.surv_juv_rear_prop_diversions</code>: Coefficient for <code>prop_diversions</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/Hierarchical_Modeling_of_Juvenile_Chinook_Salmon_S+(1).pdf" class="external-link">Newman and Brandes (2010)</a></p></li>
+<li><p><code>.surv_juv_rear_prop_diversions</code>: Coefficient for <code>prop_diversions</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/Hierarchical_Modeling_of_Juvenile_Chinook_Salmon_S+(1).pdf" class="external-link">Newman and Brandes 2010</a></p></li>
 <li><p><code>..surv_juv_rear_prop_diversions</code>: Coefficient for <code>prop_diversions</code> variable, source: calibration</p></li>
 <li><p><code>.surv_juv_rear_total_diversions</code>: Coefficient for <code>total_diversions</code> variable, source: inherited from previous calibration</p></li>
 <li><p><code>..surv_juv_rear_total_diversions</code>: Coefficient for <code>total_diversions</code> variable, source: calibration</p></li>
-<li><p><code>.surv_juv_rear_avg_temp_thresh</code>:  Coefficient for <code>avg_temp_thresh</code> variable, source: <a href="https://www.tandfonline.com/doi/full/10.1577/M07-130.1?scroll=top&amp;needAccess=true" class="external-link">Runge et al (2008)</a></p></li>
-<li><p><code>.surv_juv_rear_high_predation</code>: Coefficient for <code>high_predation</code> variable, source: <a href="https://pubag.nal.usda.gov/catalog/512123" class="external-link">Cavallo et al. (2012)</a></p></li>
-<li><p><code>.surv_juv_rear_stranded</code>: Coefficient for <code>stranded</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/DWR-1140+USFWS+2006.pdf" class="external-link">USFWS (2006) and CDWR (2006)</a></p></li>
-<li><p><code>.surv_juv_rear_medium</code>: Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
-<li><p><code>.surv_juv_rear_large</code>: Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
+<li><p><code>.surv_juv_rear_avg_temp_thresh</code>:  Coefficient for <code>avg_temp_thresh</code> variable, source: <a href="https://www.tandfonline.com/doi/full/10.1577/M07-130.1?scroll=top&amp;needAccess=true" class="external-link">Runge et al 2008</a></p></li>
+<li><p><code>.surv_juv_rear_high_predation</code>: Coefficient for <code>high_predation</code> variable, source: <a href="https://pubag.nal.usda.gov/catalog/512123" class="external-link">Cavallo et al. 2012</a></p></li>
+<li><p><code>.surv_juv_rear_stranded</code>: Coefficient for <code>stranded</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/DWR-1140+USFWS+2006.pdf" class="external-link">USFWS 2006 and CDWR 2006</a></p></li>
+<li><p><code>.surv_juv_rear_medium</code>: Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
+<li><p><code>.surv_juv_rear_large</code>: Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
 <li><p><code>.surv_juv_rear_floodplain</code>: Additional intercept for floodplain rearing benefit, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/SOMMER_T-SDWA+180+Floodplain+rearing+of+juvenile+chinook+salmon+evidence+of+enhanced+growth+and+survival+.pdf" class="external-link">Sommer et al. (2001)</a></p></li>
 <li><p><code>prey_density</code>: More details at <code><a href="prey_density.html">prey_density</a></code></p></li>
 <li><p><code>prey_density_delta</code>: More details at <code><a href="prey_density_delta.html">prey_density_delta</a></code></p></li>
@@ -175,11 +190,11 @@ period in front are model or submodel coefficients. Parameters with double perio
 <ul><li><p><code>avg_temp</code>: See Tributary Rearing Survival <code>avg_temp</code> above</p></li>
 <li><p><code>prop_high_predation</code>: See Tributary Rearing Survival <code>prop_high_predation</code> above</p></li>
 <li><p><code>..surv_juv_bypass_int</code>: Intercept, source: calibration</p></li>
-<li><p><code>.surv_juv_bypass_avg_temp_thresh</code>: Coefficient for <code>avg_temp_thresh</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf" class="external-link">Marine and Chech (2004)</a></p></li>
-<li><p><code>.surv_juv_bypass_high_predation</code>: Coefficient for <code>high_predation</code> variable, source: <a href="https://pubag.nal.usda.gov/catalog/512123" class="external-link">Cavallo et al. (2012)</a></p></li>
-<li><p><code>.surv_juv_bypass_medium</code>: Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
-<li><p><code>.surv_juv_bypass_large</code>: Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
-<li><p><code>.surv_juv_bypass_floodplain</code>: Additional intercept for floodplain rearing benefit, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/SOMMER_T-SDWA+180+Floodplain+rearing+of+juvenile+chinook+salmon+evidence+of+enhanced+growth+and+survival+.pdf" class="external-link">Sommer et al. (2001)</a></p></li>
+<li><p><code>.surv_juv_bypass_avg_temp_thresh</code>: Coefficient for <code>avg_temp_thresh</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf" class="external-link">Marine and Chech 2004</a></p></li>
+<li><p><code>.surv_juv_bypass_high_predation</code>: Coefficient for <code>high_predation</code> variable, source: <a href="https://pubag.nal.usda.gov/catalog/512123" class="external-link">Cavallo et al. 2012</a></p></li>
+<li><p><code>.surv_juv_bypass_medium</code>: Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
+<li><p><code>.surv_juv_bypass_large</code>: Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
+<li><p><code>.surv_juv_bypass_floodplain</code>: Additional intercept for floodplain rearing benefit, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/SOMMER_T-SDWA+180+Floodplain+rearing+of+juvenile+chinook+salmon+evidence+of+enhanced+growth+and+survival+.pdf" class="external-link">Sommer et al. 2001</a></p></li>
 </ul></div>
     <div id="delta-rearing-survival">
     <h2>Delta Rearing Survival</h2>
@@ -195,11 +210,11 @@ period in front are model or submodel coefficients. Parameters with double perio
 <li><p><code>..surv_juv_delta_contact_points</code>: Coefficient for <code>contact_points</code> variable, source: calibration</p></li>
 <li><p><code>.surv_juv_delta_total_diverted</code>: Coefficient for <code>total_diversions</code> variable, source: inherited from previous calibration</p></li>
 <li><p><code>..surv_juv_delta_total_diverted</code>: Coefficient for <code>total_diversions</code> variable, source: calibration</p></li>
-<li><p><code>.surv_juv_delta_avg_temp_thresh</code>: Coefficient for <code>avg_temp_thresh</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf" class="external-link">Marine and Chech (2004)</a></p></li>
-<li><p><code>.surv_juv_delta_high_predation</code>: Coefficient for <code>high_predation</code> variable, source: <a href="https://pubag.nal.usda.gov/catalog/512123" class="external-link">Cavallo et al. (2012)</a></p></li>
-<li><p><code>.surv_juv_delta_prop_diverted</code>: Coefficient for <code>prop_diversions</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/Hierarchical_Modeling_of_Juvenile_Chinook_Salmon_S+(1).pdf" class="external-link">Newman and Brandes (2010)</a></p></li>
-<li><p><code>.surv_juv_delta_medium</code>: Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
-<li><p><code>.surv_juv_delta_large</code>: Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
+<li><p><code>.surv_juv_delta_avg_temp_thresh</code>: Coefficient for <code>avg_temp_thresh</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf" class="external-link">Marine and Chech 2004</a></p></li>
+<li><p><code>.surv_juv_delta_high_predation</code>: Coefficient for <code>high_predation</code> variable, source: <a href="https://pubag.nal.usda.gov/catalog/512123" class="external-link">Cavallo et al. 2012</a></p></li>
+<li><p><code>.surv_juv_delta_prop_diverted</code>: Coefficient for <code>prop_diversions</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/Hierarchical_Modeling_of_Juvenile_Chinook_Salmon_S+(1).pdf" class="external-link">Newman and Brandes 2010</a></p></li>
+<li><p><code>.surv_juv_delta_medium</code>: Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
+<li><p><code>.surv_juv_delta_large</code>: Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
 </ul></div>
     <div id="tributary-migratory-survival">
     <h2>Tributary Migratory Survival</h2>
@@ -215,8 +230,8 @@ period in front are model or submodel coefficients. Parameters with double perio
 <li><p><code>CVP_exports</code>: More details at <code><a href="https://reorienting-to-recovery.github.io/DSMflow/reference/cvp_exports.html" class="external-link">cvp_exports</a></code></p></li>
 <li><p><code>SWP_exports</code>: More details at <code><a href="https://reorienting-to-recovery.github.io/DSMflow/reference/swp_exports.html" class="external-link">swp_exports</a></code></p></li>
 <li><p><code>..surv_juv_outmigration_sj_int</code> Intercept, source: calibration</p></li>
-<li><p><code>.surv_juv_outmigration_san_joquin_medium</code> Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
-<li><p><code>.surv_juv_outmigration_san_joaquin_large</code> Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
+<li><p><code>.surv_juv_outmigration_san_joquin_medium</code> Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
+<li><p><code>.surv_juv_outmigration_san_joaquin_large</code> Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
 <li><p><code>min_survival_rate</code> Estimated survival rate if temperature threshold is exceeded, source: expert opinion</p></li>
 <li><p><code>avg_temp</code>: More details at <code><a href="https://reorienting-to-recovery.github.io/DSMtemperature/reference/stream_temperature.html" class="external-link">stream_temperature</a></code></p></li>
 </ul></div>
@@ -233,8 +248,8 @@ period in front are model or submodel coefficients. Parameters with double perio
 <li><p><code>.surv_juv_outmigration_sac_delta_delta_flow</code> Coefficient for <code>delta_flow</code> variable, source: this parameter and function have been deprecated and its documentation is for archival purposes.</p></li>
 <li><p><code>.surv_juv_outmigration_sac_delta_avg_temp</code> Coefficient for <code>avg_temp</code> variable, source: this parameter and function have been deprecated and its documentation is for archival purposes.</p></li>
 <li><p><code>.surv_juv_outmigration_sac_delta_perc_diversions</code> Coefficient for <code>perc_diversions</code> variable, source: this parameter and function have been deprecated and its documentation is for archival purposes.</p></li>
-<li><p><code>.surv_juv_outmigration_sac_delta_medium</code> Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
-<li><p><code>.surv_juv_outmigration_sac_delta_large</code> Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. (2004)</a></p></li>
+<li><p><code>.surv_juv_outmigration_sac_delta_medium</code> Size related intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
+<li><p><code>.surv_juv_outmigration_sac_delta_large</code> Size related intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor et al. 2004</a></p></li>
 </ul></div>
     <div id="delta-routing-and-rearing">
     <h2>Delta Routing and Rearing</h2>
@@ -272,9 +287,9 @@ period in front are model or submodel coefficients. Parameters with double perio
     <h2>Ocean Entry Success</h2>
     
 
-<ul><li><p><code>.ocean_entry_success_length</code>: Size related intercept representing the fork lengths for each size classes, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/Satterthwaite_et_al_2014.pdf" class="external-link">Satterthwaite et al. (2014)</a></p></li>
+<ul><li><p><code>.ocean_entry_success_length</code>: Size related intercept representing the fork lengths for each size classes, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/Satterthwaite_et_al_2014.pdf" class="external-link">Satterthwaite et al.2014</a></p></li>
 <li><p><code>..ocean_entry_success_int</code>: Intercept, source: Calibration (Varies by tributary)</p></li>
-<li><p><code>.ocean_entry_success_months</code>: Coefficient for <code>month</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/Satterthwaite_et_al_2014.pdf" class="external-link">Satterthwaite et al. (2014)</a></p></li>
+<li><p><code>.ocean_entry_success_months</code>: Coefficient for <code>month</code> variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/Satterthwaite_et_al_2014.pdf" class="external-link">Satterthwaite et al.2014</a></p></li>
 </ul></div>
     <div id="generating-model-outputs">
     <h2>Generating Model Outputs</h2>

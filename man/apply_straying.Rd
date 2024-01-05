@@ -16,16 +16,25 @@ apply_straying(
 )
 }
 \arguments{
-\item{total_releases}{= ..params$hatchery_release,}
+\item{year}{Simulation year}
 
-\item{release_month}{= 1,}
+\item{natural_adults}{Number of natural adults}
 
-\item{flows_oct_nov}{= ..params$flows_oct_nov,}
+\item{hatchery_adults}{Number of hatchery adults}
 
-\item{flows_apr_may}{= ..params$flows_apr_may,}
+\item{total_releases}{Total hatchery fish released from..params$hatchery_release,}
 
-\item{monthly_mean_pdo}{= fallRunDSM::monthly_mean_pdo,}
+\item{release_month}{Hatchery release month, defaults to 1,}
+
+\item{flows_oct_nov}{Mean flows from October and November from ..params$flows_oct_nov,}
+
+\item{flows_apr_may}{Mean flows from April and May ..params$flows_apr_may,}
+
+\item{monthly_mean_pdo}{Mean pdo from fallRunDSM::monthly_mean_pdo,}
 }
 \description{
+Function to apply adult upstream straying
+}
+\details{
 Apply Straying
 }

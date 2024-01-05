@@ -55,6 +55,9 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/adult_stray.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/apply_enroute_survival.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/apply_straying.html</loc>
   </url>
   <url>
@@ -73,7 +76,13 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/diversity_group.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fall_hatchery_release.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fall_run_model.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fecundity_by_age.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fill.html</loc>
@@ -125,6 +134,9 @@
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/hatchery_release_proportion_bay.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/hatchery_releases_at_chipps.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/hatchery_stray_betareg.html</loc>
@@ -184,6 +196,9 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/pulse_movement.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/r2r_adult_harvest_rate.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/rear.html</loc>
   </url>
   <url>
@@ -209,6 +224,9 @@
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/stray_rate.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/stray_rates_to_matrix.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/stray_returning_adults.html</loc>

@@ -1,13 +1,15 @@
 #' Apply Straying
-#'
-#' @param year
-#' @param natural_adults
-#' @param hatchery_adults
-#' @param total_releases = ..params$hatchery_release,
-#' @param release_month = 1,
-#' @param flows_oct_nov = ..params$flows_oct_nov,
-#' @param flows_apr_may = ..params$flows_apr_may,
-#' @param monthly_mean_pdo = fallRunDSM::monthly_mean_pdo,
+#' @title Apply Straying
+#' @description Function to apply adult upstream straying
+#' @param year Simulation year
+#' @param natural_adults Number of natural adults
+#' @param hatchery_adults Number of hatchery adults
+#' @param total_releases Total hatchery fish released from..params$hatchery_release,
+#' @param release_month Hatchery release month, defaults to 1,
+#' @param flows_oct_nov Mean flows from October and November from ..params$flows_oct_nov,
+#' @param flows_apr_may Mean flows from April and May ..params$flows_apr_may,
+#' @param monthly_mean_pdo Mean pdo from fallRunDSM::monthly_mean_pdo,
+#' @export
 apply_straying <- function(year, natural_adults, hatchery_adults, total_releases,
                            release_month, flows_oct_nov, flows_apr_may, monthly_mean_pdo) {
 
@@ -106,12 +108,9 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
 
 }
 
-
-
 #' @title Adult Straying for Hatchery Origin Fish
 #' @description
 #' Calculates stray rates for all hatchery originating fish.
-#'
 #' @param release_type river or bay representing where the hatchery fish were released
 #' @param run_year year of run
 #' @param age age of fish
@@ -156,22 +155,21 @@ compute_adult_stray_rates <- function(type = c("natural", "hatchery"), sim_year,
 }
 
 #' @title Normalize data with context data
-#' @description
-#' transform data to be normalized given data to calculate mean and standard deviation from
+#' @description transform data to be normalized given data to calculate mean and standard deviation from
 #' @keywords internal
 normalize_with_context <- function(x, context_data) {
   (x - mean(context_data, na.rm = TRUE))/sd(context_data, na.rm = TRUE)
 }
 
 #' @title Normalize data with known params
-#' @description
-#' transform data to be normalized given the mean and standard deviation from the data
+#' @description transform data to be normalized given the mean and standard deviation from the data
 #' @keywords internal
 normalize_with_params <- function(x, mean_val, sd_val) {
   (x - mean_val)/sd_val
 }
 
-
+#' @title Creates matrix from stray rates
+#' @description transforms stray rates from betareg output into matrix
 #' @keywords internal
 stray_rates_to_matrix <- function(data, type) {
   out <- vector(mode = "list")

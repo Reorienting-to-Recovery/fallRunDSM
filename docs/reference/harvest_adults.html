@@ -76,13 +76,17 @@ This function is called within the larger model.R file before stray rates and pr
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">harvest_adults</span><span class="op">(</span></span>
 <span>  <span class="va">adult_df</span>,</span>
+<span>  <span class="va">spawner_df</span>,</span>
 <span>  year <span class="op">=</span> <span class="va">year</span>,</span>
-<span>  hatchery_allocation <span class="op">=</span> <span class="va">..params</span><span class="op">$</span><span class="va">hatchery_allocation</span>,</span>
+<span>  <span class="va">spawn_habitat</span>,</span>
+<span>  terminal_hatchery_logic <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">T</span>, <span class="cn">F</span><span class="op">)</span>,</span>
 <span>  <span class="va">ocean_harvest_percentage</span>,</span>
 <span>  <span class="va">tributary_harvest_percentage</span>,</span>
 <span>  restrict_harvest_to_hatchery <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span>,</span>
-<span>  <span class="va">no_cohort_harvest_years</span>,</span>
-<span>  intelligent_crr_harvest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span></span>
+<span>  no_cohort_harvest_years <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  intelligent_habitat_harvest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span>,</span>
+<span>  intelligent_crr_harvest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span>,</span>
+<span>  crr_scaling <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -94,10 +98,6 @@ This function is called within the larger model.R file before stray rates and pr
 
 <dt>year</dt>
 <dd><p>The target year for the harvest calculation.</p></dd>
-
-
-<dt>hatchery_allocation</dt>
-<dd><p>The allocation of harvest to hatcheries.</p></dd>
 
 
 <dt>ocean_harvest_percentage</dt>

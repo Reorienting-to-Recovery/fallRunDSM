@@ -2,6 +2,7 @@
 
 export(adult_stray)
 export(apply_enroute_survival)
+export(apply_straying)
 export(compute_adult_stray_rates)
 export(fall_run_model)
 export(fill_natal)

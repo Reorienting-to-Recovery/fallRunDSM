@@ -12,7 +12,8 @@ fall_run_model(
   mode = c("seed", "simulate", "calibrate"),
   seeds = NULL,
   ..params = fallRunDSM::r_to_r_baseline_params,
-  stochastic = FALSE
+  stochastic = FALSE,
+  delta_surv_inflation = TRUE
 )
 }
 \arguments{

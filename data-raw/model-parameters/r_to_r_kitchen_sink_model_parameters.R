@@ -241,7 +241,7 @@ r_to_r_kitchen_sink_params <- list(
 
   # R2R specific metrics
   hatchery_release = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
-  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
+  hatchery_release_proportion_bay = fallRunDSM::hatchery_release_proportion_bay,
   fecundity_lookup = fallRunDSM::fecundity_by_age,
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
   restrict_harvest_to_hatchery = TRUE,
@@ -258,8 +258,7 @@ r_to_r_kitchen_sink_params <- list(
   flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019,
 
   # multi route params
-  # TODO update nomenclature to refelct if calibrated or not (remove..)
-  ..adults_in_ocean_weights = rep(1/8, 8),
+  movement_hypo_weights = rep(1/8, 8),
   ..habitat_capacity = 5,
   ..floodplain_capacity = 5
 )

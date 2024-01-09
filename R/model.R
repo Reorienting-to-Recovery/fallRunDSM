@@ -374,7 +374,7 @@ fall_run_model <- function(scenario = NULL,
     total_juves_pre_hatchery <- rowSums(juveniles)
     # TODO add ability to vary release per year
     # TODO(stray) capture parameters for calculating straying
-    juveniles <- juveniles + ..params$hatchery_release
+    juveniles <- juveniles + (..params$hatchery_release * (1 - ..params$hatchery_release_proportion_bay))
     # stray_rates_in_river_releases <- hatchery_adult_stray(hatchery = )
 
     fish_list <- lapply(1:8, function(i) list(juveniles = juveniles,
@@ -697,14 +697,14 @@ fall_run_model <- function(scenario = NULL,
       }
       # # For use in the r2r metrics ---------------------------------------------
       juveniles_at_chipps <-
-        ..params$..adults_in_ocean_weights[1] * fish_list$route_1_fish$juveniles_at_chipps +
-        ..params$..adults_in_ocean_weights[2] * fish_list$route_2_fish$juveniles_at_chipps +
-        ..params$..adults_in_ocean_weights[3] * fish_list$route_3_fish$juveniles_at_chipps +
-        ..params$..adults_in_ocean_weights[4] * fish_list$route_4_fish$juveniles_at_chipps +
-        ..params$..adults_in_ocean_weights[5] * fish_list$route_5_fish$juveniles_at_chipps +
-        ..params$..adults_in_ocean_weights[6] * fish_list$route_6_fish$juveniles_at_chipps +
-        ..params$..adults_in_ocean_weights[7] * fish_list$route_7_fish$juveniles_at_chipps +
-        ..params$..adults_in_ocean_weights[8] * fish_list$route_8_fish$juveniles_at_chipps
+        ..params$movement_hypo_weights[1] * fish_list$route_1_fish$juveniles_at_chipps +
+        ..params$movement_hypo_weights[2] * fish_list$route_2_fish$juveniles_at_chipps +
+        ..params$movement_hypo_weights[3] * fish_list$route_3_fish$juveniles_at_chipps +
+        ..params$movement_hypo_weights[4] * fish_list$route_4_fish$juveniles_at_chipps +
+        ..params$movement_hypo_weights[5] * fish_list$route_5_fish$juveniles_at_chipps +
+        ..params$movement_hypo_weights[6] * fish_list$route_6_fish$juveniles_at_chipps +
+        ..params$movement_hypo_weights[7] * fish_list$route_7_fish$juveniles_at_chipps +
+        ..params$movement_hypo_weights[8] * fish_list$route_8_fish$juveniles_at_chipps
       d <- data.frame(juveniles_at_chipps)
       colnames(d) <- c("s", "m", "l", "vl")
       d$watershed <- fallRunDSM::watershed_labels
@@ -715,14 +715,14 @@ fall_run_model <- function(scenario = NULL,
       output$juveniles_at_chipps <- dplyr::bind_rows(output$juveniles_at_chipps, d)
       # end R2R metric -----------------------------------------------------------
       adults_in_ocean <-
-        ..params$..adults_in_ocean_weights[1] * fish_list$route_1_fish$adults_in_ocean +
-        ..params$..adults_in_ocean_weights[2] * fish_list$route_2_fish$adults_in_ocean +
-        ..params$..adults_in_ocean_weights[3] * fish_list$route_3_fish$adults_in_ocean +
-        ..params$..adults_in_ocean_weights[4] * fish_list$route_4_fish$adults_in_ocean +
-        ..params$..adults_in_ocean_weights[5] * fish_list$route_5_fish$adults_in_ocean +
-        ..params$..adults_in_ocean_weights[6] * fish_list$route_6_fish$adults_in_ocean +
-        ..params$..adults_in_ocean_weights[7] * fish_list$route_7_fish$adults_in_ocean +
-        ..params$..adults_in_ocean_weights[8] * fish_list$route_8_fish$adults_in_ocean
+        ..params$movement_hypo_weights[1] * fish_list$route_1_fish$adults_in_ocean +
+        ..params$movement_hypo_weights[2] * fish_list$route_2_fish$adults_in_ocean +
+        ..params$movement_hypo_weights[3] * fish_list$route_3_fish$adults_in_ocean +
+        ..params$movement_hypo_weights[4] * fish_list$route_4_fish$adults_in_ocean +
+        ..params$movement_hypo_weights[5] * fish_list$route_5_fish$adults_in_ocean +
+        ..params$movement_hypo_weights[6] * fish_list$route_6_fish$adults_in_ocean +
+        ..params$movement_hypo_weights[7] * fish_list$route_7_fish$adults_in_ocean +
+        ..params$movement_hypo_weights[8] * fish_list$route_8_fish$adults_in_ocean
     } # end month loop
 
     #still need adults in ocean and adult in ocean weights
@@ -741,7 +741,7 @@ fall_run_model <- function(scenario = NULL,
    # R2R release at chipps logic
     # TODO(stray) capture parameter for calculating straying
     # stray_rates_in_bay_releases <- hatchery_adult_stray()
-    hatchery_releases_at_chipps <- ocean_entry_success(migrants = ..params$hatchery_releases_at_chipps,
+    hatchery_releases_at_chipps <- ocean_entry_success(migrants = ..params$hatchery_release * ..params$hatchery_release_proportion_bay,
                                                month = 7, # set to final month
                                                avg_ocean_transition_month = avg_ocean_transition_month,
                                                .ocean_entry_success_length = ..params$.ocean_entry_success_length,

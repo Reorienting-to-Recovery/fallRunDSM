@@ -231,7 +231,7 @@ r_to_r_baseline_params <- list(
 
   # R2R specific metrics
   hatchery_release = fallRunDSM::fall_hatchery_release,
-  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
+  hatchery_release_proportion_bay = fallRunDSM::hatchery_release_proportion_bay,
   fecundity_lookup = fallRunDSM::fecundity_by_age,
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
   restrict_harvest_to_hatchery = FALSE,
@@ -246,9 +246,8 @@ r_to_r_baseline_params <- list(
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,
   flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019,
 
-  # multi route params
-  # TODO update nomenclature to refelct if calibrated or not (remove..)
-  ..adults_in_ocean_weights = rep(1/8, 8),
+  # multi route
+  movement_hypo_weights = rep(1/8, 8),
   ..habitat_capacity = 5,
   ..floodplain_capacity = 5
 )

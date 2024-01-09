@@ -10,7 +10,7 @@ source("data-raw/helper_graph_functions.R")
 # seed
 # BASELINE ---
 new_params <- fallRunDSM::r_to_r_baseline_params
-new_params$..adults_in_ocean_weights <- c(1, rep(0, 7))
+new_params$movement_hypo_weights <- c(1, rep(0, 7))
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
                                         ..params =  new_params,
@@ -23,7 +23,7 @@ r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
                                                 delta_surv_inflation = FALSE)
 # KITCHEN SINK ---
 new_ks_params <- fallRunDSM::r_to_r_kitchen_sink_params
-new_ks_params$..adults_in_ocean_weights <- c(rep(1/8, 8))
+new_ks_params$movement_hypo_weights <- c(rep(1/8, 8))
 r2r_kitchen_sink_seeds <- fallRunDSM::fall_run_model(mode = "seed",
                                         ..params =  new_ks_params,
                                         delta_surv_inflation = TRUE)
@@ -40,17 +40,19 @@ old_res$spawners - r2r_kitchen_sink_results$spawners
 
 non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
                        "Lower-mid Sacramento River", "Yolo Bypass",
-                       "Lower Sacramento River", "San Joaquin River") # remove american river (hab too high)
+                       "Lower Sacramento River", "San Joaquin River",
+                       "American River", "Feather River") # remove american river (hab too high)
 
-spawn <- dplyr::as_tibble(r2r_kitchen_sink_results$spawners) |> #change which results to look at diff plots
+spawn <- dplyr::as_tibble(r2r_model_results$spawners) |> #change which results to look at diff plots
   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
   pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
   filter(!location %in% non_spawn_regions) |>
   group_by(year, location) |>
   summarize(total_spawners = sum(spawners)) |>
-  filter(!location %in% non_spawn_regions) |>
   mutate(year = as.numeric(year)) %>%
-  ggplot(aes(year, total_spawners, color = location)) +
+  ggplot(aes(year, total_spawners,
+             color = location
+             )) +
   geom_line() +
   theme_minimal() +
   labs(y = "Spawners",
@@ -61,18 +63,8 @@ spawn <- dplyr::as_tibble(r2r_kitchen_sink_results$spawners) |> #change which re
 
 ggplotly(spawn)
 
-# NEW CRR calculation
-# return_prop <- matrix(c(.30, .60, .10, 0, .22, .47, .26, .05), nrow = 2, ncol = 4,
-# dimnames = list(c("hatchery", "natural"),
-#                 c("V1", "V2", "V3", "V4")))
-# r2r_model_results$spawners
-# r2r_model_results$returning_adults |>
-#   group_by(watershed, sim_year) |>
-
-
-
 # IND POP CHECK
-results_df <- create_model_results_dataframe(r2r_kitchen_sink_results,
+results_df <- create_model_results_dataframe(r2r_model_results,
                                              scenario = "recovery",
                                              model_parameters = fallRunDSM::r_to_r_baseline_params, selected_run = "fall")
 potential_dependent_pops <- c("Bear River", "Big Chico Creek", "Elder Creek", "Paynes Creek",  "Stoney Creek", "Thomes Creek")

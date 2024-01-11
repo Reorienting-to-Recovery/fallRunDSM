@@ -9,7 +9,7 @@ library(producePMs)
 
 # seed
 # BASELINE --
-new_params <- fallRunDSM::r_to_r_kitchen_sink_params
+new_params <- fallRunDSM::r_to_r_baseline_params
 new_params$movement_hypo_weights <- c(1, rep(0, 7))
 
 # seed
@@ -35,12 +35,12 @@ spawn <- dplyr::as_tibble(r2r_model_results$spawners) |> #change which results t
   pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
   filter(!location %in% non_spawn_regions) |>
   group_by(year,
-           location
+           # location
            ) |>
   summarize(total_spawners = sum(spawners)) |>
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(year, total_spawners,
-             color = location
+             # color = location
              )) +
   geom_line() +
   theme_minimal() +

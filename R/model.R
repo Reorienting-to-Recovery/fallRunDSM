@@ -38,34 +38,24 @@ fall_run_model <- function(scenario = NULL,
       weeks_flooded = ..params$weeks_flooded
     )
 
-    # check if the params has the new decay element, if yes use new function applying decay
-    # to spawning, if not then use the old method. This is a temporary bit of code to allow
-    # for quick comparison between two versions of the model.
-    if ("spawn_decay_multiplier" %in% names(..params)) {
-      scenario_data <- DSMscenario::load_scenario(scenario,
-                                                  habitat_inputs = habitats,
-                                                  species = DSMscenario::species$FALL_RUN,
-                                                  spawn_decay_rate = ..params$spawn_decay_rate,
-                                                  rear_decay_rate = ..params$rear_decay_rate,
-                                                  spawn_decay_multiplier = ..params$spawn_decay_multiplier,
-                                                  stochastic = stochastic)
-    } else {
-      scenario_data <- DSMscenario::load_scenario(scenario,
-                                                  habitat_inputs = habitats,
-                                                  species = DSMscenario::species$FALL_RUN,
-                                                  spawn_decay_rate = ..params$spawn_decay_rate,
-                                                  rear_decay_rate = ..params$rear_decay_rate,
-                                                  stochastic = stochastic)
-    }
+    # Apply spawn decay multiplier
+    scenario_data <- DSMscenario::load_scenario(scenario,
+                                                habitat_inputs = habitats,
+                                                species = DSMscenario::species$FALL_RUN,
+                                                spawn_decay_rate = ..params$spawn_decay_rate,
+                                                rear_decay_rate = ..params$rear_decay_rate,
+                                                spawn_decay_multiplier = ..params$spawn_decay_multiplier,
+                                                stochastic = stochastic)
 
-    ..params$spawning_habitat <- scenario_data$spawning_habitat
-    ..params$inchannel_habitat_fry <- scenario_data$inchannel_habitat_fry
-    ..params$inchannel_habitat_juvenile <- scenario_data$inchannel_habitat_juvenile
-    ..params$floodplain_habitat <- scenario_data$floodplain_habitat
-    ..params$weeks_flooded <- scenario_data$weeks_flooded
+  ..params$spawning_habitat <- scenario_data$spawning_habitat
+  ..params$inchannel_habitat_fry <- scenario_data$inchannel_habitat_fry
+  ..params$inchannel_habitat_juvenile <- scenario_data$inchannel_habitat_juvenile
+  ..params$floodplain_habitat <- scenario_data$floodplain_habitat
+  ..params$weeks_flooded <- scenario_data$weeks_flooded
 
   }
-
+  # TODO QUESTIONS FOR EMANUEL -
+  # IS THERE A REASON WE DO NOT USE DECAYED HABITAT FOR CALIBRATION, ONLY SIMULATION
   if (mode == "calibrate") {
     scenario_data <- list(
       survival_adjustment = matrix(1, nrow = 31, ncol = 21,
@@ -93,11 +83,9 @@ fall_run_model <- function(scenario = NULL,
     proportion_natural_at_spawning = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     proportion_natural_juves_in_tribs = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
     phos = matrix(0, nrow = 31, ncol = 20, dimnames = list(fallRunDSM::watershed_labels, 1:20)),
-    limiting_habitat = data.frame(),
     harvested_adults = data.frame()
 
   )
-
 
   if (mode == 'calibrate') {
     calculated_adults <- matrix(0, nrow = 31, ncol = 30)
@@ -108,8 +96,6 @@ fall_run_model <- function(scenario = NULL,
                     "simulate" = seeds$adults,
                     "calibrate" = seeds$adults,
   )
-
-
 
   for (year in 1:simulation_length) {
     adults_in_ocean <- numeric(31)
@@ -142,8 +128,6 @@ fall_run_model <- function(scenario = NULL,
       hatch_age_dist <- default_hatch_age_dist
       natural_age_dist <- default_nat_age_dist
     } else {
-      # TODO would be good to functionalize this age_dist - takes in origin, output$returning_adults, year
-      # TODO move to base r logic / remove dependencides on tidyverse
       hatch_age_dist <- output$returning_adults |>
         dplyr::filter(return_sim_year == year, origin == "hatchery") |>
         dplyr::mutate(age = return_sim_year - sim_year,
@@ -178,24 +162,15 @@ fall_run_model <- function(scenario = NULL,
     # Do not need to apply harvest, or survival because starting with GrandTab values
     if (mode %in% c("seed", "calibrate")) {
       adult_index <- ifelse(mode == "seed", 1, year)
-      adults_by_month <- t(sapply(1:31, function(watershed) {
-        if (stochastic) {
-          rmultinom(1, adults[watershed, adult_index], fallRunDSM::month_return_proportions)
-        } else {
-          round(adults[watershed, adult_index] * fallRunDSM::month_return_proportions)
-        }
-      }))
-
-      adults_by_month_hatchery_removed <- sapply(1:3, function(month) {
-        if (stochastic) {
+      annual_adults <- adults[, adult_index]
+      annual_adults_hatch_removed <- if (stochastic) {
           rbinom(n = 31,
-                 size = round(adults_by_month[, month]),
+                 size = adults_by_month,
                  prob = 1 - natural_adult_removal_rate)
         } else {
-          round(adults_by_month[, month] * (1 - natural_adult_removal_rate))
+          annual_adults * (1 - natural_adult_removal_rate)
         }
-      })
-      spawners = list(init_adults = rowSums(adults_by_month_hatchery_removed),
+      spawners = list(init_adults = round(annual_adults_hatch_removed),
                       proportion_natural = 1 - fallRunDSM::params$proportion_hatchery)
     }
 
@@ -207,7 +182,7 @@ fall_run_model <- function(scenario = NULL,
       hatch_after_harvest_by_age <- round(unname(adults_after_harvest) * as.matrix(default_hatch_age_dist[2:5]))
       row.names(hatch_after_harvest_by_age) = fallRunDSM::watershed_labels
       colnames(hatch_after_harvest_by_age) = c(2, 3, 4, 5)
-      harvested_hatchery_adults = hatch_adults - adults_after_harvest
+      harvested_hatchery_adults <- hatch_adults - adults_after_harvest
       # NATURAL
       if (..params$restrict_harvest_to_hatchery) {
         nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery) * .9 # hooking mortality
@@ -217,7 +192,7 @@ fall_run_model <- function(scenario = NULL,
         nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
         natutal_adults_after_harvest <- nat_adults * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
         natutal_adults_by_age <- round(unname(natutal_adults_after_harvest) * as.matrix(default_nat_age_dist[2:5]))
-        harvested_natural_adults = nat_adults - natutal_adults_after_harvest
+        harvested_natural_adults <- nat_adults - natutal_adults_after_harvest
       }
       row.names(natutal_adults_by_age) = fallRunDSM::watershed_labels
       colnames(natutal_adults_by_age) = c(2, 3, 4, 5)
@@ -226,7 +201,6 @@ fall_run_model <- function(scenario = NULL,
                                    harvested_hatchery_adults = harvested_hatchery_adults,
                                    harvested_natural_adults = harvested_natural_adults)
     }
-    # TODO THIS IS SOURCE OF LOW FEATHER NUMBERS
     if (year > 5 & mode == "simulate") {
      adults_after_harvest <- harvest_adults(output$returning_adults,
                                             output$spawners, year,
@@ -284,8 +258,7 @@ fall_run_model <- function(scenario = NULL,
     output$spawners[ , year] <- init_adults
 
     # # For use in the r2r metrics ---------------------------------------------
-    # TODO add conditional here for if hatch release == 0
-    # TODO fix handeling for PHOS on non spawn and 0 fish watersheds
+    # TODO fix handling for PHOS on non spawn and 0 fish watersheds
     phos <- ifelse(is.na(1 - spawners$proportion_natural), 0, 1 - spawners$proportion_natural)
     if (mode == "simulate" & year > 5 & (sum(..params$hatchery_release) + sum(..params$hatchery_releases_at_chipps)) == 0) {
       natural_proportion_with_renat <- rep(1, 31)
@@ -308,7 +281,6 @@ fall_run_model <- function(scenario = NULL,
       } else {
       natural_proportion_with_renat <-  spawners$proportion_natural
       }
-
 
     output$proportion_natural_at_spawning[ , year] <- natural_proportion_with_renat
     output$phos[ , year] <- 1 - natural_proportion_with_renat
@@ -334,20 +306,6 @@ fall_run_model <- function(scenario = NULL,
     prespawn_survival <- surv_adult_prespawn(average_degree_days,
                                              ..surv_adult_prespawn_int = ..params$..surv_adult_prespawn_int,
                                              .deg_day = ..params$.adult_prespawn_deg_day)
-
-    # # For use in the r2r metrics ---------------------------------------------
-    # Adding in limiting spawning habitat here
-    capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
-    at_cap <- ifelse(capacity - init_adults <= 0, TRUE, FALSE)
-    # TODO fix given age
-    lim_hab <- tibble(watershed = names(capacity),
-                      capacity = capacity,
-                      init_adults = init_adults,
-                      habitat_limited = at_cap,
-                      month = NA) |>
-      dplyr::mutate(habitat_type = "spawning")
-    output$limiting_habitat   <- dplyr::bind_rows(output$limiting_habitat, lim_hab)
-    # end R2R metric -----------------------------------------------------------
     # end R2R logic ------------------------------------------------------------
     juveniles <- spawn_success(escapement = init_adults,
                                proportion_natural = natural_proportion_with_renat, # R2R ADDS NEW PARAM
@@ -369,8 +327,6 @@ fall_run_model <- function(scenario = NULL,
     total_juves_pre_hatchery <- rowSums(juveniles)
     natural_juveniles <- total_juves_pre_hatchery  * natural_proportion_with_renat
     total_juves_pre_hatchery <- rowSums(juveniles)
-    # TODO add ability to vary release per year
-    # TODO(stray) capture parameters for calculating straying
     juveniles <- juveniles + (..params$hatchery_release * (1 - ..params$hatchery_release_proportion_bay))
     # stray_rates_in_river_releases <- hatchery_adult_stray(hatchery = )
 
@@ -729,8 +685,8 @@ fall_run_model <- function(scenario = NULL,
         ..params$movement_hypo_weights[8] * fish_list$route_8_fish$adults_in_ocean
     } # end month loop
 
-    #still need adults in ocean and adult in ocean weights
     output$juvenile_biomass[ , year] <- juveniles_at_chipps %*% fallRunDSM::params$mass_by_size_class
+
     # Updated logic here for R2R so that natural adults and hatchery adults return separately
     natural_adults_returning <- t(sapply(1:31, function(i) {
       if (stochastic) {
@@ -742,9 +698,7 @@ fall_run_model <- function(scenario = NULL,
 
     natural_adults_returning[is.na(natural_adults_returning)] = NaN
 
-   # R2R release at chipps logic
-    # TODO(stray) capture parameter for calculating straying
-    # stray_rates_in_bay_releases <- hatchery_adult_stray()
+   # R2R release at chipps locic -----------------------------------------------
     hatchery_releases_at_chipps <- ocean_entry_success(migrants = ..params$hatchery_release * ..params$hatchery_release_proportion_bay,
                                                month = 7, # set to final month
                                                avg_ocean_transition_month = avg_ocean_transition_month,
@@ -765,6 +719,7 @@ fall_run_model <- function(scenario = NULL,
    hatchery_adults_returning[is.na(hatchery_adults_returning)] = NaN
 
     # # For use in the r2r metrics ---------------------------------------------
+    # Create adult returning dataframes
     colnames(natural_adults_returning) <- c("V1", "V2", "V3", "V4")
     colnames(hatchery_adults_returning) <- c("V1", "V2", "V3")
 
@@ -793,6 +748,7 @@ fall_run_model <- function(scenario = NULL,
     if (mode == "calibrate") {
       calculated_adults[1:31, (year + 1):(year + 4)] <- calculated_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
       calculated_adults[1:31, (year + 1):(year + 3)] <- calculated_adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
+      calculated_adults[is.na(calculated_adults)] = 0
     } else {
       adults[1:31, (year + 1):(year + 4)] <- adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
       adults[1:31, (year + 1):(year + 3)] <- adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
@@ -800,24 +756,14 @@ fall_run_model <- function(scenario = NULL,
     }
 
   } # end year for loop
-
   if (mode == "seed") {
     # browser()
     return(list(adults = adults[ , 6:30],
                 proportion_hatchery = 1 - proportion_natural_juves_in_tribs))
   } else if (mode == "calibrate") {
-    return(calculated_adults[, 6:20])
+    return(calculated_adults[, 6:20]) #TODO QUESTION FOR EMANUEL - IS 6 - 20 enough, do we need more years
   }
-
-  spawn_change <- sapply(1:19, function(year) {
-    output$spawners[ , year] / (output$spawners[ , year + 1] + 1)
-  })
-
-  viable <- spawn_change >= 1 & output$proportion_natural_juves_in_tribs[ , -1] >= 0.9 & output$spawners[ , -1] >= 833
-
-  output$viability_metrics <- sapply(1:4, function(group) {
-    colSums(viable[which(fallRunDSM::params$diversity_group == group), ])
-  })
+  # Removed spawn change / viability info NOT USED FOR R2R Logic
 
   return(output)
 

@@ -1,10 +1,10 @@
 library(tidyverse)
-remotes::install_github("Reorienting-to-Recovery/DSMflow")
+# remotes::install_github("Reorienting-to-Recovery/DSMflow")
 library(DSMhabitat)
 library(DSMflow)
 
 # loads calibration data
-calib_results <- read_rds("calibration/result-test-known-nats-2.rds")
+calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")
 solution <- calib_results@solution
 
 harvest_percentage <- fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31)
@@ -13,7 +13,6 @@ harvest_percentage[harvest_percentage < 0] <- 0
 
 # initial params
 r_to_r_baseline_params <- list(
-  #TODO add updated spawn decay multiplier for 2019 biop
   spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$biop_itp_2018_2019$fr,
 
   # Data from DSMscenarios
@@ -253,7 +252,6 @@ r_to_r_baseline_params <- list(
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)
-
 
 
 

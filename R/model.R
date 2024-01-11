@@ -106,7 +106,7 @@ fall_run_model <- function(scenario = NULL,
   adults <- switch (mode,
                     "seed" = fallRunDSM::adult_seeds,
                     "simulate" = seeds$adults,
-                    "calibrate" = seeds,
+                    "calibrate" = seeds$adults,
   )
 
 
@@ -203,7 +203,7 @@ fall_run_model <- function(scenario = NULL,
     if (year <= 5 & mode == "simulate") {
       hatch_adults <- adults[, year] * seeds$proportion_hatchery
       # Default to base harvest levels .57 most tribs
-      adults_after_harvest <- hatch_adults * (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage)
+      adults_after_harvest <- hatch_adults * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
       hatch_after_harvest_by_age <- round(unname(adults_after_harvest) * as.matrix(default_hatch_age_dist[2:5]))
       row.names(hatch_after_harvest_by_age) = fallRunDSM::watershed_labels
       colnames(hatch_after_harvest_by_age) = c(2, 3, 4, 5)
@@ -215,7 +215,7 @@ fall_run_model <- function(scenario = NULL,
         harvested_natural_adults = rep(0, 31)
       } else {
         nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
-        natutal_adults_after_harvest <- nat_adults * (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage)
+        natutal_adults_after_harvest <- nat_adults * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
         natutal_adults_by_age <- round(unname(natutal_adults_after_harvest) * as.matrix(default_nat_age_dist[2:5]))
         harvested_natural_adults = nat_adults - natutal_adults_after_harvest
       }
@@ -252,7 +252,7 @@ fall_run_model <- function(scenario = NULL,
                       total_harvest = hatchery_harvest + natural_harvest)
     output$harvested_adults <- bind_rows(output$harvested_adults, harvest)
     }
-    # STRAY
+    # STRAY --------------------------------------------------------------------
     if (mode == "simulate") {
     adults_after_stray <- apply_straying(year, adults_after_harvest$natural_adults,
                                          adults_after_harvest$hatchery_adults,
@@ -262,10 +262,8 @@ fall_run_model <- function(scenario = NULL,
                                          flows_apr_may = ..params$flows_apr_may,
                                          fallRunDSM::monthly_mean_pdo)
     }
-    # TODO apply natural adults removal rate for hatcheris (apply to hatchery fish or natural fish)
-    # - why is this logic currently just in calibration and seeding
 
-    # APPLY EN ROUTE SURVIAL ---------------------------------------------------
+    # APPLY EN ROUTE SURVIVAL ---------------------------------------------------
     if (mode == "simulate") {
     spawners <- apply_enroute_survival(year,
                                        adults = adults_after_stray,
@@ -277,7 +275,6 @@ fall_run_model <- function(scenario = NULL,
                                        ..surv_adult_enroute_int = ..params$..surv_adult_enroute_int,
                                        .adult_en_route_migratory_temp = ..params$.adult_en_route_migratory_temp,
                                        .adult_en_route_bypass_overtopped = ..params$.adult_en_route_bypass_overtopped,
-                                       .adult_en_route_adult_harvest_rate = .params$.adult_en_route_adult_harvest_rate,
                                        stochastic = stochastic)
     }
 
@@ -519,7 +516,7 @@ fall_run_model <- function(scenario = NULL,
       # 7. dens filling + genetics
       # 8. dens filling + temperature
 
-
+      if (..params$movement_hypo_weights[1] != 0){
       fish_list$route_1_fish <- juvenile_month_dynamic(
         fish_list$route_1_fish,
         year = year, month = month,
@@ -532,7 +529,9 @@ fall_run_model <- function(scenario = NULL,
         fp_growth = growth_rates_fp,
         delta_growth = growth_rates_delta
       )
+      }
 
+      if (..params$movement_hypo_weights[2] != 0) {
       fish_list$route_2_fish <- juvenile_month_dynamic(
         fish_list$route_2_fish,
         year = year, month = month,
@@ -550,7 +549,8 @@ fall_run_model <- function(scenario = NULL,
                              vernalis_flow = ..params$vernalis_flows[month, year],
                              threshold = 1000, p_leave = 0.3, stochastic = stochastic)
       )
-
+      }
+      if (..params$movement_hypo_weights[3] != 0) {
       fish_list$route_3_fish <- juvenile_month_dynamic(
         fish_list$route_3_fish,
         year = year, month = month,
@@ -566,7 +566,8 @@ fall_run_model <- function(scenario = NULL,
         movement_months = 1:2,
         movement_args = list(p_leave = 0.25, stochastic = stochastic)
       )
-
+      }
+      if (..params$movement_hypo_weights[4] != 0) {
       fish_list$route_4_fish <- juvenile_month_dynamic(
         fish_list$route_4_fish,
         year = year, month = month,
@@ -582,8 +583,8 @@ fall_run_model <- function(scenario = NULL,
         movement_months = 1:2,
         movement_args = list(movement_month = 3, movement_temp = 15, stochastic = stochastic)
       )
-
-
+      }
+      if (..params$movement_hypo_weights[5] != 0) {
       fish_list$route_5_fish <- juvenile_month_dynamic(
         fish_list$route_5_fish,
         year = year, month = month,
@@ -603,8 +604,8 @@ fall_run_model <- function(scenario = NULL,
         filling_regional_args = list(up_to_size_class = 3, ..floodplain_capacity = ..params$..floodplain_capacity,
                                      ..habitat_capacity = ..params$..habitat_capacity)
       )
-
-
+      }
+      if (..params$movement_hypo_weights[6] != 0) {
       fish_list$route_6_fish <- juvenile_month_dynamic(
         fish_list$route_6_fish,
         year = year, month = month,
@@ -628,7 +629,8 @@ fall_run_model <- function(scenario = NULL,
                              vernalis_flow = ..params$vernalis_flows[month, year],
                              threshold = 1000, p_leave = 0.3, stochastic = stochastic)
       )
-
+      }
+      if (..params$movement_hypo_weights[7] != 0) {
       fish_list$route_7_fish <- juvenile_month_dynamic(
         fish_list$route_7_fish,
         year = year, month = month,
@@ -650,7 +652,8 @@ fall_run_model <- function(scenario = NULL,
         movement_months = 1:2,
         movement_args = list(p_leave = 0.25, stochastic = stochastic)
       )
-
+      }
+      if (..params$movement_hypo_weights[8] != 0) {
       fish_list$route_8_fish <- juvenile_month_dynamic(
         fish_list$route_8_fish,
         year = year, month = month,
@@ -672,7 +675,7 @@ fall_run_model <- function(scenario = NULL,
         movement_months = 1:2,
         movement_args = list(movement_month = 3, movement_temp = 15, stochastic = stochastic)
       )
-
+      }
       if (FALSE) {
         fish_1_df <- create_fish_df(fish_df = fish_list$route_1_fish, month = month, year = year)
         fish_2_df <- create_fish_df(fish_df = fish_list$route_2_fish, month = month, year = year)
@@ -705,6 +708,7 @@ fall_run_model <- function(scenario = NULL,
         ..params$movement_hypo_weights[6] * fish_list$route_6_fish$juveniles_at_chipps +
         ..params$movement_hypo_weights[7] * fish_list$route_7_fish$juveniles_at_chipps +
         ..params$movement_hypo_weights[8] * fish_list$route_8_fish$juveniles_at_chipps
+
       d <- data.frame(juveniles_at_chipps)
       colnames(d) <- c("s", "m", "l", "vl")
       d$watershed <- fallRunDSM::watershed_labels

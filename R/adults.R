@@ -164,7 +164,6 @@ apply_enroute_survival <- function(year,
                                    ..surv_adult_enroute_int,
                                    .adult_en_route_migratory_temp,
                                    .adult_en_route_bypass_overtopped,
-                                   .adult_en_route_adult_harvest_rate,
                                    stochastic) {
   # Do adults by month
   # Natural Adults

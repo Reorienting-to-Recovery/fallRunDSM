@@ -1,11 +1,11 @@
 library(tidyverse)
-remotes::install_github("Reorienting-to-Recovery/DSMflow@eff", force = TRUE)
-remotes::install_github("Reorienting-to-Recovery/DSMhabitat@eff_sac_hab", force = TRUE)
+# remotes::install_github("Reorienting-to-Recovery/DSMflow@eff", force = TRUE)
+# remotes::install_github("Reorienting-to-Recovery/DSMhabitat@eff_sac_hab", force = TRUE)
 library(DSMhabitat)
 library(DSMflow)
 
 # loads calibration data
-calib_results <- read_rds("calibration/result-test-known-nats-2.rds")
+calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")
 solution <- calib_results@solution
 
 harvest_percentage <- fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31)

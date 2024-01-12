@@ -131,7 +131,8 @@ fill_natal_dens_depend <- function(juveniles, inchannel_habitat, floodplain_habi
   list(inchannel = river_rear, floodplain = flood_rear, migrants = migrants)
 }
 
-# Alternative density dependent version of fill_regional with two additional parameters
+#' Fill Regional - Density Dependent Fill Hypothesis
+#' @description Alternative density dependent version of fill_regional with two additional parameters
 #' @param ..habitat_capacity the maximum number of rearing juveniles in channel habitat
 #' @param floodplain_capacity the maximum number of rearing juveniles in floodplain habitat
 #' @export

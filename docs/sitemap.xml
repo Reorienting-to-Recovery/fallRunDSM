@@ -94,6 +94,9 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fill_regional.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fill_regional_dens_depend.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/gamma_MOM.html</loc>
   </url>
   <url>
@@ -148,6 +151,9 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/juvenile_month_dynamic.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/load_baseline_data.html</loc>
   </url>
   <url>
@@ -158,6 +164,9 @@
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/month_return_proportions.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/movement.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/natural_adult_removal_rate.html</loc>
@@ -268,6 +277,12 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/survival_betas.html</loc>
   </url>
   <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/temperature_movement.html</loc>
+  </url>
+  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/territory_by_size.html</loc>
+  </url>
+  <url>
+    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/time_movement.html</loc>
   </url>
 </urlset>

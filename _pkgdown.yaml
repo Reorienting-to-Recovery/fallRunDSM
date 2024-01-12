@@ -42,8 +42,13 @@ reference:
   - compute_adult_stray_rates
   - stray_returning_adults
   - harvest_adults
+  - juvenile_month_dynamic
   - pulse_movement
+  - snow_globe_movement
+  - temperature_movement
+  - time_movement
   - fill
+  - fill_regional_dens_depend
   - route
   - route_and_rear_deltas
   - route_bypass
@@ -89,7 +94,6 @@ reference:
   - get_habitat
   - get_rearing_survival
   - get_migratory_survival
-  - get_spawning_adults
   - territory_by_size
   - gamma_MOM
   - days_in_month

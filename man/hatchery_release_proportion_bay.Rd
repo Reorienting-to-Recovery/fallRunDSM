@@ -5,7 +5,7 @@
 \alias{hatchery_release_proportion_bay}
 \title{Bay Proportion Hatchery Releases}
 \format{
-An object of class \code{numeric} of length 31.
+An object of class \code{numeric} of length 1.
 }
 \usage{
 hatchery_release_proportion_bay

@@ -83,8 +83,15 @@ Sacramento River or San Joaquin River) or out migrate during a simulated month</
 <span>  <span class="va">prop_pulse_flows</span>,</span>
 <span>  <span class="va">migration_survival_rate</span>,</span>
 <span>  <span class="va">proportion_flow_bypass</span>,</span>
+<span>  filling_fn <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="fill.html">fill_regional</a></span>,</span>
+<span>  filling_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  movement_fn <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  movement_months <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  movement_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  detour <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">territory_size</span>,</span>
+<span>  <span class="va">freeport_flows</span>,</span>
+<span>  <span class="va">vernalis_flows</span>,</span>
 <span>  <span class="va">stochastic</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -127,6 +134,26 @@ Sacramento River or San Joaquin River) or out migrate during a simulated month</
 <dd><p>Variable describing the proportion of flows routed through the bypasses, more details at <code><a href="https://reorienting-to-recovery.github.io/DSMflow/reference/proportion_flow_bypasses.html" class="external-link">proportion_flow_bypasses</a></code></p></dd>
 
 
+<dt>filling_fn</dt>
+<dd><p>optional filling function to use in routing procedure, by default it uses fallRunDSM::fill_regional</p></dd>
+
+
+<dt>filling_args</dt>
+<dd><p>when passing custom filling function, pass function specific arguments as a list here</p></dd>
+
+
+<dt>movement_fn</dt>
+<dd><p>optional movement function to use in routing procedure</p></dd>
+
+
+<dt>movement_months</dt>
+<dd><p>when passing custom movement function, pass movement months here</p></dd>
+
+
+<dt>movement_args</dt>
+<dd><p>when passing custom movement function, pass function specific arguments as a list here</p></dd>
+
+
 <dt>detour</dt>
 <dd><p>Values can be 'sutter' or 'yolo' if some juveniles are detoured on to that bypass, otherwise NULL</p></dd>
 
@@ -137,6 +164,14 @@ Sacramento River or San Joaquin River) or out migrate during a simulated month</
 
 <dt>stochastic</dt>
 <dd><p><code>TRUE</code> <code>FALSE</code> value indicating if model is being run stochastically</p></dd>
+
+
+<dt>freeport_flow</dt>
+<dd><p>Monthly mean flow at freeport in cubic feet per second</p></dd>
+
+
+<dt>vernalis_flow</dt>
+<dd><p>Monthly mean flow at vernalis in cubic feet per second</p></dd>
 
 </dl></div>
 

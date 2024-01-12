@@ -1,16 +1,20 @@
 #' Juvenile Month Dynamics
-#' @param hypothesis
+#' @description Function to run through monthly juvenile routing and rearing logic.
+#' @param hypothesis movement hypothesis to test
 #' @param fish list object containing tracking matrices for juveniles, juveniles at chips, and adults in ocean
-#' @param year
-#' @param month
-#' @param rearing_survival
-#' @param migratory_survival
-#' @param habitat
-#' @param ..params
+#' @param year year
+#' @param month month
+#' @param rearing_survival rearing survival for year and month
+#' @param migratory_survival migratory survival for year and month
+#' @param habitat habitat for year and month
+#' @param ..params full params list from model parms
 #' @examples
-#' fish = list(juveniles = juveniles, north_delta_fish = north_delta_fish, south_delta_fish = south_delta_fish,
-#' juveniles_at_chipps = juveniles_at_chipps,
-#' adults_in_ocean = adults_in_ocean)
+#' fish = list(juveniles = juveniles,
+#'             north_delta_fish = north_delta_fish,
+#'             south_delta_fish = south_delta_fish,
+#'             juveniles_at_chipps = juveniles_at_chipps,
+#'             adults_in_ocean = adults_in_ocean)
+#'@export
 juvenile_month_dynamic <- function(fish, year = year, month = month,
                                    rearing_survival = rearing_survival,
                                    migratory_survival = migratory_survival,

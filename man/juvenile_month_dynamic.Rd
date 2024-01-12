@@ -29,12 +29,28 @@ juvenile_month_dynamic(
 }
 \arguments{
 \item{fish}{list object containing tracking matrices for juveniles, juveniles at chips, and adults in ocean}
+
+\item{year}{year}
+
+\item{month}{month}
+
+\item{rearing_survival}{rearing survival for year and month}
+
+\item{migratory_survival}{migratory survival for year and month}
+
+\item{habitat}{habitat for year and month}
+
+\item{..params}{full params list from model parms}
+
+\item{hypothesis}{movement hypothesis to test}
 }
 \description{
-Juvenile Month Dynamics
+Function to run through monthly juvenile routing and rearing logic.
 }
 \examples{
-fish = list(juveniles = juveniles, north_delta_fish = north_delta_fish, south_delta_fish = south_delta_fish,
-juveniles_at_chipps = juveniles_at_chipps,
-adults_in_ocean = adults_in_ocean)
+fish = list(juveniles = juveniles,
+            north_delta_fish = north_delta_fish,
+            south_delta_fish = south_delta_fish,
+            juveniles_at_chipps = juveniles_at_chipps,
+            adults_in_ocean = adults_in_ocean)
 }

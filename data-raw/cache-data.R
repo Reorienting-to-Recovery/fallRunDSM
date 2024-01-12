@@ -161,9 +161,9 @@ usethis::use_data(watershed_to_hatchery_lookup, overwrite = TRUE)
 
 
 # proportion of in-river vs bay releases
-hatchery_release_proportion_bay <- rep(0, 31)
+hatchery_release_proportion_bay <- 0
 # names(hatchery_release_proportion_bay1) <- fallRunDSM::watershed_labels
-usethis::use_data(hatchery_release_proportion_bay)
+usethis::use_data(hatchery_release_proportion_bay, overwrite = TRUE)
 
 
 # mean PDO

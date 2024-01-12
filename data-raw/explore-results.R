@@ -4,30 +4,44 @@ library(plotly)
 library(producePMs)
 
 # Source helper functions
-source("data-raw/helper_graph_functions.R")
+# source("data-raw/helper_graph_functions.R")
 # View prelim R2R results
 
 # seed
-r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed", ..params = fallRunDSM::r_to_r_kitchen_sink_params)
+# BASELINE --
+new_params <- fallRunDSM::r_to_r_baseline_params
+new_params$movement_hypo_weights <- c(1, rep(0, 7))
+
+# seed
+r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
+                                        ..params =  new_params,
+                                        delta_surv_inflation = FALSE)
 
 # run model
-r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate", ..params = fallRunDSM::r_to_r_kitchen_sink_params,
-                                                seeds = r2r_seeds)
-r2r_model_results$spawners
-#   r2r_model_results$proportion_natural_at_spawning
+r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
+                                                ..params =  new_params,
+                                                seeds = r2r_seeds,
+                                                delta_surv_inflation = FALSE)
 
 non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
                        "Lower-mid Sacramento River", "Yolo Bypass",
-                       "Lower Sacramento River", "San Joaquin River")
+                       "Lower Sacramento River", "San Joaquin River"
+                       # "American River"
+                       # "Feather River"
+                       ) # remove american river (hab too high)
 
-spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
+spawn <- dplyr::as_tibble(r2r_model_results$spawners) |> #change which results to look at diff plots
   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
   pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
-  group_by(year, location) |>
-  summarize(total_spawners = sum(spawners)) |>
   filter(!location %in% non_spawn_regions) |>
+  group_by(year,
+           # location
+           ) |>
+  summarize(total_spawners = sum(spawners)) |>
   mutate(year = as.numeric(year)) %>%
-  ggplot(aes(year, total_spawners, color = location)) +
+  ggplot(aes(year, total_spawners,
+             # color = location
+             )) +
   geom_line() +
   theme_minimal() +
   labs(y = "Spawners",
@@ -38,8 +52,38 @@ spawn <- dplyr::as_tibble(r2r_model_results$spawners) |>
 
 ggplotly(spawn)
 
+
+# CHECK against grandtab
+grandtab_totals <- dplyr::as_tibble(DSMCalibrationData::grandtab_observed$fall)|> #change which results to look at diff plots
+  dplyr::mutate(location = fallRunDSM::watershed_labels) |>
+  pivot_longer(cols = c(`1998`:`2017`), values_to = 'spawners', names_to = "year") %>%
+  filter(!location %in% non_spawn_regions) |>
+  group_by(year,
+           # location
+           ) |>
+  summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(year, total_spawners,
+             # color = location
+  )) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = "Spawners",
+       x = "Year") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks = 1:20) +
+  theme(text = element_text(size = 20))
+
+ggplotly(grandtab_totals)
+
+
+
+
+
 # IND POP CHECK
-results_df <- create_model_results_dataframe(r2r_model_results, scenario = "recovery", model_parameters = fallRunDSM::r_to_r_baseline_params, selected_run = "fall")
+results_df <- create_model_results_dataframe(r2r_model_results,
+                                             scenario = "recovery",
+                                             model_parameters = fallRunDSM::r_to_r_baseline_params, selected_run = "fall")
 potential_dependent_pops <- c("Bear River", "Big Chico Creek", "Elder Creek", "Paynes Creek",  "Stoney Creek", "Thomes Creek")
 
 ind_pops <- results_df |>
@@ -60,10 +104,10 @@ ind_pops <- results_df |>
          crr_above_1 = ifelse(`2.1 CRR: Total Adult to Returning Natural Adult` >= 1, TRUE, FALSE),
          growth_rate_above_1 = ifelse(`2.2 Growth Rate Spawners` >= 0, TRUE, FALSE),
          independent_population = ifelse(above_500_spawners & phos_less_than_5_percent & growth_rate_above_1 & crr_above_1, TRUE, FALSE))
-View(ind_pops)
+# View(ind_pops)
 
 ind_pops |>
-  filter(year < 17, year > 1) |> # removes last three years because CRR is NA,
+  filter(year <= 17, year > 1) |> # removes last three years because CRR is NA,
   # first year because growth rate is NA
   ggplot(aes(x = year, y = location, color = independent_population)) +
   geom_point(size = 4) +
@@ -73,6 +117,48 @@ ind_pops |>
        x = "",
        title = "Independent Populations") +
   theme(legend.position = "bottom")
+
+
+water_yt_lookup <- waterYearType::water_year_indices |>
+  filter(WY > 1977, WY < 2001, location == "Sacramento Valley") |>
+  mutate(water_year = WY,
+         year_type = Yr_type) |> glimpse()
+
+year_lookup <- tibble(year = 1:21,
+                      actual_year = 1980:2000)
+
+flow_spawn_plot_data <- results_df |>
+  filter(performance_metric == "1 All Spawners") |>
+  group_by(year, scenario, run) |>
+  summarize(value = sum(value, na.rm = TRUE)) |>
+  left_join(year_lookup) |>
+  mutate(date = as.Date(paste0(actual_year, "-12-31"))) |>
+  filter(scenario != "No Hatchery") |> glimpse()
+
+scenario_six_colors <- c("#02401B", "#9A8822", "#798E87", "#5B1A18","#972D15", "#DC863B", "#AA9486")
+
+ggplot() +
+  geom_line(data = flow_spawn_plot_data, aes(x = date, y = value, color = scenario),linewidth = .5, alpha = 1) +
+  scale_color_manual(values = scenario_six_colors) +
+  # geom_line(data = flow_spawn_plot_data |> filter(scenario == "Baseline"), aes(x = date, y = value), color = "black", linewidth = .5, alpha = 1) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Total Spawner Abundance over Time",
+       y = "Spawner Abundance",
+       x = "Year",
+       color = "Bookend Scenario",
+       fill = "Hydrology",
+       #  caption = "Note: These numbers only reflect Upper Sacramento River Fall Run Chinook Spawners. Baseline and No Hatchery perform very simmilarly in the Upper Sacramento River."
+  ) +
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic"),# move caption to the left
+    legend.position = c(0.85, 0.7),
+    # legend.position = "none",
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 20),
+    plot.title = element_text(size = 20)
+  )
+
 
 produce_spawner_abundance_pm(results_df)
 produce_crr_geometric_mean_pm <- function(model_results_df){

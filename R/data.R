@@ -316,6 +316,14 @@ NULL
 #' @format NULL
 "params_2022"
 
+#' @rdname params
+#' @format NULL
+"r_to_r_baseline_params"
+
+#' @rdname params
+#' @format NULL
+"r_to_r_kitchen_sink_params"
+
 #' @title Hatchery Stray Model
 #' @description A serialized version of the beta-regression model for hatchery origin fish straying
 #' @source Model from

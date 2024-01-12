@@ -1,10 +1,13 @@
 library(tidyverse)
-remotes::install_github("Reorienting-to-Recovery/DSMflow")
+# remotes::install_github("Reorienting-to-Recovery/DSMflow")
+# remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
 library(DSMhabitat)
 library(DSMflow)
+library(DSMtemperature)
 
 # loads calibration data
-calib_results <- read_rds("calibration/result-test-known-nats-2.rds")
+calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")
 solution <- calib_results@solution
 
 harvest_percentage <- fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31)
@@ -13,7 +16,6 @@ harvest_percentage[harvest_percentage < 0] <- 0
 
 # initial params
 r_to_r_baseline_params <- list(
-  #TODO add updated spawn decay multiplier for 2019 biop
   spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$biop_itp_2018_2019$fr,
 
   # Data from DSMscenarios
@@ -231,7 +233,7 @@ r_to_r_baseline_params <- list(
 
   # R2R specific metrics
   hatchery_release = fallRunDSM::fall_hatchery_release,
-  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
+  hatchery_release_proportion_bay = fallRunDSM::hatchery_release_proportion_bay,
   fecundity_lookup = fallRunDSM::fecundity_by_age,
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
   restrict_harvest_to_hatchery = FALSE,
@@ -244,10 +246,17 @@ r_to_r_baseline_params <- list(
 
   # stray model
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,
-  flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019
+  flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019,
+
+  # multi route
+  movement_hypo_weights = rep(1/8, 8),
+  ..habitat_capacity = 5,
+  ..floodplain_capacity = 5
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)
+
+
 
 
 

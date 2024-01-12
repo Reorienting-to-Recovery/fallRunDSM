@@ -1,5 +1,5 @@
 #' @title Fall Run Chinook Model
-#' @description Fall Run Chinook life cycle model used for CVPIA's Structured
+#' @description Fall Run Chinook life cycle model used for Reorienting to Recovery's Structured
 #' Decision Making Process
 #' @param scenario Model inputs, can be modified to test management actions
 #' @param mode The mode to run model in. Can be \code{"seed"}, \code{"simulate"}, \code{"calibrate"}

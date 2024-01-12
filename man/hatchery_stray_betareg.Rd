@@ -7,6 +7,10 @@
 \format{
 An object of class \code{betareg} of length 29.
 }
+\source{
+Model from
+ \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019}
+}
 \usage{
 hatchery_stray_betareg
 }

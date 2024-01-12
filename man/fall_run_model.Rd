@@ -30,7 +30,7 @@ returned value can be fed into the model again as the value for the seeds argume
 \item{stochastic}{\code{TRUE} \code{FALSE} value indicating if model should be run stochastically. Defaults to \code{FALSE}.}
 }
 \description{
-Fall Run Chinook life cycle model used for CVPIA's Structured
+Fall Run Chinook life cycle model used for Reorienting to Recovery's Structured
 Decision Making Process
 }
 \examples{

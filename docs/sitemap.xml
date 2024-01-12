@@ -88,12 +88,6 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fill.html</loc>
   </url>
   <url>
-    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fill_natal.html</loc>
-  </url>
-  <url>
-    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fill_regional.html</loc>
-  </url>
-  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/fill_regional_dens_depend.html</loc>
   </url>
   <url>
@@ -109,16 +103,7 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/get_migratory_survival.html</loc>
   </url>
   <url>
-    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/get_migratory_survival_rates.html</loc>
-  </url>
-  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/get_rearing_survival.html</loc>
-  </url>
-  <url>
-    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/get_rearing_survival_rates.html</loc>
-  </url>
-  <url>
-    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/get_spawning_adults.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/growth.html</loc>
@@ -152,9 +137,6 @@
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/juvenile_month_dynamic.html</loc>
-  </url>
-  <url>
-    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/load_baseline_data.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/mass_by_size_class.html</loc>
@@ -223,9 +205,6 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/route_regional.html</loc>
   </url>
   <url>
-    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/route_south_delta.html</loc>
-  </url>
-  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/route_to_south_delta.html</loc>
   </url>
   <url>
@@ -265,16 +244,10 @@
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/surv_juv_outmigration_sac.html</loc>
   </url>
   <url>
-    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/surv_juv_outmigration_sac_delta.html</loc>
-  </url>
-  <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/surv_juv_outmigration_san_joaquin.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/surv_juv_rear.html</loc>
-  </url>
-  <url>
-    <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/survival_betas.html</loc>
   </url>
   <url>
     <loc>https://reorienting-to-recovery.github.io/fallRunDSM/reference/temperature_movement.html</loc>

@@ -1,7 +1,10 @@
 library(tidyverse)
 # remotes::install_github("Reorienting-to-Recovery/DSMflow")
+# remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
 library(DSMhabitat)
 library(DSMflow)
+library(DSMtemperature)
 
 # loads calibration data
 calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")

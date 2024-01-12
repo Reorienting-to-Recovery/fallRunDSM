@@ -1,8 +1,10 @@
 library(tidyverse)
-# remotes::install_github("Reorienting-to-Recovery/DSMflow@eff", force = TRUE)
-# remotes::install_github("Reorienting-to-Recovery/DSMhabitat@eff_sac_hab", force = TRUE)
+# remotes::install_github("Reorienting-to-Recovery/DSMflow")
+# remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
 library(DSMhabitat)
 library(DSMflow)
+library(DSMtemperature)
 
 # loads calibration data
 calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")
@@ -18,8 +20,8 @@ harvest_percentage[harvest_percentage < 0] <- 0
 # scale contact points by .3
 # scale high pred by .3
 # release 0 hatch fish in river
-#
-
+# Use Intelligent harvest regieme
+# Restrict harvest to hatchery ? may need to remove this
 
 # initial params
 r_to_r_kitchen_sink_params <- list(

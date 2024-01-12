@@ -1,6 +1,6 @@
 # Fall Chinook Salmon Reorienting to Recovery Model
 
-This model is adapted from the [CVPIA SIT Fall Run Model](https://github.com/CVPIA-OSC/fallRunDSM).
+This model is adapted from the [CVPIA SIT Fall Run Model](https://github.com/CVPIA-OSC/fallRunDSM) for use in the Reorienting to Recovery Structured Decision Making process.
 
 ## License
 
@@ -39,6 +39,7 @@ fall_run_seeds <- fall_run_model(mode = "seed")
 results <- fall_run_model(mode = "simulate",
                           seeds = fall_run_seeds)
 ```
+
 ## Details on Supporting Data
 
 ### Dependencies
@@ -55,7 +56,6 @@ All data used in the `fallRunDSM` is passed in as a argument to `fall_run_model(
 -   **Habitat Data**: View detailed documentation of habitat data inputs at [DSMhabitat](https://reorienting-to-recovery.github.io/DSMhabitat/). Modeling details for each stream can be viewed [here](https://reorienting-to-recovery.github.io/DSMhabitat/reference/habitat_data.html#modeling-details-for-streams).
 -   **Temperature Data**: View detailed documentation of temperature data inputs at [DSMtemperature](https://reorienting-to-recovery.github.io/DSMtemperature/). Modeling details for each stream can be viewed [here](https://reorienting-to-recovery.github.io/DSMtemperature/reference/stream_temperature.html#watershed-modeling-details).
 
-
 ### Calibration Data
 
 This model is calibrated using methodology and calibration data prepared for the CVPIA SIT model in the `DSMCalibration` package:
@@ -65,5 +65,3 @@ This model is calibrated using methodology and calibration data prepared for the
 2.  Proxy years are used to select Habitat, Flow, and Temperature data for 1998-2017 to correspond with the years of GrandTab escapement data. The data inputs to the DSM are for years 1980-1999. We selected proxy years for 1998-2017 from the 1980-1999 model inputs by [comparing the DWR water year indices](https://cdec.water.ca.gov/reportapp/javareports?name=WSIHIST).
 
 For a detailed overview of the calibration process see the [calibration markdown.](https://cvpia-osc.github.io/fallRunDSM/articles/calibration-2021.html)
-
-

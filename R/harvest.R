@@ -19,8 +19,12 @@
 
 harvest_adults <- function(adult_df,
                            spawner_df,
+                           early_adults,
                            year = year,
                            spawn_habitat,
+                           seed_proportion_hatchery,
+                           default_natural_age_distribution,
+                           default_hatchery_age_distribution,
                            terminal_hatchery_logic = c(T, F),
                            ocean_harvest_percentage, # same for all tribs
                            tributary_harvest_percentage, # can vary by trib
@@ -31,6 +35,35 @@ harvest_adults <- function(adult_df,
                            crr_scaling = 2
 ){
   # helper data ----------------------------------------------------------------
+  # years 1 - 5
+  # Harvest
+  if (year <= 5) {
+    hatch_adults <- early_adults[, year] * seed_proportion_hatchery
+    # Default to base harvest levels .57 most tribs
+    adults_after_harvest <- hatch_adults * (1 - (ocean_harvest_percentage + tributary_harvest_percentage))
+    hatch_after_harvest_by_age <- round(unname(adults_after_harvest) * as.matrix(default_hatchery_age_distribution[2:5]))
+    row.names(hatch_after_harvest_by_age) = fallRunDSM::watershed_labels
+    colnames(hatch_after_harvest_by_age) = c(2, 3, 4, 5)
+    harvested_hatchery_adults <- hatch_adults - adults_after_harvest
+    # NATURAL
+    if (restrict_harvest_to_hatchery) {
+      nat_adults <- early_adults[, year] * (1 - seed_proportion_hatchery) * .9 # hooking mortality
+      natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_natural_age_distribution[2:5]))
+      harvested_natural_adults = rep(0, 31)
+    } else {
+      nat_adults <- early_adults[, year] * (1 - seed_proportion_hatchery)
+      natutal_adults_after_harvest <- nat_adults * (1 - (ocean_harvest_percentage + tributary_harvest_percentage))
+      natutal_adults_by_age <- round(unname(natutal_adults_after_harvest) * as.matrix(default_natural_age_distribution[2:5]))
+      harvested_natural_adults <- nat_adults - natutal_adults_after_harvest
+    }
+    row.names(natutal_adults_by_age) = fallRunDSM::watershed_labels
+    colnames(natutal_adults_by_age) = c(2, 3, 4, 5)
+    return_data_list <- list(hatchery_adults = hatch_after_harvest_by_age,
+                             natural_adults = natutal_adults_by_age,
+                             harvested_hatchery_adults = harvested_hatchery_adults,
+                             harvested_natural_adults = harvested_natural_adults)
+  } else {
+  # years 6 and on
   return_prop <- matrix(c(.30, .60, .10, 0, .22, .47, .26, .05), nrow = 2, ncol = 4,
                         dimnames = list(c("hatchery", "natural"),
                                         c("V1", "V2", "V3", "V4")))
@@ -163,17 +196,11 @@ harvest_adults <- function(adult_df,
     as.matrix()
   rownames(total_adults) <- watershed_labels
 
-  # prepare outpults
-  total_adults <- total_adults
-  hatchery_adults <- hatchery_adults
-  natural_adults <- natural_adults
-  proportion_natural <- natural_adults / total_adults
-
   # change nan to 0 for non spawn regions
-  # recalculate pHOS
-  list(hatchery_adults = replace(hatchery_adults, is.nan(hatchery_adults), 0),
-       natural_adults = replace(natural_adults, is.nan(natural_adults), 0),
-       harvested_hatchery_adults = harvested_hatchery_adults,
-       harvested_natural_adults = harvested_natural_adults,
-       proportion_natural = replace(proportion_natural, is.nan(proportion_natural), 0))
+  return_data_list <- list(hatchery_adults = replace(hatchery_adults, is.nan(hatchery_adults), 0),
+                           natural_adults = replace(natural_adults, is.nan(natural_adults), 0),
+                           harvested_hatchery_adults = harvested_hatchery_adults,
+                           harvested_natural_adults = harvested_natural_adults)
+  }
+  return(return_data_list)
 }

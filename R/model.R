@@ -173,38 +173,17 @@ fall_run_model <- function(scenario = NULL,
       spawners = list(init_adults = round(annual_adults_hatch_removed),
                       proportion_natural = 1 - fallRunDSM::params$proportion_hatchery)
     }
-
-    # Harvest
-    if (year <= 5 & mode == "simulate") {
-      hatch_adults <- adults[, year] * seeds$proportion_hatchery
-      # Default to base harvest levels .57 most tribs
-      adults_after_harvest <- hatch_adults * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
-      hatch_after_harvest_by_age <- round(unname(adults_after_harvest) * as.matrix(default_hatch_age_dist[2:5]))
-      row.names(hatch_after_harvest_by_age) = fallRunDSM::watershed_labels
-      colnames(hatch_after_harvest_by_age) = c(2, 3, 4, 5)
-      harvested_hatchery_adults <- hatch_adults - adults_after_harvest
-      # NATURAL
-      if (..params$restrict_harvest_to_hatchery) {
-        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery) * .9 # hooking mortality
-        natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
-        harvested_natural_adults = rep(0, 31)
-      } else {
-        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
-        natutal_adults_after_harvest <- nat_adults * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
-        natutal_adults_by_age <- round(unname(natutal_adults_after_harvest) * as.matrix(default_nat_age_dist[2:5]))
-        harvested_natural_adults <- nat_adults - natutal_adults_after_harvest
-      }
-      row.names(natutal_adults_by_age) = fallRunDSM::watershed_labels
-      colnames(natutal_adults_by_age) = c(2, 3, 4, 5)
-      adults_after_harvest <- list(hatchery_adults = hatch_after_harvest_by_age,
-                                   natural_adults = natutal_adults_by_age,
-                                   harvested_hatchery_adults = harvested_hatchery_adults,
-                                   harvested_natural_adults = harvested_natural_adults)
-    }
-    if (year > 5 & mode == "simulate") {
+    # harvest & stray adults ---------------------------------------------------
+    if (mode == "simulate") {
+    # HARVEST
      adults_after_harvest <- harvest_adults(output$returning_adults,
-                                            output$spawners, year,
+                                            output$spawners,
+                                            early_adults = adults,
+                                            year,
                                             ..params$spawning_habitat,
+                                            seed_proportion_hatchery = seeds$proportion_hatchery,
+                                            default_hatchery_age_distribution = default_hatch_age_dist,
+                                            default_natural_age_distribution = default_nat_age_dist,
                                             terminal_hatchery_logic = ..params$terminal_hatchery_logic,
                                             ocean_harvest_percentage = ..params$ocean_harvest_percentage,
                                             tributary_harvest_percentage = ..params$tributary_harvest_percentage,
@@ -214,10 +193,8 @@ fall_run_model <- function(scenario = NULL,
                                             intelligent_habitat_harvest = ..params$intelligent_habitat_harvest,
                                             crr_scaling = ..params$crr_scaling
 
-      )
-
-    }
-    if (mode == "simulate") {
+    )
+    # Output harvest to output$harvested_adults
     natural_adult_harvest <- sum(adults_after_harvest$harvested_natural_adults, na.rm = TRUE)
     hatchery_adult_harvest <- sum(adults_after_harvest$harvested_hatchery_adults, na.rm = TRUE)
     harvest <- tibble(year = year,
@@ -225,9 +202,7 @@ fall_run_model <- function(scenario = NULL,
                       natural_harvest = natural_adult_harvest,
                       total_harvest = hatchery_harvest + natural_harvest)
     output$harvested_adults <- bind_rows(output$harvested_adults, harvest)
-    }
     # STRAY --------------------------------------------------------------------
-    if (mode == "simulate") {
     adults_after_stray <- apply_straying(year, adults_after_harvest$natural_adults,
                                          adults_after_harvest$hatchery_adults,
                                          total_releases = ..params$hatchery_release,
@@ -235,10 +210,7 @@ fall_run_model <- function(scenario = NULL,
                                          flows_oct_nov = ..params$flows_oct_nov,
                                          flows_apr_may = ..params$flows_apr_may,
                                          fallRunDSM::monthly_mean_pdo)
-    }
-
     # APPLY EN ROUTE SURVIVAL ---------------------------------------------------
-    if (mode == "simulate") {
     spawners <- apply_enroute_survival(year,
                                        adults = adults_after_stray,
                                        month_return_proportions = ..params$month_return_proportions,
@@ -251,8 +223,6 @@ fall_run_model <- function(scenario = NULL,
                                        .adult_en_route_bypass_overtopped = ..params$.adult_en_route_bypass_overtopped,
                                        stochastic = stochastic)
     }
-
-
 
     init_adults <- spawners$init_adults
     output$spawners[ , year] <- init_adults
@@ -746,6 +716,75 @@ fall_run_model <- function(scenario = NULL,
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
+      # browser()
+      # HARVEST
+      # apply simple harvest, consider making more complicated
+      natural_adults_after_harvest  <- natural_adults_returning * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
+      row.names(natural_adults_after_harvest) = fallRunDSM::watershed_labels
+      colnames(natural_adults_after_harvest) = c(2, 3, 4, 5)
+      hatchery_adults_after_harvest <- hatchery_adults_returning * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
+      hatchery_adults_after_harvest <- cbind(hatchery_adults_after_harvest, rep(0, 31))
+      row.names(hatchery_adults_after_harvest) = fallRunDSM::watershed_labels
+      colnames(hatchery_adults_after_harvest) = c(2, 3, 4, 5)
+      # adults_after_harvest <- harvest_adults(output$returning_adults,
+      #                                        output$spawners,
+      #                                        early_adults = adults,
+      #                                        year,
+      #                                        ..params$spawning_habitat,
+      #                                        seed_proportion_hatchery = seeds$proportion_hatchery,
+      #                                        default_hatchery_age_distribution = default_hatch_age_dist,
+      #                                        default_natural_age_distribution = default_nat_age_dist,
+      #                                        terminal_hatchery_logic = ..params$terminal_hatchery_logic,
+      #                                        ocean_harvest_percentage = ..params$ocean_harvest_percentage,
+      #                                        tributary_harvest_percentage = ..params$tributary_harvest_percentage,
+      #                                        restrict_harvest_to_hatchery = ..params$restrict_harvest_to_hatchery,
+      #                                        no_cohort_harvest_years = ..params$no_cohort_harvest_years,
+      #                                        intelligent_crr_harvest = ..params$intelligent_crr_harvest,
+      #                                        intelligent_habitat_harvest = ..params$intelligent_habitat_harvest,
+      #                                        crr_scaling = ..params$crr_scaling
+      #
+      # )
+      # STRAY --------------------------------------------------------------------
+      adults_after_stray <- apply_straying(year,
+                                           natural_adults_after_harvest,
+                                           hatchery_adults_after_harvest,
+                                           total_releases = ..params$hatchery_release,
+                                           release_month = 1,
+                                           flows_oct_nov = ..params$flows_oct_nov,
+                                           flows_apr_may = ..params$flows_apr_may,
+                                           fallRunDSM::monthly_mean_pdo)
+      # APPLY EN ROUTE SURVIVAL ---------------------------------------------------
+      calibrated_return_totals <- apply_enroute_survival(year,
+                                         adults = adults_after_stray,
+                                         month_return_proportions = ..params$month_return_proportions,
+                                         gates_overtopped = ..params$gates_overtopped,
+                                         tisdale_bypass_watershed = ..params$tisdale_bypass_watershed,
+                                         yolo_bypass_watershed = ..params$yolo_bypass_watershed,
+                                         migratory_temperature_proportion_over_20 = ..params$migratory_temperature_proportion_over_20,
+                                         ..surv_adult_enroute_int = ..params$..surv_adult_enroute_int,
+                                         .adult_en_route_migratory_temp = ..params$.adult_en_route_migratory_temp,
+                                         .adult_en_route_bypass_overtopped = ..params$.adult_en_route_bypass_overtopped,
+                                         stochastic = stochastic)
+      natural_adults_returning <- t(sapply(1:31, function(i) {
+        if (stochastic) {
+          rmultinom(1, (calibrated_return_totals$init_adults[i]), prob = c(.22, .47, .26, .05))
+        } else {
+          round((calibrated_return_totals$init_adults[i])* c(.22, .47, .26, .05))
+        }
+      })) * calibrated_return_totals$proportion_natural
+
+      natural_adults_returning[is.na(natural_adults_returning)] = NaN
+
+      hatchery_adults_returning <- t(sapply(1:31, function(i) {
+        if (stochastic) {
+          rmultinom(1, (calibrated_return_totals$init_adults[i]), prob = c(.30, .60, .10))
+        } else {
+          round((adults_in_ocean[i] * c(.30, .60, .10)))
+      }})) * (1 - calibrated_return_totals$proportion_natural)
+
+      hatchery_adults_returning[is.na(hatchery_adults_returning)] = NaN
+
+      natural_adults_returning[is.na(natural_adults_returning)] = NaN
       calculated_adults[1:31, (year + 1):(year + 4)] <- calculated_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
       calculated_adults[1:31, (year + 1):(year + 3)] <- calculated_adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
       calculated_adults[is.na(calculated_adults)] = 0
@@ -761,7 +800,7 @@ fall_run_model <- function(scenario = NULL,
     return(list(adults = adults[ , 6:30],
                 proportion_hatchery = 1 - proportion_natural_juves_in_tribs))
   } else if (mode == "calibrate") {
-    return(calculated_adults[, 6:20]) #TODO QUESTION FOR EMANUEL - IS 6 - 20 enough, do we need more years
+    return(calculated_adults[, 6:20])
   }
   # Removed spawn change / viability info NOT USED FOR R2R Logic
 

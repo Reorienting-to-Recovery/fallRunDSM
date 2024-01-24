@@ -13,12 +13,12 @@ new_params <- fallRunDSM::r_to_r_baseline_params
 new_params$movement_hypo_weights <- c(1, rep(0, 7))
 
 # seed
-r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
+r2r_seeds <- fallRunDSM::fall_run_model(mode = "calibrate",
                                         ..params =  new_params,
                                         delta_surv_inflation = FALSE)
 
 # run model
-r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
+r2r_model_results <- fallRunDSM::fall_run_model(mode = "calibrate",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
                                                 delta_surv_inflation = FALSE)

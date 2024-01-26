@@ -48,7 +48,7 @@ harvest_adults <- function(adult_df,
     # NATURAL
     if (restrict_harvest_to_hatchery) {
       nat_adults <- early_adults[, year] * (1 - seed_proportion_hatchery) * .9 # hooking mortality
-      natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_natural_age_distribution[2:5]))
+      natutal_adults_by_age <- round(unname(nat_adults) * as.matrix(default_natural_age_distribution[2:5]))
       harvested_natural_adults = rep(0, 31)
     } else {
       nat_adults <- early_adults[, year] * (1 - seed_proportion_hatchery)

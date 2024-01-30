@@ -94,7 +94,7 @@ fall_run_model <- function(scenario = NULL,
   adults <- switch (mode,
                     "seed" = fallRunDSM::adult_seeds,
                     "simulate" = seeds$adults,
-                    "calibrate" = seeds$adults,
+                    "calibrate" = seeds,
   )
 
   for (year in 1:simulation_length) {

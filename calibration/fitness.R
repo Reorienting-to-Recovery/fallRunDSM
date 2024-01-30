@@ -8,6 +8,7 @@ fall_run_fitness <- function(
   surv_egg_to_fry,
   bypass_surv_juv,
   upsac_surv_juv,
+  battle_surv_juv,
   butte_surv_juv,
   clear_surv_juv,
   deer_surv_juv,
@@ -51,7 +52,7 @@ fall_run_fitness <- function(
   params_init$..surv_egg_to_fry_int = surv_egg_to_fry
   params_init$..surv_juv_rear_int = c(`Upper Sacramento River` = upsac_surv_juv,
                                       `Antelope Creek` = deer_surv_juv,
-                                      `Battle Creek` = deer_surv_juv,
+                                      `Battle Creek` = battle_surv_juv,
                                       `Bear Creek` = deer_surv_juv,
                                       `Big Chico Creek` = deer_surv_juv,
                                       `Butte Creek` = butte_surv_juv,
@@ -122,7 +123,7 @@ fall_run_fitness <- function(
     `San Joaquin River` = default_ocean_entry_surv)
 
 
-  keep <- c(1,6,7,10,12,19,20,23,26:30)
+  keep <- c(1, 3, 6,7,10,12,19,20,23,26:30) # add battle in
   num_obs <- rowSums(!is.na(known_adults[keep, 6:20]))
   total_obs <- sum(!is.na(known_adults[keep, 6:20]))
   weights <- num_obs / total_obs
@@ -137,7 +138,8 @@ fall_run_fitness <- function(
     known_nats <- known_adults[keep, 6:20]
     mean_escapent <-rowMeans(known_nats, na.rm = TRUE)
 
-    sse <- sum(((preds[keep,] - known_nats)^2 * weights)/mean_escapent, na.rm = TRUE)
+    sse <- sum(((preds[keep,] - known_nats)^2 * weights)/mean_escapent, na.rm = TRUE) +
+           sum((colSums(preds, na.rm = TRUE) - colSums(known_nats, na.rm = TRUE))^2)
 
     return(sse)
   },

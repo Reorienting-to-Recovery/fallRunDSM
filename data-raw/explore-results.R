@@ -9,39 +9,39 @@ library(producePMs)
 
 # seed
 # BASELINE --
-new_params <- fallRunDSM::r_to_r_baseline_params
+new_params <- fallRunDSM::r_to_r_kitchen_sink_params
 new_params$movement_hypo_weights <- c(1, rep(0, 7))
 
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
                                         ..params =  new_params,
-                                        delta_surv_inflation = FALSE)
+                                        delta_surv_inflation = TRUE)
 
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
-                                                delta_surv_inflation = FALSE)
+                                                delta_surv_inflation = TRUE)
 
 non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
                        "Lower-mid Sacramento River", "Yolo Bypass",
                        "Lower Sacramento River", "San Joaquin River"
                        # "American River"
                        # "Feather River"
-                       ) # remove american river (hab too high)
+) # remove american river (hab too high)
 
 spawn <- dplyr::as_tibble(r2r_model_results$spawners) |> #change which results to look at diff plots
   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
   pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
   filter(!location %in% non_spawn_regions) |>
   group_by(year,
-           # location
-           ) |>
-  summarize(total_spawners = sum(spawners)) |>
+           location
+  ) |>
+  summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(year, total_spawners,
-             # color = location
-             )) +
+             color = location
+  )) +
   geom_line() +
   theme_minimal() +
   labs(y = "Spawners",
@@ -59,12 +59,12 @@ grandtab_totals <- dplyr::as_tibble(DSMCalibrationData::grandtab_observed$fall)|
   pivot_longer(cols = c(`1998`:`2017`), values_to = 'spawners', names_to = "year") %>%
   filter(!location %in% non_spawn_regions) |>
   group_by(year,
-           # location
-           ) |>
+           location
+  ) |>
   summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(year, total_spawners,
-             # color = location
+             color = location
   )) +
   geom_line() +
   theme_minimal() +
@@ -77,13 +77,19 @@ grandtab_totals <- dplyr::as_tibble(DSMCalibrationData::grandtab_observed$fall)|
 ggplotly(grandtab_totals)
 
 
-
-
-
 # IND POP CHECK
+# TODO questions for technical team
+# - Intrinsic growth rate? that is what it states in phase 1 report, performs worse than current strategy
+#
+# Recovery Rules
+# Above 500 spawners for at least 5 of last 10 years
+# Phos < 5% for last 5 years
+# average growth rate above 0 for full scenario
+# geometric mean crr above 1 for full scenario
+#
 results_df <- create_model_results_dataframe(r2r_model_results,
-                                             scenario = "recovery",
-                                             model_parameters = fallRunDSM::r_to_r_baseline_params, selected_run = "fall")
+                                             scenario = "kitchen sink",
+                                             model_parameters = fallRunDSM::r_to_r_kitchen_sink_params, selected_run = "fall")
 potential_dependent_pops <- c("Bear River", "Big Chico Creek", "Elder Creek", "Paynes Creek",  "Stoney Creek", "Thomes Creek")
 
 ind_pops <- results_df |>
@@ -95,6 +101,7 @@ ind_pops <- results_df |>
   pivot_wider(names_from = performance_metric, values_from = value) |>
   # round results
   mutate(`2.1 CRR: Total Adult to Returning Natural Adult` = round(`2.1 CRR: Total Adult to Returning Natural Adult`, 1),
+         intrinsic_growth_rate = round(log(`Natural Spawners`) - log(lag(`Natural Spawners`))),
          `2.2 Growth Rate Spawners` = round(`2.2 Growth Rate Spawners`, 1),
          `4 PHOS` = round(`4 PHOS`, 2),
          `Natural Spawners` = round(`Natural Spawners`)) |>
@@ -102,9 +109,52 @@ ind_pops <- results_df |>
   mutate(above_500_spawners = if_else(`Natural Spawners` > 500, TRUE, FALSE),
          phos_less_than_5_percent = ifelse(`4 PHOS` < .05, TRUE, FALSE),
          crr_above_1 = ifelse(`2.1 CRR: Total Adult to Returning Natural Adult` >= 1, TRUE, FALSE),
+         # intrinskic_growth_rate_above_1 = ifelse(intrinsic_growth_rate >= 1, TRUE, FALSE),
          growth_rate_above_1 = ifelse(`2.2 Growth Rate Spawners` >= 0, TRUE, FALSE),
-         independent_population = ifelse(above_500_spawners & phos_less_than_5_percent & growth_rate_above_1 & crr_above_1, TRUE, FALSE))
-# View(ind_pops)
+         independent_population = ifelse(above_500_spawners & phos_less_than_5_percent &
+                                           growth_rate_above_1 & crr_above_1, TRUE, FALSE))
+
+glimpse(ind_pops)
+
+# Review Pop and Hatchery Biological Parameter,
+# Must be met each year
+ind_pops |>
+  select(year, location, above_500_spawners, phos_less_than_5_percent,) |>
+  pivot_longer(above_500_spawners:phos_less_than_5_percent, names_to = "metric", values_to = "value") |>
+  # filter(year <= 17, year > 1) |> # removes last three years because CRR is NA,
+  # first year because growth rate is NA
+  ggplot(aes(x = year, y = location, color = value)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = c("azure2", "cadetblue4", "#CCC591"), name = "") +
+  theme_minimal() +
+  labs(y = "",
+       x = "",
+       title = "Pouplation and Hatchery Biological Parameters") +
+  theme(legend.position = "bottom") +
+  facet_wrap(~metric)
+
+# Review Productivity Metrics
+# Must be met on average over 20 year simulation at each tributary
+# Where we fall short - Calveras, Feather (both super close to one)
+ind_pops |>
+  filter(year > 5) |>
+  group_by(location) |>
+  summarise("Average CRR" = round(mean(`2.1 CRR: Total Adult to Returning Natural Adult`, na.rm = TRUE), 2),
+            "Average Growth Rate" = round(mean(`2.2 Growth Rate Spawners`, na.rm = TRUE), 2)) |>
+  pivot_longer("Average CRR":"Average Growth Rate", names_to = "stat", values_to = "value") |>
+  mutate(above_threshold = case_when(stat == "Average CRR" & value > 1 ~ TRUE,
+                                     stat ==  "Average Growth Rate" & value > 0 ~ TRUE,
+                                     T ~ FALSE)) |>
+  ggplot(aes(x = location, y = value, fill = above_threshold)) +
+  geom_col(size = 4) +
+  scale_fill_manual(values = c("#CCC591", "cadetblue4"), name = "") +
+  theme_minimal() +
+  labs(y = "",
+       x = "",
+       title = "Average Productivity Metrics (yr 5 - 20) of simulation") +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  facet_wrap(~stat, nrow = 2)
 
 ind_pops |>
   filter(year <= 17, year > 1) |> # removes last three years because CRR is NA,
@@ -145,9 +195,9 @@ ggplot() +
   labs(title = "Total Spawner Abundance over Time",
        y = "Spawner Abundance",
        x = "Year",
-       color = "Bookend Scenario",
+       color = "Scenario Name",
        fill = "Hydrology",
-       #  caption = "Note: These numbers only reflect Upper Sacramento River Fall Run Chinook Spawners. Baseline and No Hatchery perform very simmilarly in the Upper Sacramento River."
+       #  caption = "Note: These numbers only reflect Upper Sacramento River Fall Run Chinook Spawners. Baseline and No Hatchery perform very similarly in the Upper Sacramento River."
   ) +
   theme_minimal() +
   theme(
@@ -194,3 +244,4 @@ produce_crr_geometric_mean_pm <- function(model_results_df){
 }
 produce_crr_geometric_mean_pm(results_df)
 produce_growth_rate_pm(results_df)
+

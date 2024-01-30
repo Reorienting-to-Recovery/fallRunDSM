@@ -114,12 +114,12 @@ fall_run_model <- function(scenario = NULL,
     avg_ocean_transition_month <- ocean_transition_month(stochastic = stochastic) # 2
     # R2R logic updates #
     # R2R logic to add fish size as an input -----------------------------------
-    default_hatch_age_dist <- tibble(watershed = fallRunDSM::watershed_labels,
+    default_hatch_age_dist <- tibble::tibble(watershed = fallRunDSM::watershed_labels,
                                      prop_2 = rep(.3, 31),
                                      prop_3 = rep(.6, 31),
                                      prop_4 = rep(.1, 31),
                                      prop_5 = rep(0, 31))
-    default_nat_age_dist <- tibble(watershed = fallRunDSM::watershed_labels,
+    default_nat_age_dist <- tibble::tibble(watershed = fallRunDSM::watershed_labels,
                                    prop_2 = rep(.22, 31),
                                    prop_3 = rep(.47, 31),
                                    prop_4 = rep(.26, 31),
@@ -220,11 +220,11 @@ fall_run_model <- function(scenario = NULL,
     if (mode == "simulate") {
     natural_adult_harvest <- sum(adults_after_harvest$harvested_natural_adults, na.rm = TRUE)
     hatchery_adult_harvest <- sum(adults_after_harvest$harvested_hatchery_adults, na.rm = TRUE)
-    harvest <- tibble(year = year,
+    harvest <- tibble::tibble(year = year,
                       hatchery_harvest = hatchery_adult_harvest,
                       natural_harvest = natural_adult_harvest,
                       total_harvest = hatchery_harvest + natural_harvest)
-    output$harvested_adults <- bind_rows(output$harvested_adults, harvest)
+    output$harvested_adults <- dplyr::bind_rows(output$harvested_adults, harvest)
     }
     # STRAY --------------------------------------------------------------------
     if (mode == "simulate") {
@@ -723,7 +723,7 @@ fall_run_model <- function(scenario = NULL,
     colnames(natural_adults_returning) <- c("V1", "V2", "V3", "V4")
     colnames(hatchery_adults_returning) <- c("V1", "V2", "V3")
 
-    output$returning_adults <- bind_rows(
+    output$returning_adults <- dplyr::bind_rows(
       output$returning_adults,
       natural_adults_returning |>
         dplyr::as_tibble(.name_repair = "universal") |>

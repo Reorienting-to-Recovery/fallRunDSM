@@ -276,7 +276,7 @@ prepare_stray_model_data <- function(hatchery, type = c("natural", "hatchery"), 
   run_year <- sim_year + 1980
   flow_discrep <- flow_oct_nov - flow_apr_may
   return(
-    expand_grid(
+    tidyr::expand_grid(
       hatchery = hatchery,
       dist_hatch = normalize_with_params(
         if (type == "hatchery") c(fallRunDSM::hatchery_to_bay_distance[hatchery], 0) else  0,

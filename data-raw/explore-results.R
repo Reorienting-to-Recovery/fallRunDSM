@@ -32,13 +32,13 @@ non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
 
 spawn <- dplyr::as_tibble(r2r_model_results$spawners) |> #change which results to look at diff plots
   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
-  pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
-  filter(!location %in% non_spawn_regions) |>
-  group_by(year,
+  tidyr::pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
+  dplyr::filter(!location %in% non_spawn_regions) |>
+  dplyr::group_by(year,
            location
   ) |>
-  summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
-  mutate(year = as.numeric(year)) %>%
+  dplyr::summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
+  dplyr::mutate(year = as.numeric(year)) %>%
   ggplot(aes(year, total_spawners,
              color = location
   )) +

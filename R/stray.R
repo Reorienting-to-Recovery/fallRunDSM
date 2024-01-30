@@ -125,7 +125,7 @@ compute_adult_stray_rates <- function(type = c("natural", "hatchery"), sim_year,
 
 
   # create "newdata" for each of the hatcheries to be used in the prediction
-  new_data <- map_df(names(fallRunDSM::hatchery_to_watershed_lookup), function(x) {
+  new_data <- purrr::map_df(names(fallRunDSM::hatchery_to_watershed_lookup), function(x) {
 
     # prepare initial data
     w <- fallRunDSM::hatchery_to_watershed_lookup[x]
@@ -180,34 +180,34 @@ stray_rates_to_matrix <- function(data, type) {
   if (type == "natural") {
     # natural origin fish
     out$natural <- data |>
-      filter(watershed == "American River", stray_type == "natural") |>
-      pivot_wider(names_from = "age", values_from = "stray_rate") |>
-      slice(rep(1:n(), each = 31)) |>
-      select(`2`:`5`) |>
+      dplyr::filter(watershed == "American River", stray_type == "natural") |>
+      tidyr::pivot_wider(names_from = "age", values_from = "stray_rate") |>
+      dplyr::slice(rep(1:dplyr::n(), each = 31)) |>
+      dplyr::select(`2`:`5`) |>
       as.matrix() |>
       `row.names<-`(watershed_labels)
   } else {
     # rates dataframe to the matrix for bay hatchery
     out$release_bay <- data |>
-      filter(stray_type == "release bay") |>
-      pivot_wider(values_from = "stray_rate", names_from = "age") |>
-      select(-sim_year, -stray_type) |>
-      right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
-      arrange(order) |>
-      mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
-      select(-watershed, -order) |>
+      dplyr::filter(stray_type == "release bay") |>
+      tidyr::pivot_wider(values_from = "stray_rate", names_from = "age") |>
+      dplyr::select(-sim_year, -stray_type) |>
+      dplyr::right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
+      dplyr::arrange(order) |>
+      dplyr::mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
+      dplyr::select(-watershed, -order) |>
       as.matrix() |>
       `row.names<-`(watershed_labels)
 
     # rates for river release fish
     out$release_river <- data |>
-      filter(stray_type == "release river") |>
-      pivot_wider(values_from = "stray_rate", names_from = "age") |>
-      select(-sim_year, -stray_type) |>
-      right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
-      arrange(order) |>
-      mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
-      select(-watershed, -order) |>
+      dplyr::filter(stray_type == "release river") |>
+      tidyr::pivot_wider(values_from = "stray_rate", names_from = "age") |>
+      dplyr::select(-sim_year, -stray_type) |>
+      dplyr::right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
+      dplyr::arrange(order) |>
+      dplyr::mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
+      dplyr::select(-watershed, -order) |>
       as.matrix() |>
       `row.names<-`(watershed_labels)
   }

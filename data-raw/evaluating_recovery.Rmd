@@ -41,7 +41,7 @@ non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
 
 This document walks through the Reorienting to Recovery's Recovery Definition and evaluates how the Kitchen Sink Blended Scenario Performs. It provides summary statistics and visualizations to evaluate recovery according to defined thresholds recovery metrics (Threshold Recovery Metrics table below) and to explore results associated with non thereshold biological metrics (Additional Biological Metrics table below).
 
-## Review Indicator Populations  {.tabset}
+## Review Indicator Populations {.tabset}
 
 The Reorienting to Recovery selected a few indicator populations as a starting point for evaluating recovery of scenarios. For the Fall Run Chinook model, we selected:
 
@@ -53,7 +53,9 @@ The Reorienting to Recovery selected a few indicator populations as a starting p
 
 -   Tuolumne River
 
-In order for a population to reach our recovery definition all indicator populations must meet recovery. In addition, 90% of all independent populations (as defined by Lindely et al. 2004) need to meet recovery thresholds for all years. And each independent population must meet recovery in at least one year.
+Indicator rivers must meet all recovery metrics in last 15 years of the simulation.
+
+Secondarily, all independent populations must meet recovery in at least 5 years and the percentage of ind populations that meet recovery objects must be above 80% in last 15 years.
 
 ## Review Biological Recovery Metrics {.tabset}
 

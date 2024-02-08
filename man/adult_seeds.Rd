@@ -5,7 +5,7 @@
 \alias{adult_seeds}
 \title{Adult Seeds}
 \format{
-A matrix with dimension 31 x 30 (watershed x year)
+An object of class \code{matrix} (inherits from \code{array}) with 31 rows and 30 columns.
 }
 \source{
 Derived from average escapement estimates from 2013 to 2017 \href{https://dsm-docs.s3.us-west-2.amazonaws.com/Azat+2019.pdf}{Azat 2019}.

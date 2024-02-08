@@ -62,6 +62,17 @@ filtered_model_fit$m
 # state at time step (which is X_t and mu_t)
 filtered_model_fit$a
 
+estimated_mu <- unique(filtered_model_fit$a[,2])
+estimated_process_error <- filtered_model_fit$mod$W[1,1]
+estimated_measurement_error <- filtered_model_fit$mod$V[1,1]
+
+model_fit <- tibble("year" = years,
+                    "log_abundance" = as.numeric(X),
+                    "mu" = estimated_mu,
+                    "PE" = estimated_process_error,
+                    "ME" = estimated_measurement_error) |>
+  mutate("predicted_log_abundance" = lag(log_abundance) + mu + PE)
+
 # does this work?
 data_frame <- tibble("abundance" = ts,
                      "year" = years) |>

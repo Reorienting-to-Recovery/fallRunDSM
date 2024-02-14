@@ -1,5 +1,5 @@
 ---
-title: "Recovery Overview - Kitchen Sink Scenario"
+title: "Recovery Overview - Kitchen Sink"
 date: "01/29/24"
 output:
   html_document:
@@ -63,17 +63,17 @@ Secondarily, all independent populations must meet recovery in at least 5 years 
 
 The table below summarizes Recovery Metrics that have associated Recovery Thresholds. For each of these metrics, scenarios are evaluated to see what percentage or tributaries or years they achieve the recovery target for each scenario.
 
-+-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+-----------------------------------------+
-| **Value**                     | **Performance measure**     | **Description**                                                                                                                                                                                                                                                                                                                                                                                                             | **Target/Recovery Threshold** | **Percentage Reached in Kitchen Sink?** |
-+-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+-----------------------------------------+
-| 1: Salmonid abundance         | 1: Adult abundance          | Represents an interest in increasing salmonid abundance across the Central Valley. Can be estimated with models as annual number of adult spawning salmonids in each tributary and ocean, tracked for 20 years. Adult abundance for each year and tributary is a direct output from the SIT DSMs and is summarized to show average Central Valley annual abundance.                                                         | 500 or more spawners          |                                         |
-+-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+-----------------------------------------+
-| 2: Salmonid productivity      | 2.1: Cohort Replacement     | Represents an interest in having growing or stable salmonid populations. CRR can be estimated with models as the adult natural origin return ratio in each tributary, tracked for 20 years. CRR is calculated as the number of natural origin adult returns in year X+3 divided by the number of in-river spawners in year X. CRR is calculated for each year and tributary and then averaged across tributaries and years. | Mean CRR \> 1                 |                                         |
-+-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+-----------------------------------------+
-| 2: Salmonid productivity      | 2.2: Population growth rate | Represents an alternative way to capture growing or stable salmonid populations. Can be estimated with models as average trend in population growth over a 20-year period.                                                                                                                                                                                                                                                  | Mean Growth Rate \> 1         |                                         |
-+-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+-----------------------------------------+
-| 4: Salmonid genetic diversity | 4: pHOS                     | Represents an interest in preserving genetic diversity of natural populations and minimizing potential negative demographic effects from hatchery origin fish. Salmonid models are currently being modified to estimate proportion of hatchery origin spawners (pHOS).                                                                                                                                                      | pHOS \< 5%                    |                                         |
-+-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+-----------------------------------------+
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| **Value**                     | **Performancemeasure**      | **Description**                                                                                                                                                                                                                                                                                                                                                                                                             | **Target/Recovery Threshold** |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| 1: Salmonid abundance         | 1: Adult abundance          | Represents an interest in increasing salmonid abundance across the Central Valley. Can be estimated with models as annual number of adult spawning salmonids in each tributary and ocean, tracked for 20 years. Adult abundance for each year and tributary is a direct output from the SIT DSMs and is summarized to show average Central Valley annual abundance.                                                         | 500 or more spawners          |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| 2: Salmonid productivity      | 2.1: Cohort Replacement     | Represents an interest in having growing or stable salmonid populations. CRR can be estimated with models as the adult natural origin return ratio in each tributary, tracked for 20 years. CRR is calculated as the number of natural origin adult returns in year X+3 divided by the number of in-river spawners in year X. CRR is calculated for each year and tributary and then averaged across tributaries and years. | Mean CRR \> 1                 |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| 2: Salmonid productivity      | 2.2: Population growth rate | Represents an alternative way to capture growing or stable salmonid populations. Can be estimated with models as average trend in population growth over a 20-year period.                                                                                                                                                                                                                                                  | Mean Growth Rate \> 1         |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| 4: Salmonid genetic diversity | 4: pHOS                     | Represents an interest in preserving genetic diversity of natural populations and minimizing potential negative demographic effects from hatchery origin fish. Salmonid models are currently being modified to estimate proportion of hatchery origin spawners (pHOS).                                                                                                                                                      | pHOS \< 5%                    |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
 
 ### Additional Biological Recovery Metrics
 
@@ -95,8 +95,6 @@ The table below provides additional recovery metrics to help balance and refine 
 | 5: Salmonid life history diversity                                                   | 5.3: Size and timing of juveniles at ocean entry | Represents an interest in preserving life history diversity (size and timing of juveniles at ocean entry) in natural populations. Size distribution and timing of juveniles at ocean entry is summarized in a single metric by using a Shannon diversity index.                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 +--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 5: Salmonid life history diversity                                                   | 5.4: Habitat diversity                           | Represents an interest in preserving habitat diversity that facilitates life history diversity in natural populations. Could be estimated as the amount and relative % of available habitat of different types (measured in area and days). Specific methods using the salmon models to calculate and compare optimal habitat ratios to population growth are being developed.                                                                                                                                                                                                                                                                                                                                                           |
-|                                                                                      |                                                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-|                                                                                      |                                                  | TODO: update this to be floodplain over inchannel habitat (as starting point) - looking for evenness over the full rearing period (also present for wet years and dry year)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 +--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 6: Abundance, productivity, and distribution at levels that support ecosystem health | 6: Ecosystem health                              | Represents an interest in maintaining resilient and functioning ecosystems due to adequate salmonid abundance. Could be captured with a proxy metric of ratio of spawner abundance to habitat (marine derived nutrient proxy). The marine derived nutrient proxy metric gives the grams of marine nutrient per square meters of river. To calculate marine derived nutrient proxy, we calculated the total acres by multiplying habitat extent lengths by river width. We then multiplied the average annual number of spawners by the average weight (assumed 21 grams) and divided by our total area CV Salmon Recovery Draft for Planning Team Review 11 (square meters) to get a grams of marine derived nutrient per square meters. |
 +--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -137,7 +135,7 @@ new_params$movement_hypo_weights <- c(1, rep(0, 7))
 # seed
 r2r_seeds_ks <- fallRunDSM::fall_run_model(mode = "seed",
                                         ..params =  new_params, # seed with baseline, then kitchen sink
-                                        delta_surv_inflation = TRUE)
+                                        delta_surv_inflation = FALSE)
 
 # run model
 r2r_model_results_ks <- fallRunDSM::fall_run_model(mode = "simulate",
@@ -170,13 +168,13 @@ Model results should be evaluated relative to the Baseline model. The following 
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
                                         ..params =  new_params,
-                                        delta_surv_inflation = TRUE)
+                                        delta_surv_inflation = FALSE)
 
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
-                                                delta_surv_inflation = TRUE)
+                                                delta_surv_inflation = FALSE)
 
 # baseline spawn totals 
 spawn_baseline <- suppressMessages(dplyr::as_tibble(r2r_model_results$spawners) |> #change which results to look at diff plots
@@ -305,27 +303,6 @@ results_df <- bind_rows(results_df_ks, results_df_baseline)
 ```
 
 ```{r}
-# spawn <- dplyr::as_tibble(r2r_model_results_ks$spawners) |> #change which results to look at diff plots
-#   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
-#   pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
-#   filter(!location %in% non_spawn_regions) |>
-#   group_by(year,
-#            location
-#   ) |>
-#   summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
-#   mutate(year = as.numeric(year)) %>%
-#   ggplot(aes(year, total_spawners,
-#              color = location
-#   )) +
-#   geom_line() +
-#   theme_minimal() +
-#   labs(y = "Spawners",
-#        x = "Year") +
-#   scale_y_continuous(labels = scales::comma) +
-#   scale_x_continuous(breaks = 1:20) +
-#   theme(text = element_text(size = 20))
-# 
-# ggplotly(spawn)
 water_yt_lookup <- waterYearType::water_year_indices |>
   filter(WY > 1977, WY < 2001, location == "Sacramento Valley") |>
   mutate(water_year = WY,
@@ -369,9 +346,11 @@ ggplot() +
 
 The two tabs below show plots that describe if a tributary meets the recovery objective.
 
--   Abundance and Genetic Diversity metrics are evaluated for each Independent population in every year of the scenario. *In order to meet recovery these metrics must be met .... every year in the last 10 years. 80% in the last 10 years (8 out of 10 years...) specify this.*
+-   Abundance and Genetic Diversity metrics are evaluated for each Independent population in every year of the scenario.
 
--   Productivity Metrics are averaged for each independent population over the last 10 years of the simulation. Productivity metrics must on average for each independent population, meet recovery thresholds to consider the system at recovery*. (all independent systems, 90%) What about productivity metrics fully averaged out over years and pops?*
+-   Productivity Metrics are averaged for each independent population over the last 10 years of the simulation. Productivity metrics must on average for each independent population, meet recovery thresholds to consider the system at recovery*.*
+
+*(TODO: maybe color indicator pops differently)*
 
 ### Abundance and Genetic Diversity
 
@@ -420,5 +399,41 @@ ind_pop_ks |>
 ## Additional Biological Performance Metics {.tabset}
 
 ### Spatial Structure
+
+```{r}
+diversity_groups <- fallRunDSM::diversity_group
+fish_present_data <- bind_rows(results_df_ks, results_df_baseline) |>
+  filter(performance_metric == "1 All Spawners") |>
+  mutate(`Spawners Present` = ifelse(round(value) >= 1, 1, NA),
+         diversity_group = as.factor(diversity_group[location]),
+         div_group_with_watersheds = case_when(diversity_group == 1 ~ paste(names(which(diversity_group == 1)), collapse = ", "),
+                                               diversity_group == 2 ~ paste0("2:", paste(names(which(diversity_group == 2)), collapse = ", ")),
+                                               diversity_group == 3 ~ paste0("3:", paste(names(which(diversity_group == 3)), collapse = ", ")),
+                                               diversity_group == 4 ~ paste0("4:", paste(names(which(diversity_group == 4)), collapse = ", ")),
+                                               diversity_group == 5 ~ paste0("5:", paste(names(which(diversity_group == 5)), collapse = ", ")))) |> glimpse()
+
+fish_present_data |> filter(diversity_group == 2) |> distinct(location)
+
+fish_present <- fish_present_data |>
+  filter(!location %in% c("Sutter Bypass", "Yolo Bypass") & diversity_group != 6) |> 
+  ggplot(aes(x = year, y = `Spawners Present`, fill = diversity_group)) +
+  geom_col() +
+  theme_minimal() +
+  scale_fill_manual(values = colors_small) +
+  facet_wrap(~scenario, ncol = 2) +
+  labs(y = "Number of Tribs with Spawners Present",
+       x = "Simulation Year",
+       fill = "Diversity Group") +
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic"),# move caption to the left
+    # legend.text = "None",
+    legend.position = "bottom",
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 18),
+    plot.title = element_text(size = 18)
+  )
+
+ggplotly(fish_present)
+```
 
 ### Life History Diversity

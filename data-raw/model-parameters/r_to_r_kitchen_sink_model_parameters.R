@@ -124,7 +124,7 @@ r_to_r_kitchen_sink_params <- list(
   delta_total_diverted = DSMflow::delta_total_diverted$biop_itp_2018_2019,
   prop_pulse_flows = DSMflow::proportion_pulse_flows$biop_itp_2018_2019,
   prop_flow_natal = DSMflow::proportion_flow_natal$biop_itp_2018_2019,
-  upper_sacramento_flows = DSMflow::upper_sacramento_flows$biop_itp_2018_2019,
+  upper_sacramento_flows = DSMflow::upper_sacramento_flows$eff_sac,
   delta_inflow = DSMflow::delta_inflow$biop_itp_2018_2019,
   cc_gates_days_closed = DSMflow::delta_cross_channel_closed$biop_itp_2018_2019["count", ],
   cc_gates_prop_days_closed = DSMflow::delta_cross_channel_closed$biop_itp_2018_2019["proportion", ],

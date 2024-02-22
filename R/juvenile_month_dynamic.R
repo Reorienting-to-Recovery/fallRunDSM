@@ -163,7 +163,7 @@ juvenile_month_dynamic <- function(fish, year = year, month = month,
 
     sutter_fish <- rear(juveniles = sutter_fish$inchannel,
                         survival_rate = matrix(rep(rearing_survival$sutter, nrow(sutter_fish$inchannel)), ncol = 4, byrow = TRUE),
-                        growth = ic_growth[,,17],
+                        growth = fp_growth[,,17],
                         stochastic = stochastic)
 
 
@@ -240,7 +240,7 @@ juvenile_month_dynamic <- function(fish, year = year, month = month,
 
     yolo_fish <- rear(juveniles = yolo_fish$inchannel,
                       survival_rate = matrix(rep(rearing_survival$yolo, nrow(yolo_fish$inchannel)), ncol = 4, byrow = TRUE),
-                      growth = ic_growth[,,22],
+                      growth = fp_growth[,,22], # updated to fp growth
                       stochastic = stochastic)
 
 

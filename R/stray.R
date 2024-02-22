@@ -47,7 +47,13 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
   strayed_natural_adults[is.nan(strayed_natural_adults)] <- 0
 
 
-
+  # Stop straying to non spawn destinations
+  straying_destinations[16, ] <- rep(0, 6) # uper mid sac
+  straying_destinations[17, ] <- rep(0, 6) # sutter bypass
+  straying_destinations[21, ] <- rep(0, 6) # lower mid sac
+  straying_destinations[22, ] <- rep(0, 6) # yolo bypass
+  straying_destinations[24, ] <- rep(0, 6) # lower sac
+  straying_destinations[31, ] <- rep(0, 6) # san joaquin
   # hatchery origin
   hatchery_strays <- lapply(1:hatchery_ages, function(age) {
 
@@ -71,6 +77,14 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
   }
 
   hatchery_adults_after_stray <- hatchery_adults - strayed_hatchery_adults + hatchery_strays_allocated
+
+  # Stop straying to non spawn destinations
+  straying_destinations[16, ] <- rep(0, 6) # uper mid sac
+  straying_destinations[17, ] <- rep(0, 6) # sutter bypass
+  straying_destinations[21, ] <- rep(0, 6) # lower mid sac
+  straying_destinations[22, ] <- rep(0, 6) # yolo bypass
+  straying_destinations[24, ] <- rep(0, 6) # lower sac
+  straying_destinations[31, ] <- rep(0, 6) # san joaquin
 
   # natural origin
   natural_strays <- lapply(1:natural_ages, function(age) {

@@ -164,6 +164,7 @@ apply_enroute_survival <- function(year,
                                    ..surv_adult_enroute_int,
                                    .adult_en_route_migratory_temp,
                                    .adult_en_route_bypass_overtopped,
+                                   hatchery_release,
                                    stochastic) {
   # Do adults by month
   # Natural Adults
@@ -211,26 +212,29 @@ apply_enroute_survival <- function(year,
       round(natural_adults_by_month[, month] * adult_en_route_surv[, month])
     }
   })
-  # APPLY NAT ADULT REMOVAL RATE (SHOULD THIS ACTUALLY BE APPLIED TO HATCHERY FISH)
-  natural_adults_survived_to_spawning_minus_nat_adult_removal <- sapply(1:3, function(month) {
-    if (stochastic) {
-      rbinom(31, round(natural_adults_survived_to_spawning[, month]), (1 - natural_adult_removal_rate))
-    } else {
-      round(natural_adults_survived_to_spawning[, month] * (1 - natural_adult_removal_rate))
-    }
-  })
   # Hatchery
-  hathery_adults_survived_to_spawning <- sapply(1:3, function(month) {
+ # APPLY NAT ADULT REMOVAL RATE (APPLIED TO HATCHERY FISH instead of natural fish)
+  hatchery_adults_survived_to_spawning <- sapply(1:3, function(month) {
     if (stochastic) {
       rbinom(31, round(hatchery_adults_by_month[, month]), adult_en_route_surv[, month])
     } else {
       round(hatchery_adults_by_month[, month] * adult_en_route_surv[, month])
     }
   })
+  # Removes logic to remove hatchery fish if no
+  if (sum(hatchery_release) > 0 ) {
+    hatchery_adults_survived_to_spawning <- sapply(1:3, function(month) {
+    if (stochastic) {
+      rbinom(31, round(hatchery_adults_survived_to_spawning[, month]), (1 - natural_adult_removal_rate))
+    } else {
+      round(hatchery_adults_survived_to_spawning[, month] * (1 - natural_adult_removal_rate))
+    }
+  })
+  }
   # TODO remove fish in non spawn regions
-  surviving_natural_adults <- ifelse(rowSums(natural_adults_survived_to_spawning_minus_nat_adult_removal) < 0, 0,
-                                     rowSums(natural_adults_survived_to_spawning_minus_nat_adult_removal))
-  surviving_hatchery_adults <- ifelse(rowSums(hathery_adults_survived_to_spawning) < 0, 0, rowSums(hathery_adults_survived_to_spawning))
+  surviving_natural_adults <- ifelse(rowSums(natural_adults_survived_to_spawning) < 0, 0,
+                                     rowSums(natural_adults_survived_to_spawning))
+  surviving_hatchery_adults <- ifelse(rowSums(hatchery_adults_survived_to_spawning) < 0, 0, rowSums(hatchery_adults_survived_to_spawning))
   init_adults <- surviving_natural_adults + surviving_hatchery_adults
   proportion_natural <- surviving_natural_adults / init_adults
 

@@ -92,7 +92,7 @@ fall_run_model <- function(scenario = NULL,
   }
 
   adults <- switch (mode,
-                    "seed" = fallRunDSM::adult_seeds,
+                    "seed" = seeds,
                     "simulate" = seeds$adults,
                     "calibrate" = seeds,
   )
@@ -249,12 +249,13 @@ fall_run_model <- function(scenario = NULL,
                                        ..surv_adult_enroute_int = ..params$..surv_adult_enroute_int,
                                        .adult_en_route_migratory_temp = ..params$.adult_en_route_migratory_temp,
                                        .adult_en_route_bypass_overtopped = ..params$.adult_en_route_bypass_overtopped,
+                                       hatchery_release = ..params$hatchery_release,
                                        stochastic = stochastic)
     }
 
 
 
-    init_adults <- spawners$init_adults
+    init_adults <- round(spawners$init_adults)
     output$spawners[ , year] <- init_adults
 
     # # For use in the r2r metrics ---------------------------------------------
@@ -746,12 +747,12 @@ fall_run_model <- function(scenario = NULL,
 
     # distribute returning adults for future spawning
     if (mode == "calibrate") {
-      calculated_adults[1:31, (year + 1):(year + 4)] <- calculated_adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
-      calculated_adults[1:31, (year + 1):(year + 3)] <- calculated_adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
+      calculated_adults[1:31, (year + 2):(year + 5)] <- calculated_adults[1:31, (year + 2):(year + 5)] + natural_adults_returning
+      calculated_adults[1:31, (year + 2):(year + 4)] <- calculated_adults[1:31, (year + 2):(year + 4)] + hatchery_adults_returning
       calculated_adults[is.na(calculated_adults)] = 0
     } else {
-      adults[1:31, (year + 1):(year + 4)] <- adults[1:31, (year + 1):(year + 4)] + natural_adults_returning
-      adults[1:31, (year + 1):(year + 3)] <- adults[1:31, (year + 1):(year + 3)] + hatchery_adults_returning
+      adults[1:31, (year + 2):(year + 5)] <- adults[1:31, (year + 2):(year + 5)] + natural_adults_returning
+      adults[1:31, (year + 2):(year + 4)] <- adults[1:31, (year + 2):(year + 4)] + hatchery_adults_returning
       adults[is.na(adults)] = 0
     }
 

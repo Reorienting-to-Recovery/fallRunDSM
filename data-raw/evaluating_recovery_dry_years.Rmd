@@ -105,13 +105,10 @@ The table below provides additional recovery metrics to help balance and refine 
 
 The Dry Years scenario includes efforts in each of the 4 knobs that we can turn in the R2R process: Habitat, Hydrology, Harvest (oceans & rivers) and Hatcheries. The table below summarizes the Dry Years scenario in comparison to the Baseline scenario.
 
-+-----------------------+:--------------------+:----------------------------------+:----------------------------------------------------------+:---------------------------------------------------------------------+
 | **Recovery scenario** | **Habitat**         | **Hydrology**                     | **Harvest (oceans & rivers)**                             | **Hatcheries**                                                       |
-+-----------------------+---------------------+-----------------------------------+-----------------------------------------------------------+----------------------------------------------------------------------+
+| ------------------- | ------------------------------ | ------------------------- |------------------------------------ | ------------------------|
 | **Baseline**          | Current + planned   | Current operations                | Current levels                                            | Current operations                                                   |
-+-----------------------+---------------------+-----------------------------------+-----------------------------------------------------------+----------------------------------------------------------------------+
-| **Dry Years**      | Max habitat, Food subsidies, Predation reduction (Dry Years) | EFF (dry years) | No harvest of dry Cohort            | Terminal Hatcheries (currunt output number) |
-+-----------------------+---------------------+-----------------------------------+-----------------------------------------------------------+----------------------------------------------------------------------+
+| **Dry Years**         | Max habitat, Food subsidies, Predation reduction (Dry Years) | EFF (dry years) | No harvest of dry Cohort            | Terminal Hatcheries (current output number) |
 
 ## Run Dry Years Scenario
 
@@ -120,7 +117,7 @@ The following code block runs the Dry Years scenario.
 #TODO discuss leads with tech team 
 - harvest is playing a big role in the big dip - once you allow dry year in there you allow for harvest you only get a small dip and then rise again
 - Also increasing delta survival gets us above 500 spawners for a consecuative 5 year period everywhere...
-- The delta + outmigration survival gauntlet seems to be diminishing pops (all but tribs that are less stong get deminshed )
+- The delta + outmigration survival gauntlet seems to be diminishing pops (all but tribs that are less strong get diminished )
 - All of the default calibration tribs are starting out the simulation with very few spawners seeds show limited pops on all tribs except main ones 
 
 ```{r, echo = TRUE}
@@ -136,6 +133,7 @@ new_params$movement_hypo_weights <- c(1, rep(0, 7))
 
 # seed
 r2r_seeds_dy <- fallRunDSM::fall_run_model(mode = "seed",
+                                           seeds = fallRunDSM::adult_seeds, 
                                         ..params =  new_params, # seed with baseline, then Dry Years
                                         delta_surv_inflation = FALSE)
 
@@ -170,6 +168,7 @@ Model results should be evaluated relative to the Baseline model. The following 
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
                                         ..params =  new_params,
+                                        seeds = fallRunDSM::adult_seeds,
                                         delta_surv_inflation = FALSE)
 
 # run model

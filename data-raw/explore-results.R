@@ -10,7 +10,7 @@ library(producePMs)
 # seed
 # BASELINE --
 new_params <- fallRunDSM::r_to_r_baseline_params
-new_params$movement_hypo_weights <- c(1, rep(0, 7))
+# new_params$movement_hypo_weights <- c(1, rep(0, 7))
 
 # Create new R2R seeds
 r2r_adult_seeds <- matrix(0, nrow = 31, ncol = 30)

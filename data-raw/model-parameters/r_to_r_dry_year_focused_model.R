@@ -20,7 +20,7 @@ dry_years <- waterYearType::water_year_indices |>
   glimpse()
 
 yolo_hab <- DSMhabitat::yolo_habitat$biop_itp_2018_2019
-yolo_hab[1:2, c(2, 6, 8:13, 15)] <- yolo_hab[1:2, c(2, 6, 8:13, 15)] + DSMhabitat::acres_to_square_meters(900)
+yolo_hab[1:2, c(2, 6, 8:13, 15)] <- yolo_hab[1:2, c(2, 6, 8:13, 15)] + DSMhabitat::acres_to_square_meters(9000)
 # Dry year, food subsidies (TODO, right now being applied in all years) to
 # sacramento (lower and lower mid), butte, yuba, and feather, sutter, and yolo
 # (food subsidies added more places because they include outside of levee habitat)
@@ -182,7 +182,7 @@ r_to_r_dry_years_params <- list(
   weeks_flooded = DSMhabitat::weeks_flooded$biop_itp_2018_2019,
   delta_habitat = DSMhabitat::delta_habitat$r_to_r_baseline,
   sutter_habitat = DSMhabitat::sutter_habitat$biop_itp_2018_2019,
-  yolo_habitat = DSMhabitat::yolo_habitat$yolo_hab,
+  yolo_habitat = yolo_hab,
   tisdale_bypass_watershed = DSMhabitat::tisdale_bypass_watershed,
   yolo_bypass_watershed = DSMhabitat::yolo_bypass_watershed,
   south_delta_routed_watersheds = DSMhabitat::south_delta_routed_watersheds,
@@ -278,13 +278,15 @@ r_to_r_dry_years_params <- list(
   hatchery_release_proportion_bay = fallRunDSM::hatchery_release_proportion_bay,
   fecundity_lookup = fallRunDSM::fecundity_by_age,
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
-  restrict_harvest_to_hatchery = FALSE,
+  restrict_harvest_to_hatchery = TRUE,
   ocean_harvest_percentage = .5,
   tributary_harvest_percentage = harvest_percentage,
   no_cohort_harvest_years = c(2, 6, 8:13, 15), # no harvest of dry year cohorts
   intelligent_crr_harvest = FALSE,
-  intelligent_habitat_harvest = TRUE,
+  intelligent_habitat_harvest = FALSE,
   terminal_hatchery_logic = TRUE,
+  crr_scaling = 2, # defaults to 2
+
 
   # stray model
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,

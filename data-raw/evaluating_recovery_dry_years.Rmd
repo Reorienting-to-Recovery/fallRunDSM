@@ -117,7 +117,15 @@ The Dry Years scenario includes efforts in each of the 4 knobs that we can turn 
 
 The following code block runs the Dry Years scenario.
 
+#TODO discuss leads with tech team 
+- harvest is playing a big role in the big dip - once you allow dry year in there you allow for harvest you only get a small dip and then rise again
+- Also increasing delta survival gets us above 500 spawners for a consecuative 5 year period everywhere...
+- The delta + outmigration survival gauntlet seems to be diminishing pops (all but tribs that are less stong get deminshed )
+- All of the default calibration tribs are starting out the simulation with very few spawners seeds show limited pops on all tribs except main ones 
+
 ```{r, echo = TRUE}
+test_seeds <- fallRunDSM::adult_seeds
+test_seeds[1] <- rowMeans(DSMCalibrationData::grandtab_imputed$fall)
 # Dry Years --
 new_params_dy <- fallRunDSM::r_to_r_dry_years_params
 new_params_dy$movement_hypo_weights <- c(1, rep(0, 7))
@@ -335,6 +343,63 @@ ggplot() +
   )
 
 ```
+
+### Diagnostic Plots
+
+```{r}
+
+# Does not seem like it is outmigration survival 
+flows <- dplyr::as_tibble(r_to_r_dry_years_params$upper_sacramento_flows) |> 
+  dplyr::mutate(month = tolower(month.abb)) |>
+  pivot_longer(cols = c("1980":"2000"), values_to = 'flows', names_to = "year") |> 
+  mutate(date = as.Date(paste0("1", month, year), format = "%d%b%Y"),
+         sac_migratory_survival = case_when(flows <= 122 ~ .03, 
+                                            flows > 122 & flows <= 303 ~ .189,
+                                            flows > 303 ~ .508),
+         outmigration_month = ifelse(month %in% c("jan", "feb", "mar", "apr", "jun", "jul"), "Outmigration Month", "No Outmigration")) |> glimpse()
+
+flows |>
+  filter(outmigration_month == "Outmigration Month",
+         year > 1990) |> 
+  ggplot(aes(x = date, y = sac_migratory_survival, color = month)) + 
+  geom_point() + 
+  scale_color_manual(values = colors_small) +
+  theme_minimal()
+
+
+# Habitat capcaity plot 
+spawning_months <- c(10:12)
+month_lookup <- tibble(month_num = c(1:12), month = month.abb)
+spawn_capacity <- r_to_r_dry_years_params$spawning_habitat |>
+    as_tibble() |>
+    mutate(location = fallRunDSM::watershed_labels) |>
+    pivot_longer(cols = -location, names_to = "year_date", values_to = "spawning_habitat") |>
+    separate(year_date, into = c("month", "year")) |>
+    left_join(month_lookup) |>
+    filter(month_num  %in% spawning_months) |>
+    group_by(year, month, location) |> # can add location in here too if we want
+    summarise(total_monthly_spawning_habitat = sum(spawning_habitat, na.rm = TRUE)) |>
+    ungroup() |>
+    group_by(year, location) |>
+    summarise(average_monthly_annual_spawning_habitat = mean(total_monthly_spawning_habitat, na.rm = TRUE)) |>
+    ungroup() |>
+    mutate(spawner_capacity = round(average_monthly_annual_spawning_habitat/
+           fallRunDSM::r_to_r_baseline_params$spawn_success_redd_size)) |>
+    glimpse()
+
+spawn_capacity |> 
+  filter(!location %in% non_spawn_regions) |> 
+  ggplot(aes(x = location, y = spawner_capacity)) +
+  geom_boxplot() +
+  scale_color_manual(values = colors_small) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  geom_hline(yintercept = 500, color = "red")
+
+
+DSMCalibrationData::grandtab_imputed 
+```
+
 
 ## Threshold Biological Performance Metrics {.tabset}
 

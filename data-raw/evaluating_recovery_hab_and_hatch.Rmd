@@ -115,6 +115,7 @@ new_params$movement_hypo_weights <- c(1, rep(0, 7))
 
 # seed
 r2r_seeds_hh <- fallRunDSM::fall_run_model(mode = "seed",
+                                           seeds = fallRunDSM::adult_seeds,
                                         ..params =  new_params, # seed with baseline, then Habitat and Hatchery
                                         delta_surv_inflation = FALSE)
 
@@ -149,6 +150,7 @@ Model results should be evaluated relative to the Baseline model. The following 
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
                                         ..params =  new_params,
+                                        seeds = fallRunDSM::adult_seeds,
                                         delta_surv_inflation = FALSE)
 
 # run model

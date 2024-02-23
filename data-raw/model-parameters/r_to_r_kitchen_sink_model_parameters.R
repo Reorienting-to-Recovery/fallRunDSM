@@ -250,10 +250,10 @@ r_to_r_kitchen_sink_params <- list(
   ocean_harvest_percentage = .5,
   tributary_harvest_percentage = harvest_percentage,
   no_cohort_harvest_years = c(),
-  intelligent_crr_harvest = FALSE,
-  intelligent_habitat_harvest = TRUE,
+  intelligent_crr_harvest = TRUE,
+  intelligent_habitat_harvest = FALSE,
   terminal_hatchery_logic = TRUE,
-  crr_scaling = 1, # defaults to 2
+  crr_scaling = 2, # defaults to 2
 
   # stray model
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,

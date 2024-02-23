@@ -54,8 +54,6 @@ fall_run_model <- function(scenario = NULL,
   ..params$weeks_flooded <- scenario_data$weeks_flooded
 
   }
-  # TODO QUESTIONS FOR EMANUEL -
-  # IS THERE A REASON WE DO NOT USE DECAYED HABITAT FOR CALIBRATION, ONLY SIMULATION
   if (mode == "calibrate") {
     scenario_data <- list(
       survival_adjustment = matrix(1, nrow = 31, ncol = 21,

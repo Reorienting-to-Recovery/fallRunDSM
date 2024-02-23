@@ -9,20 +9,41 @@ library(producePMs)
 
 # seed
 # BASELINE --
-new_params <- fallRunDSM::r_to_r_kitchen_sink_params
-new_params$movement_hypo_weights <- c(1, rep(0, 7))
+new_params <- fallRunDSM::r_to_r_baseline_params
+# new_params$movement_hypo_weights <- c(1, rep(0, 7))
+
+# Create new R2R seeds
+r2r_adult_seeds <- matrix(0, nrow = 31, ncol = 30)
+no_fr_spawn <- !as.logical(DSMhabitat::watershed_species_present[1:31, ]$fr *
+                             DSMhabitat::watershed_species_present[1:31,]$spawn)
+
+fall_escapement <-tibble(mean_escapement = round(rowMeans(DSMCalibrationData::grandtab_observed$fall, na.rm = TRUE)),
+       watershed = names(rowMeans(DSMCalibrationData::grandtab_observed$fall, na.rm = TRUE)),
+       no_fr_spawn = no_fr_spawn) |>
+  mutate(corrected_fall = case_when(
+    no_fr_spawn ~ 0,
+    is.na(mean_escapement) | mean_escapement < 10 ~ 140,
+    TRUE ~ mean_escapement)
+  ) |> pull(corrected_fall)
+
+r2r_adult_seeds[ , 1] <- fall_escapement
+
+rownames(r2r_adult_seeds) <- DSMhabitat::watershed_species_present$watershed_name[-32]
 
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
+                                        seeds = r2r_adult_seeds,
                                         ..params =  new_params,
-                                        delta_surv_inflation = TRUE)
-
+                                        delta_surv_inflation = FALSE)
+r2r_seeds$adults
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
-                                                delta_surv_inflation = TRUE)
+                                                delta_surv_inflation = FALSE)
 
+
+r2r_model_results$spawners
 non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
                        "Lower-mid Sacramento River", "Yolo Bypass",
                        "Lower Sacramento River", "San Joaquin River"

@@ -10,29 +10,11 @@ library(producePMs)
 # seed
 # BASELINE --
 new_params <- fallRunDSM::r_to_r_baseline_params
-# new_params$movement_hypo_weights <- c(1, rep(0, 7))
-
-# Create new R2R seeds
-r2r_adult_seeds <- matrix(0, nrow = 31, ncol = 30)
-no_fr_spawn <- !as.logical(DSMhabitat::watershed_species_present[1:31, ]$fr *
-                             DSMhabitat::watershed_species_present[1:31,]$spawn)
-
-fall_escapement <-tibble(mean_escapement = round(rowMeans(DSMCalibrationData::grandtab_observed$fall, na.rm = TRUE)),
-       watershed = names(rowMeans(DSMCalibrationData::grandtab_observed$fall, na.rm = TRUE)),
-       no_fr_spawn = no_fr_spawn) |>
-  mutate(corrected_fall = case_when(
-    no_fr_spawn ~ 0,
-    is.na(mean_escapement) | mean_escapement < 10 ~ 140,
-    TRUE ~ mean_escapement)
-  ) |> pull(corrected_fall)
-
-r2r_adult_seeds[ , 1] <- fall_escapement
-
-rownames(r2r_adult_seeds) <- DSMhabitat::watershed_species_present$watershed_name[-32]
+new_params$movement_hypo_weights <- c(1, rep(0, 7))
 
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
-                                        seeds = r2r_adult_seeds,
+                                        seeds = fallRunDSM::adult_seeds,
                                         ..params =  new_params,
                                         delta_surv_inflation = FALSE)
 r2r_seeds$adults
@@ -80,12 +62,12 @@ grandtab_totals <- dplyr::as_tibble(DSMCalibrationData::grandtab_observed$fall)|
   pivot_longer(cols = c(`1998`:`2017`), values_to = 'spawners', names_to = "year") %>%
   filter(!location %in% non_spawn_regions) |>
   group_by(year,
-           location
+           # location
   ) |>
   summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(year, total_spawners,
-             color = location
+             # color = location
   )) +
   geom_line() +
   theme_minimal() +

@@ -19,7 +19,7 @@ harvest_percentage[harvest_percentage < 0] <- 0
 # scale contact points by .3
 # scale high pred by .3
 # release 0 hatch fish in river
-
+# update to no harvest in dry years
 
 # initial params
 r_to_r_habitat_and_hatchery_params <- list(
@@ -247,7 +247,7 @@ r_to_r_habitat_and_hatchery_params <- list(
   restrict_harvest_to_hatchery = FALSE,
   ocean_harvest_percentage = .5,
   tributary_harvest_percentage = harvest_percentage,
-  no_cohort_harvest_years = c(),
+  no_cohort_harvest_years =  c(2, 6, 8:13, 15), # no harvest of dry year cohorts,
   intelligent_crr_harvest = FALSE,
   intelligent_habitat_harvest = FALSE,
   terminal_hatchery_logic = TRUE,

@@ -9,12 +9,10 @@ library(DSMtemperature)
 # loads calibration data
 calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")
 solution <- calib_results@solution
-
-# calib_results <- readr::read_rds("calibration/calibration-results-2022.rds")@solution[1,]
+# solution <- readr::read_rds("calibration/r2r-results-2024-02-28.rds")@solution[1,]
 
 harvest_percentage <- fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31)
 harvest_percentage[harvest_percentage < 0] <- 0
-
 
 # initial params
 r_to_r_baseline_params <- list(

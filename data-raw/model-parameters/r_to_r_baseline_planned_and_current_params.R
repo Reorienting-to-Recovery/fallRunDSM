@@ -6,58 +6,23 @@ library(DSMhabitat)
 library(DSMflow)
 library(DSMtemperature)
 
+## Updates from baseline ----
+# Habitat increase? Where
+#### Battle Spawn
+# Fry releases
+# Delta rice field releases
+# Others?
 
-# Description of dry year scenario
-# In dry years add rice field habitat in the yolo bypass (900 acres in Feb (maybe jan too?))
-# TODO
-dry_years <- waterYearType::water_year_indices |>
-  filter(location == "Sacramento Valley",
-         WY > 1979 & WY < 2001) |>
-  rename(water_year = WY) |>
-  mutate(year_type = ifelse(Yr_type %in% c("Wet", "Above Normal"), "wet", "dry"),
-         model_year = c(1:21)) |>
-  select(water_year, year_type, model_year) |>
-  glimpse()
-
-yolo_hab <- DSMhabitat::yolo_habitat$biop_itp_2018_2019
-yolo_hab[1:2, c(2, 6, 8:13, 15)] <- yolo_hab[1:2, c(2, 6, 8:13, 15)] + DSMhabitat::acres_to_square_meters(9000)
-# Dry year, food subsidies (TODO, right now being applied in all years) to
-# sacramento (lower and lower mid), butte, yuba, and feather, sutter, and yolo
-# (food subsidies added more places because they include outside of levee habitat)
-rice_field_prey_increase_prey_density <- fallRunDSM::prey_density
-rice_field_prey_increase_prey_density[24] <- "max" # lower sac
-rice_field_prey_increase_prey_density[21] <- "max" # lower-mid sac
-rice_field_prey_increase_prey_density[16] <- "max" # sutter
-rice_field_prey_increase_prey_density[22] <- "max" # yolo
-rice_field_prey_increase_prey_density[6] <- "max" # butte
-rice_field_prey_increase_prey_density[19] <- "max" # feather
-rice_field_prey_increase_prey_density[20] <- "max" # yuba
-
-# EFF dry years sac
-up_sac_flow <- DSMflow::upper_sacramento_flows$biop_itp_2018_2019
-up_sac_flow[, c(2, 6, 8:13, 15)] <- DSMflow::upper_sacramento_flows$eff_sac[, c(2, 6, 8:13, 15)]
-
-fry <- DSMhabitat::fr_fry$r_to_r_baseline
-fry[,, c(2, 6, 8:13, 15)] <- DSMhabitat::fr_fry$eff_sac[,, c(2, 6, 8:13, 15)]
-
-juv <- DSMhabitat::fr_juv$r_to_r_baseline
-juv[,, c(2, 6, 8:13, 15)] <- DSMhabitat::fr_juv$eff_sac[,, c(2, 6, 8:13, 15)]
-
-fp <- DSMhabitat::fr_fp$r_to_r_baseline
-fp[,, c(2, 6, 8:13, 15)] <- DSMhabitat::fr_fp$eff_sac[,, c(2, 6, 8:13, 15)]
-
-spawn <- DSMhabitat::fr_spawn$r_to_r_baseline
-spawn[,, c(2, 6, 8:13, 15)] <- DSMhabitat::fr_spawn$eff_sac[,, c(2, 6, 8:13, 15)]
 # loads calibration data
 calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")
 solution <- calib_results@solution
+# solution <- readr::read_rds("calibration/r2r-results-2024-02-28.rds")@solution[1,]
 
 harvest_percentage <- fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31)
 harvest_percentage[harvest_percentage < 0] <- 0
 
-
 # initial params
-r_to_r_dry_years_params <- list(
+r_to_r_baseline_params <- list(
   spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$biop_itp_2018_2019$fr,
 
   # Data from DSMscenarios
@@ -157,7 +122,7 @@ r_to_r_dry_years_params <- list(
   delta_total_diverted = DSMflow::delta_total_diverted$biop_itp_2018_2019,
   prop_pulse_flows = DSMflow::proportion_pulse_flows$biop_itp_2018_2019,
   prop_flow_natal = DSMflow::proportion_flow_natal$biop_itp_2018_2019,
-  upper_sacramento_flows = up_sac_flow,
+  upper_sacramento_flows = DSMflow::upper_sacramento_flows$biop_itp_2018_2019,
   delta_inflow = DSMflow::delta_inflow$biop_itp_2018_2019,
   cc_gates_days_closed = DSMflow::delta_cross_channel_closed$biop_itp_2018_2019["count", ],
   cc_gates_prop_days_closed = DSMflow::delta_cross_channel_closed$biop_itp_2018_2019["proportion", ],
@@ -175,14 +140,14 @@ r_to_r_dry_years_params <- list(
   migratory_temperature_proportion_over_20 = DSMtemperature::migratory_temperature_proportion_over_20,
 
   # DSMhabitat variables -----
-  spawning_habitat = spawn,
-  inchannel_habitat_fry = fry, # vary by run
-  inchannel_habitat_juvenile = juv, # vary by run
-  floodplain_habitat = fp, # vary by run
+  spawning_habitat = DSMhabitat::fr_spawn$r_to_r_baseline,
+  inchannel_habitat_fry = DSMhabitat::fr_fry$r_to_r_baseline, # vary by run
+  inchannel_habitat_juvenile = DSMhabitat::fr_juv$r_to_r_baseline, # vary by run
+  floodplain_habitat = DSMhabitat::fr_fp$r_to_r_baseline, # vary by run
   weeks_flooded = DSMhabitat::weeks_flooded$biop_itp_2018_2019,
   delta_habitat = DSMhabitat::delta_habitat$r_to_r_baseline,
   sutter_habitat = DSMhabitat::sutter_habitat$biop_itp_2018_2019,
-  yolo_habitat = yolo_hab,
+  yolo_habitat = DSMhabitat::yolo_habitat$biop_itp_2018_2019,
   tisdale_bypass_watershed = DSMhabitat::tisdale_bypass_watershed,
   yolo_bypass_watershed = DSMhabitat::yolo_bypass_watershed,
   south_delta_routed_watersheds = DSMhabitat::south_delta_routed_watersheds,
@@ -194,7 +159,7 @@ r_to_r_dry_years_params <- list(
   prob_strand_late = DSMhabitat::prob_strand_late,
   prob_nest_scoured = DSMhabitat::prob_nest_scoured,
 
-  prey_density = rice_field_prey_increase_prey_density,
+  prey_density = fallRunDSM::prey_density,
   prey_density_delta = fallRunDSM::prey_density_delta,
 
   # Calibration Variables (vary by run)
@@ -274,19 +239,17 @@ r_to_r_dry_years_params <- list(
     `San Joaquin River` = solution[28]),
 
   # R2R specific metrics
-  hatchery_release = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)), # all terminal release
+  hatchery_release = fallRunDSM::fall_hatchery_release,
   hatchery_release_proportion_bay = fallRunDSM::hatchery_release_proportion_bay,
   fecundity_lookup = fallRunDSM::fecundity_by_age,
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
-  restrict_harvest_to_hatchery = TRUE, # this gets me to recovery
+  restrict_harvest_to_hatchery = FALSE,
   ocean_harvest_percentage = .5,
   tributary_harvest_percentage = harvest_percentage,
-  no_cohort_harvest_years = c(2, 6, 8:13, 15), # no harvest of dry year cohorts
+  no_cohort_harvest_years = c(),
   intelligent_crr_harvest = FALSE,
-  intelligent_habitat_harvest = FALSE, # kinda meets recovery, but huge drop
-  terminal_hatchery_logic = TRUE,
-  crr_scaling = 2, # defaults to 2
-
+  intelligent_habitat_harvest = FALSE,
+  terminal_hatchery_logic = FALSE,
 
   # stray model
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,
@@ -298,7 +261,7 @@ r_to_r_dry_years_params <- list(
   ..floodplain_capacity = 5
 )
 
-usethis::use_data(r_to_r_dry_years_params, overwrite = TRUE)
+usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)
 
 
 

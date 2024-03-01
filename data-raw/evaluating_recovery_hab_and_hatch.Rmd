@@ -99,6 +99,7 @@ The Habitat and Hatchery scenario includes efforts in each of the 4 knobs that w
 +-----------------------+---------------------+-----------------------------------+-----------------------------------------------------------+----------------------------------------------------------------------+
 | **Habitat and Hatchery**      | Max habitat, Food Subsidies, Predation Reduction (All years)         |  Current operations |    Current levels    | Terminal hatchery/ocean outplanting (current release output number) (All Years) |
 
+*Additional modifications required to meet recovery: Intelligent Habitat Harvest* 
 
 ## Run Habitat and Hatchery Scenario
 

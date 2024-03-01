@@ -108,17 +108,14 @@ The Dry Years scenario includes efforts in each of the 4 knobs that we can turn 
 | **Recovery scenario** | **Habitat**         | **Hydrology**                     | **Harvest (oceans & rivers)**                             | **Hatcheries**                                                       |
 | ------------------- | ------------------------------ | ------------------------- |------------------------------------ | ------------------------|
 | **Baseline**          | Current + planned   | Current operations                | Current levels                                            | Current operations                                                   |
-| **Dry Years**         | Max habitat, Food subsidies, Predation reduction (Dry Years) | EFF (dry years) | No harvest of dry Cohort            | Terminal Hatcheries (current output number) |
+| **Dry Years**         | Floodplain habitat (rice fields) & food subsidies (Dry years) | EFF (dry years) | No harvest of dry Cohort, Restrict harvest to hatchery fish            | Terminal Hatcheries (current output number) |
+
+*Additional modifications required to meet recovery: Restrict harvest to hatchery fish and increase delta survival consistent with increased dry year flows* 
 
 ## Run Dry Years Scenario
 
 The following code block runs the Dry Years scenario.
 
-#TODO discuss leads with tech team 
-- harvest is playing a big role in the big dip - once you allow dry year in there you allow for harvest you only get a small dip and then rise again
-- Also increasing delta survival gets us above 500 spawners for a consecuative 5 year period everywhere...
-- The delta + outmigration survival gauntlet seems to be diminishing pops (all but tribs that are less strong get diminished )
-- All of the default calibration tribs are starting out the simulation with very few spawners seeds show limited pops on all tribs except main ones 
 
 ```{r, echo = TRUE}
 test_seeds <- fallRunDSM::adult_seeds

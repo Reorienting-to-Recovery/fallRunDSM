@@ -156,7 +156,7 @@ r_to_r_kitchen_sink_params <- list(
   south_delta_routed_watersheds = DSMhabitat::south_delta_routed_watersheds,
   prop_high_predation = DSMhabitat::prop_high_predation * .3,
   contact_points = DSMhabitat::contact_points * .3,
-  delta_contact_points = DSMhabitat::delta_contact_points,
+  delta_contact_points = DSMhabitat::delta_contact_points, # TODO should I scale these as well ?
   delta_prop_high_predation = DSMhabitat::delta_prop_high_predation,
   prob_strand_early = DSMhabitat::prob_strand_early,
   prob_strand_late = DSMhabitat::prob_strand_late,

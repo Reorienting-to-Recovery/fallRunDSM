@@ -326,7 +326,7 @@ fall_run_model <- function(scenario = NULL,
     total_juves_pre_hatchery <- rowSums(juveniles)
     natural_juveniles <- total_juves_pre_hatchery  * natural_proportion_with_renat
     total_juves_pre_hatchery <- rowSums(juveniles)
-    juveniles <- juveniles + (..params$hatchery_release * (1 - ..params$hatchery_release_proportion_bay))
+    juveniles <- juveniles + sweep(..params$hatchery_release, MARGIN=2, (1 - ..params$hatchery_release_proportion_bay), "*")
     # stray_rates_in_river_releases <- hatchery_adult_stray(hatchery = )
 
     fish_list <- lapply(1:8, function(i) list(juveniles = juveniles,
@@ -698,7 +698,8 @@ fall_run_model <- function(scenario = NULL,
     natural_adults_returning[is.na(natural_adults_returning)] = NaN
 
    # R2R release at chipps locic -----------------------------------------------
-    hatchery_releases_at_chipps <- ocean_entry_success(migrants = ..params$hatchery_release * ..params$hatchery_release_proportion_bay,
+   bay_releases <- sweep(..params$hatchery_release, MARGIN=2, ..params$hatchery_release_proportion_bay, "*")
+   hatchery_releases_at_chipps <- ocean_entry_success(migrants = bay_releases,
                                                month = 7, # set to final month
                                                avg_ocean_transition_month = avg_ocean_transition_month,
                                                .ocean_entry_success_length = ..params$.ocean_entry_success_length,

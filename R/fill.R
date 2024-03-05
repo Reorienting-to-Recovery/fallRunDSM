@@ -53,7 +53,7 @@ fill_regional <- function(juveniles, habitat, floodplain_habitat = NULL,
                           territory_size = fallRunDSM::params$territory_size,
                           up_to_size_class = 3){
 
-  all_sheds <- orig_tot <- colSums(juveniles)
+  all_sheds <- orig_tot <- colSums(juveniles, na.rm = TRUE)
 
   migrants <- flood_rear <- river_rear <- matrix(0, ncol = 4, nrow = 1)
 

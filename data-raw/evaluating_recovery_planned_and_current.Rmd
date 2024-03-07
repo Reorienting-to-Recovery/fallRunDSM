@@ -97,7 +97,7 @@ The planned and current scenario includes efforts in each of the 4 knobs that we
 +-----------------------+---------------------+-----------------------------------+-----------------------------------------------------------+----------------------------------------------------------------------+
 | **Baseline**          | Current + planned   | Current operations                | Current levels                                            | Current operations                                                   |
 +-----------------------+---------------------+-----------------------------------+-----------------------------------------------------------+----------------------------------------------------------------------+
-| **Planned and Current** | Expand habitat where spawning habitat is limited  | Current operations | Current levels                | Rice Field (Baseline Numbers) & Fry Releases (Bridge Proposal)                                 |
+| **Planned and Current** | Expand habitat where habitat is limited or where planned projects   | Current operations | Current levels                | Rice Field (Baseline Numbers) & Fry Releases (Bridge Proposal)                                 |
 +-----------------------+---------------------+-----------------------------------+-----------------------------------------------------------+----------------------------------------------------------------------+
 
 ## Run Planned and Current Scenario

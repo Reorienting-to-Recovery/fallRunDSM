@@ -21,12 +21,93 @@ fry_and_rice_field_releases[, 1] <- c(0, 0, 2000000, rep(0, 28))
 ## Yuba River
 ## Clear Creek
 ## Upper Sacramento River
+##
+##
+## # Scale of spawning habitat increase from VA
+# 100 acres of additional spawning in the sacramento river
+# feather 15 acres
+# american 25 acres spawning
+#
+# # rearing hatbitat increase on VA
+# 20000 acres on sutter
+# OVERALL PLAN --------------------
+# scale to 25% increase in spawning. on battle, feather, yuba, clear, and upper sac (lower than va but accounts for flow dependency)
+sac_increase <- rowMeans(DSMhabitat::fr_spawn$r_to_r_baseline[, 10:12, ])["Upper Sacramento River"] * .25
+battle_increase <- rowMeans(DSMhabitat::fr_spawn$r_to_r_baseline[, 10:12, ])["Battle Creek"] * .25
+clear_increase <- rowMeans(DSMhabitat::fr_spawn$r_to_r_baseline[, 10:12, ])["Clear Creek"] * .25
+feather_increase <- rowMeans(DSMhabitat::fr_spawn$r_to_r_baseline[, 10:12, ])["Feather River"] * .25
+yuba_increase <- rowMeans(DSMhabitat::fr_spawn$r_to_r_baseline[, 10:12, ])["Yuba River"] * .25
+
+# scale rearing 50% increase in sutter, yolo, and sacramento mainstem & feather, american (VA informed)
+
+# Create new spawning matrix
 spawning_habitat_with_new_restoration <- DSMhabitat::fr_spawn$r_to_r_baseline
-spawning_habitat_with_new_restoration[1,,] <- DSMhabitat::acres_to_square_meters(3) * spawning_habitat_with_new_restoration[1,,]
-spawning_habitat_with_new_restoration[3,,] <- DSMhabitat::acres_to_square_meters(3) * spawning_habitat_with_new_restoration[3,,]
-spawning_habitat_with_new_restoration[7,,] <- DSMhabitat::acres_to_square_meters(3) * spawning_habitat_with_new_restoration[7,,]
-spawning_habitat_with_new_restoration[19,,] <- DSMhabitat::acres_to_square_meters(3) * spawning_habitat_with_new_restoration[19,,]
-spawning_habitat_with_new_restoration[20,,] <- DSMhabitat::acres_to_square_meters(3) * spawning_habitat_with_new_restoration[20,,]
+spawning_habitat_with_new_restoration[1,,] <- sac_increase + spawning_habitat_with_new_restoration[1,,]
+spawning_habitat_with_new_restoration[3,,] <- battle_increase + spawning_habitat_with_new_restoration[3,,]
+spawning_habitat_with_new_restoration[7,,] <- clear_increase + spawning_habitat_with_new_restoration[7,,]
+spawning_habitat_with_new_restoration[19,,] <- feather_increase + spawning_habitat_with_new_restoration[19,,]
+spawning_habitat_with_new_restoration[20,,] <- yuba_increase + spawning_habitat_with_new_restoration[20,,]
+
+# Create new rearing matrices
+# FRY
+sac_increase <- rowMeans(DSMhabitat::fr_fry$r_to_r_baseline[, 1:7, ])["Upper Sacramento River"] * .5
+sac_2_increase <- rowMeans(DSMhabitat::fr_fry$r_to_r_baseline[, 1:7, ])["Upper-mid Sacramento River"] * .5
+sac_3_increase <- rowMeans(DSMhabitat::fr_fry$r_to_r_baseline[, 1:7, ])["Lower-mid Sacramento River"] * .5
+sac_4_increase <- rowMeans(DSMhabitat::fr_fry$r_to_r_baseline[, 1:7, ])["Lower Sacramento River"] * .5
+sutter_increase <- rowMeans(DSMhabitat::fr_fry$r_to_r_baseline[, 1:7, ])["Sutter Bypass"] * .5
+yolo_increase <- rowMeans(DSMhabitat::fr_fry$r_to_r_baseline[, 1:7, ])["Yolo Bypass"] * .5
+feather_increase <- rowMeans(DSMhabitat::fr_fry$r_to_r_baseline[, 1:7, ])["Feather River"] * .5
+american_increase <- rowMeans(DSMhabitat::fr_fry$r_to_r_baseline[, 1:7, ])["American River"] * .5
+# ADD bypass and others
+fry_habitat_with_new_restoration <- DSMhabitat::fr_fry$r_to_r_baseline
+fry_habitat_with_new_restoration[1,,] <- sac_increase + fry_habitat_with_new_restoration[1,,]
+fry_habitat_with_new_restoration[16,,] <- sac_2_increase + fry_habitat_with_new_restoration[16,,]
+fry_habitat_with_new_restoration[21,,] <- sac_3_increase + fry_habitat_with_new_restoration[21,,]
+fry_habitat_with_new_restoration[24,,] <- sac_4_increase + fry_habitat_with_new_restoration[24,,]
+fry_habitat_with_new_restoration[17,,] <- sutter_increase + fry_habitat_with_new_restoration[17,,]
+fry_habitat_with_new_restoration[22,,] <- yolo_increase + fry_habitat_with_new_restoration[22,,]
+fry_habitat_with_new_restoration[19,,] <- feather_increase + fry_habitat_with_new_restoration[19,,]
+fry_habitat_with_new_restoration[23,,] <- american_increase + fry_habitat_with_new_restoration[23,,]
+
+# JUV
+sac_increase <- rowMeans(DSMhabitat::fr_juv$r_to_r_baseline[, 1:7, ])["Upper Sacramento River"] * .5
+sac_2_increase <- rowMeans(DSMhabitat::fr_juv$r_to_r_baseline[, 1:7, ])["Upper-mid Sacramento River"] * .5
+sac_3_increase <- rowMeans(DSMhabitat::fr_juv$r_to_r_baseline[, 1:7, ])["Lower-mid Sacramento River"] * .5
+sac_4_increase <- rowMeans(DSMhabitat::fr_juv$r_to_r_baseline[, 1:7, ])["Lower Sacramento River"] * .5
+sutter_increase <- rowMeans(DSMhabitat::fr_juv$r_to_r_baseline[, 1:7, ])["Sutter Bypass"] * .5
+yolo_increase <- rowMeans(DSMhabitat::fr_juv$r_to_r_baseline[, 1:7, ])["Yolo Bypass"] * .5
+feather_increase <- rowMeans(DSMhabitat::fr_juv$r_to_r_baseline[, 1:7, ])["Feather River"] * .5
+american_increase <- rowMeans(DSMhabitat::fr_juv$r_to_r_baseline[, 1:7, ])["American River"] * .5
+# ADD bypass and others
+juv_habitat_with_new_restoration <- DSMhabitat::fr_juv$r_to_r_baseline
+juv_habitat_with_new_restoration[1,,] <- sac_increase + juv_habitat_with_new_restoration[1,,]
+juv_habitat_with_new_restoration[16,,] <- sac_2_increase + juv_habitat_with_new_restoration[16,,]
+juv_habitat_with_new_restoration[21,,] <- sac_3_increase + juv_habitat_with_new_restoration[21,,]
+juv_habitat_with_new_restoration[24,,] <- sac_4_increase + juv_habitat_with_new_restoration[24,,]
+juv_habitat_with_new_restoration[17,,] <- sutter_increase + juv_habitat_with_new_restoration[17,,]
+juv_habitat_with_new_restoration[22,,] <- yolo_increase + juv_habitat_with_new_restoration[22,,]
+juv_habitat_with_new_restoration[19,,] <- feather_increase + juv_habitat_with_new_restoration[19,,]
+juv_habitat_with_new_restoration[23,,] <- american_increase + juv_habitat_with_new_restoration[23,,]
+
+# FP
+sac_increase <- rowMeans(DSMhabitat::fr_fp$r_to_r_baseline[, 1:7, ])["Upper Sacramento River"] * .5
+sac_2_increase <- rowMeans(DSMhabitat::fr_fp$r_to_r_baseline[, 1:7, ])["Upper-mid Sacramento River"] * .5
+sac_3_increase <- rowMeans(DSMhabitat::fr_fp$r_to_r_baseline[, 1:7, ])["Lower-mid Sacramento River"] * .5
+sac_4_increase <- rowMeans(DSMhabitat::fr_fp$r_to_r_baseline[, 1:7, ])["Lower Sacramento River"] * .5
+sutter_increase <- rowMeans(DSMhabitat::fr_fp$r_to_r_baseline[, 1:7, ])["Sutter Bypass"] * .5
+yolo_increase <- rowMeans(DSMhabitat::fr_fp$r_to_r_baseline[, 1:7, ])["Yolo Bypass"] * .5
+feather_increase <- rowMeans(DSMhabitat::fr_fp$r_to_r_baseline[, 1:7, ])["Feather River"] * .5
+american_increase <- rowMeans(DSMhabitat::fr_fp$r_to_r_baseline[, 1:7, ])["American River"] * .5
+# ADD bypass and others
+fp_habitat_with_new_restoration <- DSMhabitat::fr_fp$r_to_r_baseline
+fp_habitat_with_new_restoration[1,,] <- sac_increase + fp_habitat_with_new_restoration[1,,]
+fp_habitat_with_new_restoration[16,,] <- sac_2_increase + fp_habitat_with_new_restoration[16,,]
+fp_habitat_with_new_restoration[21,,] <- sac_3_increase + fp_habitat_with_new_restoration[21,,]
+fp_habitat_with_new_restoration[24,,] <- sac_4_increase + fp_habitat_with_new_restoration[24,,]
+fp_habitat_with_new_restoration[17,,] <- sutter_increase + fp_habitat_with_new_restoration[17,,]
+fp_habitat_with_new_restoration[22,,] <- yolo_increase + fp_habitat_with_new_restoration[22,,]
+fp_habitat_with_new_restoration[19,,] <- feather_increase + fp_habitat_with_new_restoration[19,,]
+fp_habitat_with_new_restoration[23,,] <- american_increase + fp_habitat_with_new_restoration[23,,]
 
 # loads calibration data
 calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")
@@ -156,9 +237,9 @@ r_to_r_planned_and_current <- list(
 
   # DSMhabitat variables -----
   spawning_habitat = spawning_habitat_with_new_restoration,
-  inchannel_habitat_fry = DSMhabitat::fr_fry$r_to_r_baseline, # vary by run
-  inchannel_habitat_juvenile = DSMhabitat::fr_juv$r_to_r_baseline, # vary by run
-  floodplain_habitat = DSMhabitat::fr_fp$r_to_r_baseline, # vary by run
+  inchannel_habitat_fry = fry_habitat_with_new_restoration, # vary by run
+  inchannel_habitat_juvenile = juv_habitat_with_new_restoration, # vary by run
+  floodplain_habitat = fp_habitat_with_new_restoration, # vary by run
   weeks_flooded = DSMhabitat::weeks_flooded$biop_itp_2018_2019,
   delta_habitat = DSMhabitat::delta_habitat$r_to_r_baseline,
   sutter_habitat = DSMhabitat::sutter_habitat$biop_itp_2018_2019,

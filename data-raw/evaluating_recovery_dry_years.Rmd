@@ -118,8 +118,6 @@ The following code block runs the Dry Years scenario.
 
 
 ```{r, echo = TRUE}
-test_seeds <- fallRunDSM::adult_seeds
-test_seeds[1] <- rowMeans(DSMCalibrationData::grandtab_imputed$fall)
 # Dry Years --
 new_params_dy <- fallRunDSM::r_to_r_dry_years_params
 new_params_dy$movement_hypo_weights <- c(1, rep(0, 7))

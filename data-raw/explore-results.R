@@ -62,12 +62,12 @@ grandtab_totals <- dplyr::as_tibble(DSMCalibrationData::grandtab_observed$fall)|
   pivot_longer(cols = c(`1998`:`2017`), values_to = 'spawners', names_to = "year") %>%
   filter(!location %in% non_spawn_regions) |>
   group_by(year,
-           # location
+           location
   ) |>
   summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(year, total_spawners,
-             # color = location
+             color = location
   )) +
   geom_line() +
   theme_minimal() +

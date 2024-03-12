@@ -182,11 +182,16 @@ fall_run_model <- function(scenario = NULL,
       colnames(hatch_after_harvest_by_age) = c(2, 3, 4, 5)
       harvested_hatchery_adults <- hatch_adults - adults_after_harvest
       # NATURAL
-      if (..params$restrict_harvest_to_hatchery) {
-        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery) * .9 # hooking mortality
+      if (..params$restrict_harvest_to_hatchery_ocean) {
+        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery) * (.1 - ..params$tributary_harvest_percentage) * .9 # hooking mortality
         natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
         harvested_natural_adults = rep(0, 31)
-      } else {
+      }
+      if (..params$restrict_harvest_to_hatchery_ocean & ..params$restrict_harvest_to_hatchery_trib) {
+        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)  * .9 # hooking mortality
+        natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
+        harvested_natural_adults = rep(0, 31)}
+      else {
         nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
         natutal_adults_after_harvest <- nat_adults * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
         natutal_adults_by_age <- round(unname(natutal_adults_after_harvest) * as.matrix(default_nat_age_dist[2:5]))
@@ -206,7 +211,8 @@ fall_run_model <- function(scenario = NULL,
                                             terminal_hatchery_logic = ..params$terminal_hatchery_logic,
                                             ocean_harvest_percentage = ..params$ocean_harvest_percentage,
                                             tributary_harvest_percentage = ..params$tributary_harvest_percentage,
-                                            restrict_harvest_to_hatchery = ..params$restrict_harvest_to_hatchery,
+                                            restrict_harvest_to_hatchery_ocean  = ..params$restrict_harvest_to_hatchery_ocean,
+                                            restrict_harvest_to_hatchery_trib  = ..params$restrict_harvest_to_hatchery_trib,
                                             no_cohort_harvest_years = ..params$no_cohort_harvest_years,
                                             intelligent_crr_harvest = ..params$intelligent_crr_harvest,
                                             intelligent_habitat_harvest = ..params$intelligent_habitat_harvest,

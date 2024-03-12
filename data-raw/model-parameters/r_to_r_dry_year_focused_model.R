@@ -278,7 +278,8 @@ r_to_r_dry_years_params <- list(
   hatchery_release_proportion_bay = fallRunDSM::hatchery_release_proportion_bay,
   fecundity_lookup = fallRunDSM::fecundity_by_age,
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
-  restrict_harvest_to_hatchery = TRUE, # this gets me to recovery
+  restrict_harvest_to_hatchery_ocean = TRUE,
+  restrict_harvest_to_hatchery_trib = TRUE,
   ocean_harvest_percentage = .5,
   tributary_harvest_percentage = harvest_percentage,
   no_cohort_harvest_years = c(2, 6, 8:13, 15), # no harvest of dry year cohorts

@@ -150,7 +150,8 @@ spawn_totals_dry_years <- dplyr::as_tibble(r2r_model_results_dy$spawners) |> #ch
            location) |>
   summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
   mutate(year = as.numeric(year),
-         scenario = "Dry Years")
+         scenario = "Dry Years") |> 
+  ungroup()
 ```
 
 ## Results {.tabset}
@@ -181,7 +182,8 @@ spawn_baseline <- suppressMessages(dplyr::as_tibble(r2r_model_results$spawners) 
            location) |>
   summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
   mutate(year = as.numeric(year),
-         scenario = "Baseline"))
+         scenario = "Baseline")) |> 
+  ungroup()
 
 # create percent diff formula 
 percent_diff <- function(old_value, new_value) {

@@ -248,7 +248,7 @@ r_to_r_habitat_and_hatchery_params <- list(
   restrict_harvest_to_hatchery_trib = FALSE,
   ocean_harvest_percentage = .5,
   tributary_harvest_percentage = harvest_percentage,
-  no_cohort_harvest_years =  c(), #c(2, 6, 8:13, 15), # no harvest of dry year cohorts,
+  no_cohort_harvest_years = c(), # c(2, 6, 8:13, 15), # no harvest of dry year cohorts,
   intelligent_crr_harvest = FALSE,
   intelligent_habitat_harvest = TRUE,
   terminal_hatchery_logic = TRUE,

@@ -354,7 +354,7 @@ NULL
 
 #' @title Fall Hatchery Release
 #' @description Hatchery release by size class and hatchery
-#' @format A matrix with dimension 31 x 4 x 20 (watershed x size class x year)
+#' @format A list of 20 elements (representing simulation year), each containing a matrix with dimensions 31 x 4 (watershed x size class)
 #' @source Hatchery return data comes from the production targets defined in the
 #' \href{https://swfsc-publications.fisheries.noaa.gov/publications/CR/2012/2012California.pdf}{California HSRG (Pages 65 - 95)}
 "fall_hatchery_release"

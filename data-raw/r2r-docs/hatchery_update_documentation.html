@@ -382,17 +382,22 @@ dynamic logic into the model.</p>
 <ol style="list-style-type: decimal">
 <li>The first two years there are 307650 hatchery adults initiated into
 the model based on CWT data. In subsequent years hatchery adults are
-carried over from prior generations and not initated annually.</li>
-<li>Percent natural is output from model in the
-<code>get_spawning_adults()</code> submodel<br />
-</li>
-<li>PHOS initiated as <code>1 - percent_natural</code> and adjusted to
-describe hatchery fish renaturing every 2 generations. Renaturing
+carried over from prior generations and not initiated annually.</li>
+<li>The adult removal rate for hatcheries is <code>0</code> for years
+where there are no hatchery releases.</li>
+<li>Proportion natural is calculated as
+<code>1 - proportion_hatchery</code>. <code>proportion_hatchery</code>
+is calculated from CWT data, grouped by tributary and summarized to find
+the mean percentage of hatchery fish for each tributary.</li>
+<li>PHOS initiated as <code>1 - proportion_natural</code> and adjusted
+to describe hatchery fish renaturing every 2 generations. Renaturing
 adjustment assumes that if PHOS is decreasing in two prior years than
 the population of hatchery for current year should be adjusted by the
 percent difference of PHOS in current year vs current year minus two.
 PHOS is recalculated using adjusted number of hatchery fish divided by
-total population.</li>
+total population. If there were no hatchery releases in the five
+previous years, <code>proportion_natural</code> is set to <code>1</code>
+(i.e. <code>PHOS = 0</code>).</li>
 <li>Both natural adults and hatchery adults spawn. Distinct fecundity is
 applied to natural vs hatchery fish based on fish size. The model does
 not track fish size, only age, so ages are mapped to size using logic

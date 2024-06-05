@@ -112,6 +112,10 @@ fall_hatchery_release = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDS
 # populate hatchery release as larger fish based on avg hatchery release data
 fall_hatchery_release[, 3] <- summarized_release$release_number
 
+# convert to list of 20 (one matrix per year) to allow hatchery releases to vary annually
+fall_hatchery_release <- rep(list(fall_hatchery_release), 20)
+names(fall_hatchery_release) <- c(1:20)
+
 usethis::use_data(fall_hatchery_release, overwrite = TRUE)
 
 knitr::kable(hatchery_releases)

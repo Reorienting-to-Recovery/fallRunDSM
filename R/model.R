@@ -158,23 +158,37 @@ fall_run_model <- function(scenario = NULL,
     # Begin adult logic --------------------------------------------------------
     # In seed and calibrate just use adults
     # Do not need to apply harvest, or survival because starting with GrandTab values
+
+    # the natural adult removal rate is 0 for years where we have no hatchery releases
+    years_with_no_hatchery_release <- which(rowSums(..params$hatchery_release[[year]]) == 0)
+    ..params$natural_adult_removal_rate[years_with_no_hatchery_release] <- 0
+
     if (mode %in% c("seed", "calibrate")) {
       adult_index <- ifelse(mode == "seed", 1, year)
       annual_adults <- adults[, adult_index]
       annual_adults_hatch_removed <- if (stochastic) {
           rbinom(n = 31,
                  size = adults_by_month,
-                 prob = 1 - natural_adult_removal_rate)
+                 prob = 1 - ..params$natural_adult_removal_rate)
         } else {
-          annual_adults * (1 - natural_adult_removal_rate)
+          annual_adults * (1 - ..params$natural_adult_removal_rate)
         }
       spawners = list(init_adults = round(annual_adults_hatch_removed),
-                      proportion_natural = 1 - fallRunDSM::params$proportion_hatchery)
+                      proportion_natural = 1 - ..params$proportion_hatchery)
+    }
+    if(mode == "simulate") {
+      annual_adults_hatch_removed <- if (stochastic) {
+        rbinom(n = 31,
+               size = adults_by_month,
+               prob = 1 - ..params$natural_adult_removal_rate)
+      } else {
+        adults[, year] * (1 - ..params$natural_adult_removal_rate)
+      }
     }
 
     # Harvest
     if (year <= 5 & mode == "simulate") {
-      hatch_adults <- adults[, year] * seeds$proportion_hatchery
+      hatch_adults <- annual_adults_hatch_removed * seeds$proportion_hatchery
       # Default to base harvest levels .57 most tribs
       adults_after_harvest <- hatch_adults * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
       hatch_after_harvest_by_age <- round(unname(adults_after_harvest) * as.matrix(default_hatch_age_dist[2:5]))
@@ -183,16 +197,16 @@ fall_run_model <- function(scenario = NULL,
       harvested_hatchery_adults <- hatch_adults - adults_after_harvest
       # NATURAL
       if (..params$restrict_harvest_to_hatchery_ocean) {
-        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery) * (.1 - ..params$tributary_harvest_percentage) * .9 # hooking mortality
+        nat_adults <- annual_adults_hatch_removed * (1 - seeds$proportion_hatchery) * (.1 - ..params$tributary_harvest_percentage) * .9 # hooking mortality
         natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
         harvested_natural_adults = rep(0, 31)
       }
       if (..params$restrict_harvest_to_hatchery_ocean & ..params$restrict_harvest_to_hatchery_trib) {
-        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)  * .9 # hooking mortality
+        nat_adults <- annual_adults_hatch_removed * (1 - seeds$proportion_hatchery)  * .9 # hooking mortality
         natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
         harvested_natural_adults = rep(0, 31)}
       else {
-        nat_adults <- adults[, year] * (1 - seeds$proportion_hatchery)
+        nat_adults <- annual_adults_hatch_removed * (1 - seeds$proportion_hatchery)
         natutal_adults_after_harvest <- nat_adults * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))
         natutal_adults_by_age <- round(unname(natutal_adults_after_harvest) * as.matrix(default_nat_age_dist[2:5]))
         harvested_natural_adults <- nat_adults - natutal_adults_after_harvest
@@ -234,7 +248,7 @@ fall_run_model <- function(scenario = NULL,
     if (mode == "simulate") {
     adults_after_stray <- apply_straying(year, adults_after_harvest$natural_adults,
                                          adults_after_harvest$hatchery_adults,
-                                         total_releases = ..params$hatchery_release,
+                                         total_releases = ..params$hatchery_release[[year]],
                                          release_month = 1,
                                          flows_oct_nov = ..params$flows_oct_nov,
                                          flows_apr_may = ..params$flows_apr_may,
@@ -253,7 +267,7 @@ fall_run_model <- function(scenario = NULL,
                                        ..surv_adult_enroute_int = ..params$..surv_adult_enroute_int,
                                        .adult_en_route_migratory_temp = ..params$.adult_en_route_migratory_temp,
                                        .adult_en_route_bypass_overtopped = ..params$.adult_en_route_bypass_overtopped,
-                                       hatchery_release = ..params$hatchery_release,
+                                       hatchery_release = ..params$hatchery_release[[year]],
                                        stochastic = stochastic)
     }
 
@@ -265,7 +279,8 @@ fall_run_model <- function(scenario = NULL,
     # # For use in the r2r metrics ---------------------------------------------
     # TODO fix handling for PHOS on non spawn and 0 fish watersheds
     phos <- ifelse(is.na(1 - spawners$proportion_natural), 0, 1 - spawners$proportion_natural)
-    if (mode == "simulate" & year > 5 & (sum(..params$hatchery_release) + sum(..params$hatchery_releases_at_chipps)) == 0) {
+    # if hatchery releases from last five years are 0, all renatured
+    if (mode == "simulate" & year > 5 & (sum(unlist(..params$hatchery_release[year - 5:year]))) == 0) {
       natural_proportion_with_renat <- rep(1, 31)
       names(natural_proportion_with_renat) <- fallRunDSM::watershed_labels
     } else if (year > 3){
@@ -332,7 +347,7 @@ fall_run_model <- function(scenario = NULL,
     total_juves_pre_hatchery <- rowSums(juveniles)
     natural_juveniles <- total_juves_pre_hatchery  * natural_proportion_with_renat
     total_juves_pre_hatchery <- rowSums(juveniles)
-    juveniles <- juveniles + sweep(..params$hatchery_release, MARGIN=2, (1 - ..params$hatchery_release_proportion_bay), "*")
+    juveniles <- juveniles + sweep(..params$hatchery_release[[year]], MARGIN=2, (1 - ..params$hatchery_release_proportion_bay), "*")
     # stray_rates_in_river_releases <- hatchery_adult_stray(hatchery = )
 
     fish_list <- lapply(1:8, function(i) list(juveniles = juveniles,
@@ -704,7 +719,7 @@ fall_run_model <- function(scenario = NULL,
     natural_adults_returning[is.na(natural_adults_returning)] = NaN
 
    # R2R release at chipps locic -----------------------------------------------
-   bay_releases <- sweep(..params$hatchery_release, MARGIN=2, ..params$hatchery_release_proportion_bay, "*")
+   bay_releases <- sweep(..params$hatchery_release[[year]], MARGIN=2, ..params$hatchery_release_proportion_bay, "*")
    hatchery_releases_at_chipps <- ocean_entry_success(migrants = bay_releases,
                                                month = 7, # set to final month
                                                avg_ocean_transition_month = avg_ocean_transition_month,

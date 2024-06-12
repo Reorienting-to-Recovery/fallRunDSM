@@ -244,6 +244,7 @@ r_to_r_baseline_params <- list(
   intelligent_crr_harvest = FALSE,
   intelligent_habitat_harvest = FALSE,
   terminal_hatchery_logic = FALSE,
+  preserve_tribal_harvest = FALSE,
 
   # stray model
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,

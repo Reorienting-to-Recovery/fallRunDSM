@@ -27,7 +27,8 @@ harvest_adults <- function(adult_df,
                            no_cohort_harvest_years = NULL, # maybe we can get rid of this
                            intelligent_habitat_harvest = c(F, T),
                            intelligent_crr_harvest = c(F, T),
-                           crr_scaling = 2
+                           crr_scaling = 2,
+                           preserve_tribal_harvest = c(F, T)
 ){
   # helper data ----------------------------------------------------------------
   return_prop <- matrix(c(.30, .60, .10, 0, .22, .47, .26, .05), nrow = 2, ncol = 4,
@@ -44,6 +45,7 @@ harvest_adults <- function(adult_df,
   total_harvest <- rep(ocean_harvest_percentage, 31) + tributary_harvest_percentage
   # Apply harvest ---------------------------------------------------------------
   # Set no harvest adults based on no cohort years and no hatchery only harvest restrictions
+  # This data frame contains adults that are not "allowed" to be harvested (will always be carried through harvest)
   ocean_no_harvest_adults <- adult_df |>
     dplyr::filter(return_sim_year == year) |>
     dplyr::mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well? follow up with technical team
@@ -84,25 +86,28 @@ harvest_adults <- function(adult_df,
   # TRIB
   trib_no_harvest_adults <- adults_after_ocean_harvest |>
     dplyr::mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well? follow up with technical team
-                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural", T, no_harvest),
+                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
+                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & preserve_tribal_harvest & origin == "hatchery", T, no_harvest),
                   age = return_sim_year - sim_year) |>
     dplyr::filter(no_harvest) |>
     dplyr::group_by(watershed, origin, age, sim_year, return_year, return_sim_year) |>
     dplyr::summarise(return_total = round(sum(return_total, na.rm = TRUE)),
-                     remaining_adults = round(sum(return_total, na.rm = TRUE) * .99, 0), # multipiles by .9 to remove 1 percent bycatch/hook mortality in trib (much lower than in ocean)
+                     remaining_adults = round(sum(return_total, na.rm = TRUE) * .99, 0), # multipiles by .99 to remove 1 percent bycatch/hook mortality in trib (much lower than in ocean)
                      actual_harvest = 0)
 
   trib_harvest_adults <- adults_after_ocean_harvest |>
     dplyr::left_join(hab_capacity, by = "watershed") |>
     dplyr::mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well
-                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural", T, no_harvest)) |>
+                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
+                  no_harvest = ifelse(preserve_tribal_harvest & origin == "hatchery", T, no_harvest)) |>
     dplyr::filter(!no_harvest) |>
     dplyr::rowwise() |>
     dplyr::mutate(num_adults_required_after_harvest = ifelse(intelligent_crr_harvest,
                                                              round(spawner_df[watershed, sim_year] *
                                                                      return_prop[origin, return_year] * crr_scaling, 0), 0), # this is capturing total
                   age = return_sim_year - sim_year,
-                  trib_harvest = tributary_harvest_percentage[watershed],
+                  trib_harvest = ifelse(preserve_tribal_harvest & restrict_harvest_to_hatchery_trib,
+                                        0.01, tributary_harvest_percentage[watershed]), # TODO update this once we know the correct tribal harvest percentage
                   adults_after_trib_harvest = round((return_total * (1 - trib_harvest)), 0),
                   combined_harvest_number = (return_total - adults_after_ocean_harvest) + (return_total - adults_after_trib_harvest),
                   adults_after_harvest = return_total - combined_harvest_number,

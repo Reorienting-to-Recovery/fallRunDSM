@@ -14,7 +14,7 @@ fall_releases <- readxl::read_excel(path = "data-raw/analysis/hatchery_release_a
 
 uncounted_releases <- fall_releases |>
   # filter(year(Avg_date) > 1980, year(Avg_date) < 2000) |>
-  transmute(date = Avg_date,
+  dplyr::transmute(date = Avg_date,
             year = year(date),
             hatchery = Hatchery,
             count_thousands = round(Total_N/1000, 0),
@@ -32,7 +32,7 @@ uncounted_releases |>
 
 daily_releases <- fall_releases |>
   # filter(year(Avg_date) > 1980, year(Avg_date) < 2000) |>
-  transmute(date = Avg_date,
+  dplyr::transmute(date = Avg_date,
             year = year(date),
             hatchery = Hatchery,
             count_thousands = round(Total_N/1000, 0),

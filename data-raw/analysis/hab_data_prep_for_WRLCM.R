@@ -17,7 +17,7 @@ spawn <- expand_grid(
 
 spawn %>%
   filter(month %in% c(10:12)) |>
-  transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
+  dplyr::transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
   filter(!(watershed %in% c('Sutter Bypass', 'Yolo Bypass'))) %>%
   gather(version, acres, -watershed, -date)  %>%
   ggplot(aes(date, acres, color = version)) +
@@ -42,7 +42,7 @@ fp <- expand_grid(
 
 fp %>%
   filter(month %in% c(1:7)) |>
-  transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
+  dplyr::transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
   filter(!(watershed %in% c('Sutter Bypass', 'Yolo Bypass'))) %>%
   gather(version, acres, -watershed, -date)  %>%
   ggplot(aes(date, acres, color = version)) +
@@ -67,7 +67,7 @@ juv <- expand_grid(
 
 juv %>%
   filter(month %in% c(1:7), year %in% (1985:1990)) |>
-  transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
+  dplyr::transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
   filter(!(watershed %in% c('Sutter Bypass', 'Yolo Bypass'))) %>%
   gather(version, acres, -watershed, -date)  %>%
   ggplot(aes(date, acres, color = version)) +
@@ -91,7 +91,7 @@ fry <- expand_grid(
                           "Lower-mid Sacramento River", "Lower Sacramento River"))
 
 fry %>%
-  transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
+  dplyr::transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
   filter(!(watershed %in% c('Sutter Bypass', 'Yolo Bypass'))) %>%
   gather(version, acres, -watershed, -date)  %>%
   ggplot(aes(date, acres, color = version)) +
@@ -121,7 +121,7 @@ delta <- expand_grid(
   pivot_wider(names_from = scenario, values_from = habitat) |> glimpse()
 
 delta %>%
-  transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
+  dplyr::transmute(watershed, date = ymd(paste(year, month, 1)), baseline, max_eff) %>%
   gather(version, acres, -watershed, -date)  %>%
   ggplot(aes(date, acres, color = version)) +
   geom_line() +

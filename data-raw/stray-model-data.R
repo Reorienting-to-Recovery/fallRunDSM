@@ -14,7 +14,7 @@ run_year <-  output$returning_adults$sim_year
 
 d |> filter(origin == "hatchery",
             watershed == "Battle Creek") |>
-  transmute(run = sim_year,
+  dplyr::transmute(run = sim_year,
             age = return_sim_year - sim_year,
             Total_N = sum(fallRunDSM::r_to_r_baseline_params$hatchery_release),
             rel_month = 1,

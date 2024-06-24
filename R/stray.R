@@ -157,7 +157,7 @@ compute_adult_stray_rates <- function(type = c("natural", "hatchery"), sim_year,
   stray_type <-  if (type == "natural") "natural" else rep(rep(c("release bay", "release river"),
                                                             each = 4), 5)
 
-  stray_rates <- new_data |> transmute(
+  stray_rates <- new_data |> dplyr::transmute(
     sim_year = sim_year,
     watershed = fallRunDSM::hatchery_to_watershed_lookup[hatchery],
     age = age_unorm,

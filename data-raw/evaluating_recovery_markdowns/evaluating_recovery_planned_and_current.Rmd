@@ -353,7 +353,7 @@ annual_adult_abundance <-  results_df_pc |>
     glimpse()
 
 joined_spawn_capacity <- left_join(spawn_capacity, annual_adult_abundance) |> 
-    transmute(year = as.numeric(year),
+    dplyr::transmute(year = as.numeric(year),
               location = location, 
               scenario = scenario,
               at_capacity = ifelse(actual_total_spawners >= spawner_capacity, TRUE, FALSE)) |> 

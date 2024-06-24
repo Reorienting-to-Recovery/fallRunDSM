@@ -16,6 +16,7 @@ apply_enroute_survival(
   ..surv_adult_enroute_int,
   .adult_en_route_migratory_temp,
   .adult_en_route_bypass_overtopped,
+  hatchery_release,
   stochastic
 )
 }

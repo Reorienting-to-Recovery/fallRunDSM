@@ -242,7 +242,7 @@ r_to_r_kitchen_sink_params <- list(
     `San Joaquin River` = solution[28]),
 
   # R2R specific metrics
-  hatchery_release = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
+  hatchery_release = fallRunDSM::fall_hatchery_release,
   hatchery_release_proportion_bay = fallRunDSM::hatchery_release_proportion_bay,
   fecundity_lookup = fallRunDSM::fecundity_by_age,
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,

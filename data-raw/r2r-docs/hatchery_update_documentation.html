@@ -418,8 +418,8 @@ CWT data and the same logic in as in the CVPIA SIT DSMs. There are a
 total of 307,650 hatchery adults initiated each of the first 3
 years.</p>
 </div>
-<div id="calculating-perecnt-natural" class="section level3">
-<h3>Calculating Perecnt Natural</h3>
+<div id="calculating-percent-natural" class="section level3">
+<h3>Calculating Percent Natural</h3>
 <p>Percent natural is calculated by taking the total number of natural
 adults returning and dividing by total number of adults in system
 (natural and hatchery). This is calculated each year for each tributary
@@ -429,7 +429,8 @@ in the model.</p>
 <h3>Calculating PHOS</h3>
 <p>Each year PHOS is initiated as 1 - percent_natural. PHOS is updated
 to account for renaturing every 2 generations if PHOS decreases in last
-two consecutive years.</p>
+two consecutive years. If there were no hatchery releases in the five
+previous years, PHOS is set to <code>0</code>.</p>
 <div id="renaturing" class="section level4">
 <h4>Renaturing</h4>
 <p>Renaturing only occurs in the model after year 3 if PHOS decreases

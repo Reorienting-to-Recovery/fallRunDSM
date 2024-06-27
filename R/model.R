@@ -406,14 +406,14 @@ fall_run_model <- function(scenario = NULL,
     for (month in 1:7) { # Change to move out by July
 
       growth_rates_ic <- get_growth_rates(growth_temps[,month, year],
-                                          prey_density = ..params$prey_density)
+                                          prey_density = ..params$prey_density[, year])
 
       growth_rates_fp <- get_growth_rates(growth_temps[,month, year],
-                                          prey_density = ..params$prey_density,
+                                          prey_density = ..params$prey_density[, year],
                                           floodplain = TRUE)
 
       growth_rates_delta <- get_growth_rates(..params$avg_temp_delta[month, year,],
-                                             prey_density = ..params$prey_density_delta)
+                                             prey_density = ..params$prey_density_delta[, year])
 
       habitat <- get_habitat(year, month,
                              inchannel_habitat_fry = ..params$inchannel_habitat_fry,

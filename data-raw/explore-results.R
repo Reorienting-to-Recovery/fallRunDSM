@@ -11,6 +11,7 @@ library(producePMs)
 # BASELINE --
 new_params <- fallRunDSM::r_to_r_baseline_params
 new_params$movement_hypo_weights <- c(1, rep(0, 7))
+# new_params$spawning_habitat <- fallRunDSM::fr_spawning_habitat_with_weir
 
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",

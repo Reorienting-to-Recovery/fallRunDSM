@@ -223,3 +223,36 @@ rmultinom(n = 1, size = matrix(1:4, ncol = 2), prob = matrix(1:4, ncol = 2))
 hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4,
                                      dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
 usethis::use_data(hatchery_releases_at_chipps,overwrite = TRUE)
+
+# create weir habitat data object for weir action
+# baseline habitat
+fr_spawning_habitat_with_weir <- DSMhabitat::fr_spawn$r_to_r_baseline
+total_overlap_tribs <- c("Upper Sacramento River", "Antelope Creek", "Feather River",
+                          "Mokelumne River", "Stanislaus River",
+                          "Tuolumne River")
+# TODO calculate RM of overlap here - Emanuel?
+partial_overlap_tribs <- c("Big Chico Creek", "Clear Creek", "Mill Creek") # Clear Creek too, but SR exceeds FR habitat on Clear
+
+overlap <- array(dim = c(3, 12, 22))
+
+for(i in 1:22) {
+  # update tribs with total overlap to reduce fall run by 1/3
+  fr_spawning_habitat_with_weir[,,i][rownames(fr_spawning_habitat_with_weir[,,i]) %in% total_overlap_tribs, ] <- fr_spawning_habitat_with_weir[,,i][rownames(fr_spawning_habitat_with_weir[,,i]) %in% total_overlap_tribs, ] * .66
+
+  # yuba habitat split at DPD
+  # TODO update this with rates per mile and then apply
+  fr_spawning_habitat_with_weir[,,i][rownames(fr_spawning_habitat_with_weir[,,i]) == "Yuba River", ] <- fr_spawning_habitat_with_weir[,,i][rownames(fr_spawning_habitat_with_weir[,,i]) == "Yuba River", ] / 2
+
+  # subtract overlap from fall run
+  overlap[,,i] <- abs(fr_spawning_habitat_with_weir[,,i][rownames(fr_spawning_habitat_with_weir[,,i]) %in% partial_overlap_tribs, ] -
+    DSMhabitat::sr_spawn$r_to_r_baseline[,,i][rownames(fr_spawning_habitat_with_weir[,,i]) %in% partial_overlap_tribs, ])
+
+  # will need these values to be smaller, most likely
+  fr_spawning_habitat_with_weir[,,i][rownames(fr_spawning_habitat_with_weir[,,i]) %in% partial_overlap_tribs, ] <- fr_spawning_habitat_with_weir[,,i][rownames(fr_spawning_habitat_with_weir[,,i]) %in% partial_overlap_tribs, ] -
+    overlap[,,i]
+
+}
+
+usethis::use_data(fr_spawning_habitat_with_weir, overwrite = TRUE)
+
+

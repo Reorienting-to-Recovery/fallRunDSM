@@ -258,4 +258,22 @@ for(i in 1:22) {
 
 usethis::use_data(fr_spawning_habitat_with_weir, overwrite = TRUE)
 
+# above dam habitat
+# for now, ding in-channel and floodplain habitat
+# TODO fry?
+# inchannel_habitat_fry_sr_effect <- DSMhabitat::fr_fry$r_to_r_baseline
+sr_tribs <- c("Upper Sacramento River", "Antelope Creek", "Feather River",
+              "Mokelumne River", "Stanislaus River",
+              "Tuolumne River", "Big Chico Creek", "Deer Creek", "Mill Creek",
+              "Clear Creek", "Yuba River", "Battle Creek")
+sr_effect <- 0.9 # 10% effect
+inchannel_habitat_juv_sr_effect <- DSMhabitat::fr_juv$r_to_r_baseline
+floodplain_habitat_sr_effect <- DSMhabitat::fr_fp$r_to_r_baseline
 
+for(i in 1:21) {
+  inchannel_habitat_juv_sr_effect[,,i][rownames(inchannel_habitat_juv_sr_effect[,,i]) %in% sr_tribs, ] <- inchannel_habitat_juv_sr_effect[,,i][rownames(inchannel_habitat_juv_sr_effect[,,i]) %in% sr_tribs, ] * sr_effect
+  floodplain_habitat_sr_effect[,,i][rownames(floodplain_habitat_sr_effect[,,i]) %in% sr_tribs, ] <- floodplain_habitat_sr_effect[,,i][rownames(floodplain_habitat_sr_effect[,,i]) %in% sr_tribs, ] * sr_effect
+}
+
+usethis::use_data(inchannel_habitat_juv_sr_effect, overwrite = T)
+usethis::use_data(floodplain_habitat_sr_effect, overwrite = T)

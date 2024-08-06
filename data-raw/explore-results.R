@@ -11,7 +11,11 @@ library(producePMs)
 # BASELINE --
 new_params <- fallRunDSM::r_to_r_baseline_params
 new_params$movement_hypo_weights <- c(1, rep(0, 7))
+
+# test some above dam / sr effects
 # new_params$spawning_habitat <- fallRunDSM::fr_spawning_habitat_with_weir
+# new_params$inchannel_habitat_juvenile <- fallRunDSM::inchannel_habitat_juv_sr_effect
+# new_params$floodplain_habitat <- fallRunDSM::floodplain_habitat_sr_effect
 
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",

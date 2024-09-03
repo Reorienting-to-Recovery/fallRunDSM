@@ -27,38 +27,36 @@ fall_run_model <- function(scenario = NULL,
   if (mode == "simulate") {
     if (is.null(scenario)) {
       # the do nothing scenario to force habitat degradation
-      scenario <- DSMscenario::scenarios$NO_ACTION
+      ..params$survival_adjustment <- matrix(1, nrow = 31, ncol = 21,
+                                             dimnames = list(DSMscenario::watershed_labels,
+                                                             1980:2000))
+      scenario_data <- ..params
+    } else {
+      scenario_group <- ifelse(scenario %in% c("elephant", "platypus", "tortoise"),
+                               "balanced_scenarios",
+                               "blended_scenarios")
+
+      # Create new inputs consistent with R2Rscenario package
+      scenario_path <- paste0(paste0("R2Rscenario::scenarios$", scenario_group, "$", scenario))
+      scenario_object <- eval(parse(text = scenario_path))
+      if(is.null(scenario_object)) {
+        stop("The scenario you provided is not in the available options. Please see ??R2Rscenario::scenarios for a list of available scenarios to run.")
+      }
+
+      scenario_data <- R2Rscenario::load_scenario(eval(parse(text = scenario_path)),
+                                                  params = ..params,
+                                                  species = R2Rscenario::species$FALL_RUN)
+      ..params <- scenario_data
+      ..params$survival_adjustment <- matrix(1, nrow = 31, ncol = 21,
+                                             dimnames = list(DSMscenario::watershed_labels,
+                                                             1980:2000))
     }
-
-    habitats <- list(
-      spawning_habitat = ..params$spawning_habitat,
-      inchannel_habitat_fry = ..params$inchannel_habitat_fry,
-      inchannel_habitat_juvenile = ..params$inchannel_habitat_juvenile,
-      floodplain_habitat = ..params$floodplain_habitat,
-      weeks_flooded = ..params$weeks_flooded
-    )
-
-    # Apply spawn decay multiplier
-    scenario_data <- DSMscenario::load_scenario(scenario,
-                                                habitat_inputs = habitats,
-                                                species = DSMscenario::species$FALL_RUN,
-                                                spawn_decay_rate = ..params$spawn_decay_rate,
-                                                rear_decay_rate = ..params$rear_decay_rate,
-                                                spawn_decay_multiplier = ..params$spawn_decay_multiplier,
-                                                stochastic = stochastic)
-
-  ..params$spawning_habitat <- scenario_data$spawning_habitat
-  ..params$inchannel_habitat_fry <- scenario_data$inchannel_habitat_fry
-  ..params$inchannel_habitat_juvenile <- scenario_data$inchannel_habitat_juvenile
-  ..params$floodplain_habitat <- scenario_data$floodplain_habitat
-  ..params$weeks_flooded <- scenario_data$weeks_flooded
-
   }
+  # TODO confirm purpose of this code block
   if (mode == "calibrate") {
-    scenario_data <- list(
-      survival_adjustment = matrix(1, nrow = 31, ncol = 21,
-                                   dimnames = list(DSMscenario::watershed_labels,
-                                                   1980:2000)))
+    ..params$survival_adjustment <- matrix(1, nrow = 31, ncol = 21,
+                                           dimnames = list(DSMscenario::watershed_labels,
+                                                           1980:2000))
   }
 
   simulation_length <- switch(mode,
@@ -424,7 +422,7 @@ fall_run_model <- function(scenario = NULL,
                              delta_habitat = ..params$delta_habitat)
 
       rearing_survival <- get_rearing_survival(year, month,
-                                               survival_adjustment = scenario_data$survival_adjustment,
+                                               survival_adjustment = ..params$survival_adjustment,
                                                mode = mode,
                                                avg_temp = ..params$avg_temp,
                                                avg_temp_delta = ..params$avg_temp_delta,

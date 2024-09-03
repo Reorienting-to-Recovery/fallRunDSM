@@ -2,6 +2,7 @@ library(tidyverse)
 library(fallRunDSM)
 library(plotly)
 library(producePMs)
+library(R2Rscenario)
 
 # Source helper functions
 # source("data-raw/helper_graph_functions.R")
@@ -12,11 +13,6 @@ library(producePMs)
 new_params <- fallRunDSM::r_to_r_baseline_params
 new_params$movement_hypo_weights <- c(1, rep(0, 7))
 
-# test some above dam / sr effects
-# new_params$spawning_habitat <- fallRunDSM::fr_spawning_habitat_with_weir
-# new_params$inchannel_habitat_juvenile <- fallRunDSM::inchannel_habitat_juv_sr_effect
-# new_params$floodplain_habitat <- fallRunDSM::floodplain_habitat_sr_effect
-
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
                                         seeds = fallRunDSM::adult_seeds,
@@ -25,6 +21,7 @@ r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
 r2r_seeds$adults
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
+                                                # scenario = "baseline",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
                                                 delta_surv_inflation = FALSE)

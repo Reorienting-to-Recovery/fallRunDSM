@@ -12,6 +12,8 @@ library(R2Rscenario)
 # BASELINE --
 new_params <- fallRunDSM::r_to_r_baseline_params
 new_params$movement_hypo_weights <- c(1, rep(0, 7))
+new_params$san_joaquin_flows <- matrix(0, nrow = 12, ncol = 21,
+                                       dimnames = list(month.abb, 1980:2000))
 
 # seed
 r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
@@ -21,7 +23,7 @@ r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
 r2r_seeds$adults
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
-                                                # scenario = "baseline",
+                                                scenario = "kitchen_sink",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
                                                 delta_surv_inflation = FALSE)

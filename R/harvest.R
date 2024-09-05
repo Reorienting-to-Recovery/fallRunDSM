@@ -85,9 +85,14 @@ harvest_adults <- function(adult_df,
 
   # TRIB
   trib_no_harvest_adults <- adults_after_ocean_harvest |>
+    # TODO this is causing this to be empty for "platypus" - tribal harvest action
     dplyr::mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well? follow up with technical team
-                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
-                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & preserve_tribal_harvest & origin == "hatchery", T, no_harvest),
+                  # the only fish we DON'T harvest are natural fish when we are NOT preserving tribal harvest # TODO confirm this logic
+                  no_harvest = ifelse(origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
+                  # no_harvest = ifelse(origin == "natural" & preserve_tribal_harvest, T, no_harvest),
+                  # no_harvest = ifelse(origin == "hatchery" & restrict_harvest_to_hatchery_trib)
+                  # no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
+                  # no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "hatchery", T, no_harvest), # TODO confirm this logic
                   age = return_sim_year - sim_year) |>
     dplyr::filter(no_harvest) |>
     dplyr::group_by(watershed, origin, age, sim_year, return_year, return_sim_year) |>
@@ -98,8 +103,9 @@ harvest_adults <- function(adult_df,
   trib_harvest_adults <- adults_after_ocean_harvest |>
     dplyr::left_join(hab_capacity, by = "watershed") |>
     dplyr::mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well
-                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
-                  no_harvest = ifelse(preserve_tribal_harvest & origin == "hatchery", T, no_harvest)) |>
+                  no_harvest = ifelse(origin == "natural" & !preserve_tribal_harvest, T, no_harvest)) |> #,
+                  # no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
+                  # no_harvest = ifelse(preserve_tribal_harvest & origin == "hatchery", T, no_harvest)) |>
     dplyr::filter(!no_harvest) |>
     dplyr::rowwise() |>
     dplyr::mutate(num_adults_required_after_harvest = ifelse(intelligent_crr_harvest,
@@ -136,7 +142,13 @@ harvest_adults <- function(adult_df,
     dplyr::arrange(order) |>
     dplyr::select(-watershed, -order) |>
     as.matrix()
+
   rownames(hatchery_adults) <- watershed_labels
+  # # TODO confirm - sometimes no hatchery adults are harvested, is this logic right?
+  # if(!any(dim(hatchery_adults) == 0)) {
+  #
+  # }
+
 
   # harvested hatch_adults
   harvested_hatchery_adults <- adults_after_harvest |>

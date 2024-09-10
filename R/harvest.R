@@ -85,10 +85,9 @@ harvest_adults <- function(adult_df,
 
   # TRIB
   trib_no_harvest_adults <- adults_after_ocean_harvest |>
-    # TODO this is causing this to be empty for "platypus" - tribal harvest action
     dplyr::mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well? follow up with technical team
                   # the only fish we DON'T harvest are natural fish when we are NOT preserving tribal harvest # TODO confirm this logic
-                  no_harvest = ifelse(origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
+                  no_harvest = ifelse(origin == "natural" & !preserve_tribal_harvest & restrict_harvest_to_hatchery_trib, T, no_harvest),
                   # no_harvest = ifelse(origin == "natural" & preserve_tribal_harvest, T, no_harvest),
                   # no_harvest = ifelse(origin == "hatchery" & restrict_harvest_to_hatchery_trib)
                   # no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
@@ -144,11 +143,6 @@ harvest_adults <- function(adult_df,
     as.matrix()
 
   rownames(hatchery_adults) <- watershed_labels
-  # # TODO confirm - sometimes no hatchery adults are harvested, is this logic right?
-  # if(!any(dim(hatchery_adults) == 0)) {
-  #
-  # }
-
 
   # harvested hatch_adults
   harvested_hatchery_adults <- adults_after_harvest |>

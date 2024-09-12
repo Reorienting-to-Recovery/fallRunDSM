@@ -23,7 +23,7 @@ r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
 r2r_seeds$adults
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
-                                                scenario = "platypus",
+                                                scenario = "tortoise",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
                                                 delta_surv_inflation = FALSE)

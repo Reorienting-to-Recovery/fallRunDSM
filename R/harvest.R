@@ -89,7 +89,8 @@ harvest_adults <- function(adult_df,
                   # the only fish we DON'T harvest are natural fish when we are NOT preserving tribal harvest
                   # liz logic no_harvest = ifelse(origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
                   no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
-                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & preserve_tribal_harvest & origin == "hatchery", T, no_harvest),
+                  no_harvest = ifelse(preserve_tribal_harvest & origin == "hatchery", T, no_harvest),
+                  #no_harvest = ifelse(restrict_harvest_to_hatchery_trib & preserve_tribal_harvest & origin == "hatchery", T, no_harvest),
                   age = return_sim_year - sim_year) |>
     dplyr::filter(no_harvest) |>
     dplyr::group_by(watershed, origin, age, sim_year, return_year, return_sim_year) |>

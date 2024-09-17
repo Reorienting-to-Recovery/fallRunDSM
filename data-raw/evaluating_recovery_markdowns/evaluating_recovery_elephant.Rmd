@@ -1,6 +1,6 @@
 ---
-title: "Recovery Overview - Tortoise"
-date: "09/11/2024"
+title: "Recovery Overview - Elephant"
+date: "09/16/2024"
 output:
   html_document:
      code_folding: hide
@@ -40,7 +40,7 @@ non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
                        "Lower Sacramento River", "San Joaquin River") 
 ```
 
-This document walks through the Reorienting to Recovery's Recovery Definition and evaluates how the Tortoise Balanced Scenario Performs. It provides summary statistics and visualizations to evaluate recovery according to defined thresholds recovery metrics (Threshold Recovery Metrics table below) and to explore results associated with non thereshold biological metrics (Additional Biological Metrics table below).
+This document walks through the Reorienting to Recovery's Recovery Definition and evaluates how the Elephant Balanced Scenario Performs. It provides summary statistics and visualizations to evaluate recovery according to defined thresholds recovery metrics (Threshold Recovery Metrics table below) and to explore results associated with non thereshold biological metrics (Additional Biological Metrics table below).
 
 ## Review Indicator Populations {.tabset}
 
@@ -102,33 +102,33 @@ The table below provides additional recovery metrics to help balance and refine 
 | 7: Biological recovery objectives met by certain time                                | 7: Time to biological recovery                   | Represents an interest to recover salmonids quickly. Can be estimated by salmon models as the \# of years until recovery objectives are met. See Phase 1 report for a list of recovery objectives.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 +--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-## Review Tortoise Scenario
+## Review Elephant Scenario
 
-The Tortoise scenario includes efforts in each of the 4 knobs that we can turn in the R2R process: Habitat, Hydrology, Harvest (oceans & rivers) and Hatcheries. The table below summarizes the Tortoise scenario in comparison to the Baseline scenario.
+The Elephant scenario includes efforts in each of the 4 knobs that we can turn in the R2R process: Habitat, Hydrology, Harvest (oceans & rivers) and Hatcheries. The table below summarizes the Elephant scenario in comparison to the Baseline scenario.
 
-+-----------------------+:---------------------------------------------+:----------------------------------+:-------------------------------------------------+:-------------------+
-| **Recovery scenario** | **Habitat**                                  | **Hydrology**                     | **Harvest (oceans & rivers)**                    | **Hatcheries**     |
-+-----------------------+----------------------------------------------+-----------------------------------+--------------------------------------------------+--------------------+
-| **Baseline**          | Current + planned                            | Current operations                | Current levels                                   | Current operations |
-+-----------------------+----------------------------------------------+-----------------------------------+--------------------------------------------------+--------------------+
-| **Tortoise**          | Current + planned                            | Ecological Functional Flows (EFF) | No harvest of dry year cohorts (ocean, in-river) | Phased hatchery    |
-|                       |                                              |                                   |                                                  |                    |
-|                       | Floodplains / rice fields (Sac/SJ)           | Dry years                         | Harvest of hatchery fish only (ocean, in-river)  | Weirs              |
-|                       |                                              |                                   |                                                  |                    |
-|                       | Food subsidies (dry years)                   |                                   | Tribal harvest prioritized                       | All years          |
-|                       |                                              |                                   |                                                  |                    |
-|                       | Predation reduction (large-scale, dry years) |                                   | All years                                        |                    |
-+-----------------------+----------------------------------------------+-----------------------------------+--------------------------------------------------+--------------------+
++-----------------------+:---------------------------------------------+:------------------------+:----------------------------------------------------------+:-------------------+
+| **Recovery scenario** | **Habitat**                                  | **Hydrology**           | **Harvest (oceans & rivers)**                             | **Hatcheries**     |
++-----------------------+----------------------------------------------+-------------------------+-----------------------------------------------------------+--------------------+
+| **Baseline**          | Current + planned                            | Current operations      | Current levels                                            | Current operations |
++-----------------------+----------------------------------------------+-------------------------+-----------------------------------------------------------+--------------------+
+| **Elephant**          | Current and planned + near-future habitat    | Planned flow operations | Intelligent CRR harvest\* (in-river/Tribal, Recreational) | Phased hatcheries  |
+|                       |                                              |                         |                                                           |                    |
+|                       | Floodplains (Sac)                            |                         | Preserve tribal harvest                                   | Weirs\             |
+|                       |                                              |                         |                                                           |                    |
+|                       | Food subsidies (all years, Jan-March)        |                         | All years                                                 | All years          |
+|                       |                                              |                         |                                                           |                    |
+|                       | Predation reduction (small scale, all years) |                         |                                                           |                    |
++-----------------------+----------------------------------------------+-------------------------+-----------------------------------------------------------+--------------------+
 
-## Run Tortoise Scenario
+## Run Elephant Scenario
 
-The following code block runs the Tortoise scenario.
+The following code block runs the Elephant scenario.
 
 ```{r, echo = TRUE}
-# Tortoise --
-new_params_tortoise <- R2Rscenario::load_scenario(R2Rscenario::scenarios$balanced_scenarios$tortoise,
+# elephant --
+new_params_elephant <- R2Rscenario::load_scenario(R2Rscenario::scenarios$balanced_scenarios$elephant,
                                                   species = "fr")
-new_params_tortoise$movement_hypo_weights <- c(1, rep(0, 7))
+new_params_elephant$movement_hypo_weights <- c(1, rep(0, 7))
 
 # BASELINE --
 new_params <- fallRunDSM::r_to_r_baseline_params
@@ -137,23 +137,23 @@ new_params$san_joaquin_flows <- matrix(0, nrow = 12, ncol = 21,
                                        dimnames = list(month.abb, 1980:2000))
 
 # seed
-r2r_seeds_tortoise <- fallRunDSM::fall_run_model(mode = "seed",
+r2r_seeds_elephant <- fallRunDSM::fall_run_model(mode = "seed",
                                            seeds = fallRunDSM::adult_seeds,
-                                        ..params =  new_params, # seed with baseline, then Tortoise
+                                        ..params =  new_params, # seed with baseline, then elephant
                                         delta_surv_inflation = FALSE)
 
 # run model
-r2r_model_results_tortoise <- fallRunDSM::fall_run_model(mode = "simulate",
-                                                         scenario = "tortoise",
-                                                ..params =  new_params_tortoise,
-                                                seeds = r2r_seeds_tortoise,
+r2r_model_results_elephant <- fallRunDSM::fall_run_model(mode = "simulate",
+                                                         scenario = "elephant",
+                                                ..params =  new_params_elephant,
+                                                seeds = r2r_seeds_elephant,
                                                 delta_surv_inflation = TRUE)
 
 ```
 
 ```{r}
-# Tortoise spawn totals 
-spawn_totals_tortoise <- dplyr::as_tibble(r2r_model_results_tortoise$spawners) |> #change which results to look at diff plots
+# elephant spawn totals 
+spawn_totals_elephant <- dplyr::as_tibble(r2r_model_results_elephant$spawners) |> #change which results to look at diff plots
   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
   pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
   filter(!location %in% non_spawn_regions) |>
@@ -161,12 +161,12 @@ spawn_totals_tortoise <- dplyr::as_tibble(r2r_model_results_tortoise$spawners) |
            location) |>
   summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
   mutate(year = as.numeric(year),
-         scenario = "Tortoise")
+         scenario = "Elephant")
 ```
 
 ## Results {.tabset}
 
-Model results should be evaluated relative to the Baseline model. The following plots show the % difference from baseline results for the Tortoise scenario. You can look at the tab to the right to see the total spawner trends of the Tortoise Scenario in comparison to the Baseline Scenario. *(Make add a percent difference table in here too) - Think through the best way to present these. Also add a percent difference bar plot)*
+Model results should be evaluated relative to the Baseline model. The following plots show the % difference from baseline results for the Elephant scenario. You can look at the tab to the right to see the total spawner trends of the Elephant Scenario in comparison to the Baseline Scenario. *(Make add a percent difference table in here too) - Think through the best way to present these. Also add a percent difference bar plot)*
 
 ### % Difference from Baseline (all watersheds)
 
@@ -200,12 +200,12 @@ percent_diff <- function(old_value, new_value) {
 }
 
 # create spawner
-spawners <- bind_rows(spawn_baseline, spawn_totals_tortoise) |> 
+spawners <- bind_rows(spawn_baseline, spawn_totals_elephant) |> 
   pivot_wider(names_from = scenario, values_from = total_spawners) |> 
   group_by(year) |> 
   summarize(`Baseline` = sum(`Baseline`, na.rm = TRUE),
-            `Tortoise` = sum(`Tortoise`, na.rm = TRUE)) |> 
-  mutate(percent_difference = percent_diff(`Baseline`, `Tortoise`))
+            `Elephant` = sum(`Elephant`, na.rm = TRUE)) |> 
+  mutate(percent_difference = percent_diff(`Baseline`, `Elephant`))
 
 # View(spawners)
 
@@ -230,9 +230,9 @@ ggplotly(percent_diff_plot)
 ### % Difference from Baseline (all watersheds)
 
 ```{r}
-spawners <- bind_rows(spawn_baseline, spawn_totals_tortoise) |> 
+spawners <- bind_rows(spawn_baseline, spawn_totals_elephant) |> 
   pivot_wider(names_from = scenario, values_from = total_spawners) |>
-  mutate(percent_difference = percent_diff(`Baseline`, `Tortoise`))
+  mutate(percent_difference = percent_diff(`Baseline`, `Elephant`))
 
 # make percent diff plot all tribs 
 percent_diff_plot <- spawners |> 
@@ -255,9 +255,9 @@ ggplotly(percent_diff_plot)
 ### Spawners Plot
 
 ```{r, results='hide'}
-results_df_tortoise <- suppressMessages(create_model_results_dataframe(r2r_model_results_tortoise,
-                                             scenario = "Tortoise",
-                                             model_parameters = R2Rscenario::load_scenario(R2Rscenario::scenarios$balanced_scenarios$tortoise), selected_run = "fall"))
+results_df_elephant <- suppressMessages(create_model_results_dataframe(r2r_model_results_elephant,
+                                             scenario = "Elephant",
+                                             model_parameters = R2Rscenario::load_scenario(R2Rscenario::scenarios$balanced_scenarios$elephant), selected_run = "fall"))
 results_df_baseline <- create_model_results_dataframe(r2r_model_results,
                                              scenario = "Baseline",
                                              model_parameters = fallRunDSM::r_to_r_baseline_params, selected_run = "fall")
@@ -285,7 +285,7 @@ ind_pop_baseline <- results_df_baseline |>
          independent_population = ifelse(above_500_spawners & phos_less_than_5_percent &
                                            growth_rate_above_1 & crr_above_1, TRUE, FALSE))
 
-ind_pop_Tortoise <- results_df_tortoise |>
+ind_pop_elephant <- results_df_elephant |>
   select(-size_or_age, -origin, -month, -run) |>
   filter(performance_metric %in% c("Natural Spawners", "2.2 Growth Rate Spawners",
                                    "4 PHOS", "2.1 CRR: Total Adult to Returning Natural Adult"),
@@ -306,7 +306,7 @@ ind_pop_Tortoise <- results_df_tortoise |>
          independent_population = ifelse(above_500_spawners & phos_less_than_5_percent &
                                            growth_rate_above_1 & crr_above_1, TRUE, FALSE))
 
-results_df <- bind_rows(results_df_tortoise, results_df_baseline)
+results_df <- bind_rows(results_df_elephant, results_df_baseline)
 ```
 
 ```{r}
@@ -362,7 +362,7 @@ The two tabs below show plots that describe if a tributary meets the recovery ob
 ### Abundance and Genetic Diversity
 
 ```{r}
-ind_pop_Tortoise |>
+ind_pop_elephant |>
   select(year, location, above_500_spawners, phos_less_than_5_percent) |>
   pivot_longer(above_500_spawners:phos_less_than_5_percent, names_to = "metric", values_to = "value") |>
   mutate(metric = ifelse(metric == "above_500_spawners", "Above 500 Spawners", "PHOS < 5%")) |> 
@@ -382,7 +382,7 @@ ind_pop_Tortoise |>
 ### Productivity Metrics
 
 ```{r}
-ind_pop_Tortoise |> 
+ind_pop_elephant |> 
   filter(year > 5) |> 
   group_by(location) |> 
   summarise("Average CRR" = round(mean(`2.1 CRR: Total Adult to Returning Natural Adult`, na.rm = TRUE), 2),
@@ -409,7 +409,7 @@ ind_pop_Tortoise |>
 
 ```{r, echo = FALSE}
 diversity_groups <- fallRunDSM::diversity_group
-fish_present_data <- bind_rows(results_df_tortoise, results_df_baseline) |>
+fish_present_data <- bind_rows(results_df_elephant, results_df_baseline) |>
   filter(performance_metric == "1 All Spawners") |>
   mutate(`Spawners Present` = ifelse(round(value) >= 1, 1, NA),
          diversity_group = as.factor(diversity_group[location]),

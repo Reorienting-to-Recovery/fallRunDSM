@@ -32,20 +32,29 @@ fall_run_model <- function(scenario = NULL,
                                                              1980:2000))
       scenario_data <- ..params
     } else {
-      scenario_group <- ifelse(scenario %in% c("elephant", "platypus", "tortoise"),
-                               "balanced_scenarios",
-                               "blended_scenarios")
+      if(is.data.frame(scenario)) {
+        # if you are passing a custom scenario
+        scenario_data <- R2Rscenario::load_scenario(scenario,
+                                                    params = ..params,
+                                                    species = R2Rscenario::species$FALL_RUN)
+      } else {
 
-      # Create new inputs consistent with R2Rscenario package
-      scenario_path <- paste0(paste0("R2Rscenario::scenarios$", scenario_group, "$", scenario))
-      scenario_object <- eval(parse(text = scenario_path))
-      if(is.null(scenario_object)) {
-        stop("The scenario you provided is not in the available options. Please see ??R2Rscenario::scenarios for a list of available scenarios to run.")
+        scenario_group <- ifelse(scenario %in% c("elephant", "platypus", "tortoise"),
+                                 "balanced_scenarios",
+                                 "blended_scenarios")
+
+        # Create new inputs consistent with R2Rscenario package
+        scenario_path <- paste0(paste0("R2Rscenario::scenarios$", scenario_group, "$", scenario))
+        scenario_object <- eval(parse(text = scenario_path))
+        scenario_data <- R2Rscenario::load_scenario(eval(parse(text = scenario_path)),
+                                                    params = ..params,
+                                                    species = R2Rscenario::species$FALL_RUN)
       }
 
-      scenario_data <- R2Rscenario::load_scenario(eval(parse(text = scenario_path)),
-                                                  params = ..params,
-                                                  species = R2Rscenario::species$FALL_RUN)
+      # if(is.null(scenario_object)) {
+      #   stop("The scenario you provided is not in the available options. Please see ??R2Rscenario::scenarios for a list of available scenarios to run.")
+      # }
+
       ..params <- scenario_data
       ..params$survival_adjustment <- matrix(1, nrow = 31, ncol = 21,
                                              dimnames = list(DSMscenario::watershed_labels,

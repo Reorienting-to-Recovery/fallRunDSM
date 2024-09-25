@@ -125,11 +125,6 @@ The platypus scenario includes efforts in each of the 4 knobs that we can turn i
 The following code block runs the platypus scenario.
 
 ```{r, echo = TRUE}
-# platypus --
-new_params_platypus <- R2Rscenario::load_scenario(R2Rscenario::scenarios$balanced_scenarios$platypus,
-                                                  species = "fr")
-new_params_platypus$movement_hypo_weights <- c(1, rep(0, 7))
-
 # BASELINE --
 new_params <- fallRunDSM::r_to_r_baseline_params
 new_params$movement_hypo_weights <- c(1, rep(0, 7))
@@ -145,7 +140,7 @@ r2r_seeds_platypus <- fallRunDSM::fall_run_model(mode = "seed",
 # run model
 r2r_model_results_platypus <- fallRunDSM::fall_run_model(mode = "simulate",
                                                          scenario = "platypus",
-                                                ..params =  new_params_platypus,
+                                                ..params =  new_params,
                                                 seeds = r2r_seeds_platypus,
                                                 delta_surv_inflation = TRUE)
 
@@ -374,7 +369,7 @@ ind_pop_platypus |>
   theme_minimal() +
   labs(y = "",
        x = "",
-       title = "Pouplation and Hatchery Biological Parameters") +
+       title = "Population and Hatchery Biological Parameters") +
   theme(legend.position = "bottom") +
   facet_wrap(~metric)
 ```

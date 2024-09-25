@@ -125,11 +125,6 @@ The Elephant scenario includes efforts in each of the 4 knobs that we can turn i
 The following code block runs the Elephant scenario.
 
 ```{r, echo = TRUE}
-# elephant --
-new_params_elephant <- R2Rscenario::load_scenario(R2Rscenario::scenarios$balanced_scenarios$elephant,
-                                                  species = "fr")
-new_params_elephant$movement_hypo_weights <- c(1, rep(0, 7))
-
 # BASELINE --
 new_params <- fallRunDSM::r_to_r_baseline_params
 new_params$movement_hypo_weights <- c(1, rep(0, 7))
@@ -145,7 +140,7 @@ r2r_seeds_elephant <- fallRunDSM::fall_run_model(mode = "seed",
 # run model
 r2r_model_results_elephant <- fallRunDSM::fall_run_model(mode = "simulate",
                                                          scenario = "elephant",
-                                                ..params =  new_params_elephant,
+                                                ..params =  new_params,
                                                 seeds = r2r_seeds_elephant,
                                                 delta_surv_inflation = TRUE)
 
@@ -374,7 +369,7 @@ ind_pop_elephant |>
   theme_minimal() +
   labs(y = "",
        x = "",
-       title = "Pouplation and Hatchery Biological Parameters") +
+       title = "Population and Hatchery Biological Parameters") +
   theme(legend.position = "bottom") +
   facet_wrap(~metric)
 ```

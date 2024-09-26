@@ -86,11 +86,11 @@ harvest_adults <- function(adult_df,
   # TRIB
   trib_no_harvest_adults <- adults_after_ocean_harvest |>
     dplyr::mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well? follow up with technical team
+                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural", T, no_harvest),
                   # the only fish we DON'T harvest are natural fish when we are NOT preserving tribal harvest
                   # liz logic no_harvest = ifelse(origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
-                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
-                  no_harvest = ifelse(preserve_tribal_harvest & origin == "hatchery", T, no_harvest),
-                  #no_harvest = ifelse(restrict_harvest_to_hatchery_trib & preserve_tribal_harvest & origin == "hatchery", T, no_harvest),
+                  # no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
+                  # no_harvest = ifelse(preserve_tribal_harvest & origin == "hatchery", T, no_harvest),
                   age = return_sim_year - sim_year) |>
     dplyr::filter(no_harvest) |>
     dplyr::group_by(watershed, origin, age, sim_year, return_year, return_sim_year) |>
@@ -101,17 +101,19 @@ harvest_adults <- function(adult_df,
   trib_harvest_adults <- adults_after_ocean_harvest |>
     dplyr::left_join(hab_capacity, by = "watershed") |>
     dplyr::mutate(no_harvest = ifelse(sim_year %in% no_cohort_harvest_years, T, F), # Do we want to exclude hatchery here as well
+                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural", T, no_harvest)) |>
                   # liz logic no_harvest = ifelse(origin == "natural" & !preserve_tribal_harvest, T, no_harvest)) |> #,
-                  no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
-                  no_harvest = ifelse(preserve_tribal_harvest & origin == "hatchery", T, no_harvest)) |>
+                  # no_harvest = ifelse(restrict_harvest_to_hatchery_trib & origin == "natural" & !preserve_tribal_harvest, T, no_harvest),
+                  # no_harvest = ifelse(preserve_tribal_harvest & origin == "hatchery", T, no_harvest)) |>
     dplyr::filter(!no_harvest) |>
     dplyr::rowwise() |>
     dplyr::mutate(num_adults_required_after_harvest = ifelse(intelligent_crr_harvest,
                                                              round(spawner_df[watershed, sim_year] *
                                                                      return_prop[origin, return_year] * crr_scaling, 0), 0), # this is capturing total
                   age = return_sim_year - sim_year,
-                  trib_harvest = ifelse(preserve_tribal_harvest & restrict_harvest_to_hatchery_trib,
-                                        0.01, tributary_harvest_percentage[watershed]), # TODO update this once we know the correct tribal harvest percentage
+                  trib_harvest = tributary_harvest_percentage[watershed],
+                  # trib_harvest = ifelse(preserve_tribal_harvest & restrict_harvest_to_hatchery_trib,
+                  #                       0.01, tributary_harvest_percentage[watershed]), # TODO update this once we know the correct tribal harvest percentage
                   adults_after_trib_harvest = round((return_total * (1 - trib_harvest)), 0),
                   combined_harvest_number = (return_total - adults_after_ocean_harvest) + (return_total - adults_after_trib_harvest),
                   adults_after_harvest = return_total - combined_harvest_number,

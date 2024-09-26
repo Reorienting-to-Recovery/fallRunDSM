@@ -221,7 +221,7 @@ fall_run_model <- function(scenario = NULL,
       if (..params$restrict_harvest_to_hatchery_ocean & ..params$restrict_harvest_to_hatchery_trib) {
         nat_adults <- annual_adults_hatch_removed *
           (1 - seeds$proportion_hatchery) * # remove hatchery fish
-          (1 - tribal_harvest_scalar) * # if preserve tribal harvest, there is still in-river harvest of natural adults
+          #(1 - tribal_harvest_scalar) * # if preserve tribal harvest, there is still in-river harvest of natural adults
           .9 # hooking mortality
         natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
         harvested_natural_adults = rep(0, 31)

@@ -10,7 +10,6 @@ IP-117068
 surv_adult_enroute(
   migratory_temp,
   bypass_overtopped,
-  adult_harvest,
   ..surv_adult_enroute_int = fallRunDSM::params$..surv_adult_enroute_int,
   .migratory_temp = fallRunDSM::params$.adult_en_route_migratory_temp,
   .bypass_overtopped = fallRunDSM::params$.adult_en_route_bypass_overtopped
@@ -21,13 +20,13 @@ surv_adult_enroute(
 
 \item{bypass_overtopped}{Indicator for bypass overtopped}
 
-\item{adult_harvest}{Adult harvest rate}
-
 \item{..surv_adult_enroute_int}{Intercept}
 
 \item{.migratory_temp}{Coefficient for \code{migratory_temp} variable}
 
 \item{.bypass_overtopped}{Coefficient for \code{bypass_overtopped} variable}
+
+\item{adult_harvest}{Adult harvest rate}
 }
 \description{
 Calculate adult survival en route to spawning grounds

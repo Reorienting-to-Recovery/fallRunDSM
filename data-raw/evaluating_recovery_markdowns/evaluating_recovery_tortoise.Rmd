@@ -1,0 +1,441 @@
+---
+title: "Recovery Overview - Tortoise"
+date: "09/11/2024"
+output:
+  html_document:
+     code_folding: hide
+     theme: flatly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.width = 10, fig.height = 8)
+library(tidyverse)
+library(lubridate)
+library(googleCloudStorageR)
+library(ggplot2)
+library(scales)
+library(tidyverse)
+library(fallRunDSM)
+library(plotly)
+library(producePMs)
+library(R2Rscenario)
+colors_small <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                            "#899DA4", "#C93312", "#DC863B" # royal 1 (- 3)
+)
+
+colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                           "#899DA4", "#C93312", "#DC863B", # royal 1 (- 3)
+                           "#F1BB7B", "#FD6467", "#5B1A18", "#D67236",# Grand Budapest 1 (-4)
+                           "#D8B70A", "#02401B", "#A2A475", # Cavalcanti 1
+                           "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
+                           "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87", # Isle of dogs 2 altered slightly
+                           "#F3DF6C", "#CEAB07", "#D5D5D3", "#24281A", # Moonriese 1, 
+                           "#798E87", "#C27D38", "#CCC591", "#29211F", # moonrise 2
+                           "#85D4E3", "#F4B5BD", "#9C964A", "#CDC08C", "#FAD77B" # moonrise 3 
+                          )
+scenario_six_colors <- c("#02401B", "#9A8822", "#798E87", "#5B1A18","#972D15", "#DC863B", "#AA9486")
+
+non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
+                       "Lower-mid Sacramento River", "Yolo Bypass",
+                       "Lower Sacramento River", "San Joaquin River") 
+```
+
+This document walks through the Reorienting to Recovery's Recovery Definition and evaluates how the Tortoise Balanced Scenario Performs. It provides summary statistics and visualizations to evaluate recovery according to defined thresholds recovery metrics (Threshold Recovery Metrics table below) and to explore results associated with non thereshold biological metrics (Additional Biological Metrics table below).
+
+## Review Indicator Populations {.tabset}
+
+The Reorienting to Recovery selected a few indicator populations as a starting point for evaluating recovery of scenarios. For the Fall Run Chinook model, we selected:
+
+-   Upper Sacramento River
+
+-   American River (?)
+
+-   Stanislaus River
+
+-   Tuolumne River
+
+Indicator rivers must meet all recovery metrics in last 15 years of the simulation.
+
+Secondarily, all independent populations must meet recovery in at least 5 years and the percentage of ind populations that meet recovery objects must be above 80% in last 15 years.
+
+## Review Biological Recovery Metrics {.tabset}
+
+### Threshold Recovery Metrics
+
+The table below summarizes Recovery Metrics that have associated Recovery Thresholds. For each of these metrics, scenarios are evaluated to see what percentage or tributaries or years they achieve the recovery target for each scenario.
+
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| **Value**                     | **Performancemeasure**      | **Description**                                                                                                                                                                                                                                                                                                                                                                                                             | **Target/Recovery Threshold** |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| 1: Salmonid abundance         | 1: Adult abundance          | Represents an interest in increasing salmonid abundance across the Central Valley. Can be estimated with models as annual number of adult spawning salmonids in each tributary and ocean, tracked for 20 years. Adult abundance for each year and tributary is a direct output from the SIT DSMs and is summarized to show average Central Valley annual abundance.                                                         | 500 or more spawners          |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| 2: Salmonid productivity      | 2.1: Cohort Replacement     | Represents an interest in having growing or stable salmonid populations. CRR can be estimated with models as the adult natural origin return ratio in each tributary, tracked for 20 years. CRR is calculated as the number of natural origin adult returns in year X+3 divided by the number of in-river spawners in year X. CRR is calculated for each year and tributary and then averaged across tributaries and years. | Mean CRR \> 1                 |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| 2: Salmonid productivity      | 2.2: Population growth rate | Represents an alternative way to capture growing or stable salmonid populations. Can be estimated with models as average trend in population growth over a 20-year period.                                                                                                                                                                                                                                                  | Mean Growth Rate \> 1         |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+| 4: Salmonid genetic diversity | 4: pHOS                     | Represents an interest in preserving genetic diversity of natural populations and minimizing potential negative demographic effects from hatchery origin fish. Salmonid models are currently being modified to estimate proportion of hatchery origin spawners (pHOS).                                                                                                                                                      | pHOS \< 5%                    |
++-------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+
+### Additional Biological Recovery Metrics
+
+The table below provides additional recovery metrics to help balance and refine scenarios. This set of metrics does not have clear threshold values that indicate recovery but instead provides additional context to help select more balanced scenarios.
+
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Value**                                                                            | **Performance measure**                          | **Description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 3: Salmonid spatial structure                                                        | 3.1: Independent populations                     | Represents an interest in increasing and maintaining the distribution of salmonids across historically occupied watersheds. Watershed-specific abundance estimates from models can be used to calculate the number of independent viable populations in each diversity group per ESU/run.                                                                                                                                                                                                                                                                                                                                                                                                                                                |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 3: Salmonid spatial structure                                                        | 3.2: % of potential independent populations      | Represents an alternative way to capture the distribution of salmonid, calculated as the % of potential independent viable populations in each diversity group per ESU/run.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 3: Salmonid spatial structure                                                        | 3.3: Dependent populations                       | *Represents an interest in increasing and maintaining the distribution of salmonids across historically occupied watersheds. Watershed-specific CV Salmon Recovery abundance estimates from models can be used to calculate the number of dependent populations in each diversity group per ESU/run.*                                                                                                                                                                                                                                                                                                                                                                                                                                    |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 5: Salmonid life history diversity                                                   | 5.1: Age distribution of spawning adults         | Represents an interest in preserving life history diversity (age of spawners) in natural populations. Salmonid models can be used to estimate the minimum % of each age class of adults and check if targets are met (Age 4 \>35%, Age 5+ \>20%).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 5: Salmonid life history diversity                                                   | 5.2: Size distribution of juveniles              | Represents an interest in preserving life history diversity (size distribution of juveniles) in natural populations. Salmonid models can be used to estimate the variation in juvenile abundance of each life stage (fry, parr, yearling) and calculate variation across years. Size distribution of juveniles is summarized in a single metric by using a Shannon diversity index.                                                                                                                                                                                                                                                                                                                                                      |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 5: Salmonid life history diversity                                                   | 5.3: Size and timing of juveniles at ocean entry | Represents an interest in preserving life history diversity (size and timing of juveniles at ocean entry) in natural populations. Size distribution and timing of juveniles at ocean entry is summarized in a single metric by using a Shannon diversity index.                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 5: Salmonid life history diversity                                                   | 5.4: Habitat diversity                           | Represents an interest in preserving habitat diversity that facilitates life history diversity in natural populations. Could be estimated as the amount and relative % of available habitat of different types (measured in area and days). Specific methods using the salmon models to calculate and compare optimal habitat ratios to population growth are being developed.                                                                                                                                                                                                                                                                                                                                                           |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 6: Abundance, productivity, and distribution at levels that support ecosystem health | 6: Ecosystem health                              | Represents an interest in maintaining resilient and functioning ecosystems due to adequate salmonid abundance. Could be captured with a proxy metric of ratio of spawner abundance to habitat (marine derived nutrient proxy). The marine derived nutrient proxy metric gives the grams of marine nutrient per square meters of river. To calculate marine derived nutrient proxy, we calculated the total acres by multiplying habitat extent lengths by river width. We then multiplied the average annual number of spawners by the average weight (assumed 21 grams) and divided by our total area CV Salmon Recovery Draft for Planning Team Review 11 (square meters) to get a grams of marine derived nutrient per square meters. |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 7: Biological recovery objectives met by certain time                                | 7: Time to biological recovery                   | Represents an interest to recover salmonids quickly. Can be estimated by salmon models as the \# of years until recovery objectives are met. See Phase 1 report for a list of recovery objectives.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
++--------------------------------------------------------------------------------------+--------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+## Review Tortoise Scenario
+
+The Tortoise scenario includes efforts in each of the 4 knobs that we can turn in the R2R process: Habitat, Hydrology, Harvest (oceans & rivers) and Hatcheries. The table below summarizes the Tortoise scenario in comparison to the Baseline scenario.
+
++-----------------------+:---------------------------------------------+:----------------------------------+:-------------------------------------------------+:-------------------+
+| **Recovery scenario** | **Habitat**                                  | **Hydrology**                     | **Harvest (oceans & rivers)**                    | **Hatcheries**     |
++-----------------------+----------------------------------------------+-----------------------------------+--------------------------------------------------+--------------------+
+| **Baseline**          | Current + planned                            | Current operations                | Current levels                                   | Current operations |
++-----------------------+----------------------------------------------+-----------------------------------+--------------------------------------------------+--------------------+
+| **Tortoise**          | Current + planned                            | Ecological Functional Flows (EFF) | No harvest of dry year cohorts (ocean, in-river) | Phased hatchery    |
+|                       |                                              |                                   |                                                  |                    |
+|                       | Floodplains / rice fields (Sac/SJ)           | Dry years                         | Harvest of hatchery fish only (ocean, in-river)  | Weirs              |
+|                       |                                              |                                   |                                                  |                    |
+|                       | Food subsidies (dry years)                   |                                   | Tribal harvest prioritized                       | All years          |
+|                       |                                              |                                   |                                                  |                    |
+|                       | Predation reduction (large-scale, dry years) |                                   | All years                                        |                    |
++-----------------------+----------------------------------------------+-----------------------------------+--------------------------------------------------+--------------------+
+
+## Run Tortoise Scenario
+
+The following code block runs the Tortoise scenario.
+
+```{r, echo = TRUE}
+# BASELINE --
+new_params <- fallRunDSM::r_to_r_baseline_params
+new_params$movement_hypo_weights <- c(1, rep(0, 7))
+new_params$san_joaquin_flows <- matrix(0, nrow = 12, ncol = 21,
+                                       dimnames = list(month.abb, 1980:2000))
+
+# seed
+r2r_seeds_tortoise <- fallRunDSM::fall_run_model(mode = "seed",
+                                           seeds = fallRunDSM::adult_seeds,
+                                        ..params =  new_params, # seed with baseline, then Tortoise
+                                        delta_surv_inflation = FALSE)
+
+# run model
+r2r_model_results_tortoise <- fallRunDSM::fall_run_model(mode = "simulate",
+                                                         scenario = "tortoise",
+                                                ..params =  new_params,
+                                                seeds = r2r_seeds_tortoise,
+                                                delta_surv_inflation = TRUE)
+
+```
+
+```{r}
+# Tortoise spawn totals 
+spawn_totals_tortoise <- dplyr::as_tibble(r2r_model_results_tortoise$spawners) |> #change which results to look at diff plots
+  dplyr::mutate(location = fallRunDSM::watershed_labels) |>
+  pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
+  filter(!location %in% non_spawn_regions) |>
+  group_by(year,
+           location) |>
+  summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
+  mutate(year = as.numeric(year),
+         scenario = "Tortoise")
+```
+
+## Results {.tabset}
+
+Model results should be evaluated relative to the Baseline model. The following plots show the % difference from baseline results for the Tortoise scenario. You can look at the tab to the right to see the total spawner trends of the Tortoise Scenario in comparison to the Baseline Scenario. *(Make add a percent difference table in here too) - Think through the best way to present these. Also add a percent difference bar plot)*
+
+### % Difference from Baseline (all watersheds)
+
+```{r}
+# seed
+r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
+                                        ..params =  new_params,
+                                        seeds = fallRunDSM::adult_seeds,
+                                        delta_surv_inflation = FALSE)
+
+# run model
+r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
+                                                ..params =  new_params,
+                                                seeds = r2r_seeds,
+                                                delta_surv_inflation = FALSE)
+
+# baseline spawn totals 
+spawn_baseline <- suppressMessages(dplyr::as_tibble(r2r_model_results$spawners) |> #change which results to look at diff plots
+  dplyr::mutate(location = fallRunDSM::watershed_labels) |>
+  pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
+  filter(!location %in% non_spawn_regions) |>
+  group_by(year,
+           location) |>
+  summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
+  mutate(year = as.numeric(year),
+         scenario = "Baseline"))
+
+# create percent diff formula 
+percent_diff <- function(old_value, new_value) {
+  ((new_value - old_value) / old_value) * 100
+}
+
+# create spawner
+spawners <- bind_rows(spawn_baseline, spawn_totals_tortoise) |> 
+  pivot_wider(names_from = scenario, values_from = total_spawners) |> 
+  group_by(year) |> 
+  summarize(`Baseline` = sum(`Baseline`, na.rm = TRUE),
+            `Tortoise` = sum(`Tortoise`, na.rm = TRUE)) |> 
+  mutate(percent_difference = percent_diff(`Baseline`, `Tortoise`))
+
+# View(spawners)
+
+# make percent diff plot
+percent_diff_plot <- spawners |> 
+  ggplot(aes(year, percent_difference)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = "Percent Difference",
+       x = "Year") +
+  scale_y_continuous(labels = scales::comma) +
+   # scale_y_continuous(trans='log10',
+   #                   breaks=trans_breaks('log10', function(x) 10^x),
+   #                   labels=trans_format('log10', math_format(10^.x))) +
+  scale_color_manual(values = colors_full) +
+  scale_x_continuous(breaks = 1:20) +
+  theme(text = element_text(size = 20))
+
+ggplotly(percent_diff_plot)
+```
+
+### % Difference from Baseline (all watersheds)
+
+```{r}
+spawners <- bind_rows(spawn_baseline, spawn_totals_tortoise) |> 
+  pivot_wider(names_from = scenario, values_from = total_spawners) |>
+  mutate(percent_difference = percent_diff(`Baseline`, `Tortoise`))
+
+# make percent diff plot all tribs 
+percent_diff_plot <- spawners |> 
+  ggplot(aes(year, percent_difference, color = location)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = "Percent Difference",
+       x = "Year") +
+  scale_y_continuous(labels = scales::comma) +
+   # scale_y_continuous(trans='log10',
+   #                   breaks=trans_breaks('log10', function(x) 10^x),
+   #                   labels=trans_format('log10', math_format(10^.x))) +
+  scale_color_manual(values = colors_full) +
+  scale_x_continuous(breaks = 1:20) +
+  theme(text = element_text(size = 20))
+
+ggplotly(percent_diff_plot)
+```
+
+### Spawners Plot
+
+```{r, results='hide'}
+results_df_tortoise <- suppressMessages(create_model_results_dataframe(r2r_model_results_tortoise,
+                                             scenario = "Tortoise",
+                                             model_parameters = R2Rscenario::load_scenario(R2Rscenario::scenarios$balanced_scenarios$tortoise), selected_run = "fall"))
+results_df_baseline <- create_model_results_dataframe(r2r_model_results,
+                                             scenario = "Baseline",
+                                             model_parameters = fallRunDSM::r_to_r_baseline_params, selected_run = "fall")
+
+potential_dependent_pops <- c("Bear River", "Big Chico Creek", "Elder Creek", "Paynes Creek",  "Stoney Creek", "Thomes Creek")
+
+ind_pop_baseline <- results_df_baseline |>
+  select(-size_or_age, -origin, -month, -run) |>
+  filter(performance_metric %in% c("Natural Spawners", "2.2 Growth Rate Spawners",
+                                   "4 PHOS", "2.1 CRR: Total Adult to Returning Natural Adult"),
+         !location %in% potential_dependent_pops,
+         !location %in% non_spawn_regions) |>
+  pivot_wider(names_from = performance_metric, values_from = value) |>
+  # round results
+  mutate(`2.1 CRR: Total Adult to Returning Natural Adult` = round(`2.1 CRR: Total Adult to Returning Natural Adult`, 1),
+         intrinsic_growth_rate = round(log(`Natural Spawners`) - log(lag(`Natural Spawners`))),
+         `2.2 Growth Rate Spawners` = round(`2.2 Growth Rate Spawners`, 1),
+         `4 PHOS` = round(`4 PHOS`, 2),
+         `Natural Spawners` = round(`Natural Spawners`)) |>
+  # categorize as meets threshold or not
+  mutate(above_500_spawners = if_else(`Natural Spawners` > 500, TRUE, FALSE),
+         phos_less_than_5_percent = ifelse(`4 PHOS` < .05, TRUE, FALSE),
+         crr_above_1 = ifelse(`2.1 CRR: Total Adult to Returning Natural Adult` >= 1, TRUE, FALSE),
+         growth_rate_above_1 = ifelse(`2.2 Growth Rate Spawners` >= 0, TRUE, FALSE),
+         independent_population = ifelse(above_500_spawners & phos_less_than_5_percent &
+                                           growth_rate_above_1 & crr_above_1, TRUE, FALSE))
+
+ind_pop_Tortoise <- results_df_tortoise |>
+  select(-size_or_age, -origin, -month, -run) |>
+  filter(performance_metric %in% c("Natural Spawners", "2.2 Growth Rate Spawners",
+                                   "4 PHOS", "2.1 CRR: Total Adult to Returning Natural Adult"),
+         !location %in% potential_dependent_pops,
+         !location %in% non_spawn_regions) |>
+  pivot_wider(names_from = performance_metric, values_from = value) |>
+  # round results
+  mutate(`2.1 CRR: Total Adult to Returning Natural Adult` = round(`2.1 CRR: Total Adult to Returning Natural Adult`, 1),
+         intrinsic_growth_rate = round(log(`Natural Spawners`) - log(lag(`Natural Spawners`))),
+         `2.2 Growth Rate Spawners` = round(`2.2 Growth Rate Spawners`, 1),
+         `4 PHOS` = round(`4 PHOS`, 2),
+         `Natural Spawners` = round(`Natural Spawners`)) |>
+  # categorize as meets threshold or not
+  mutate(above_500_spawners = if_else(`Natural Spawners` > 500, TRUE, FALSE),
+         phos_less_than_5_percent = ifelse(`4 PHOS` < .05, TRUE, FALSE),
+         crr_above_1 = ifelse(`2.1 CRR: Total Adult to Returning Natural Adult` >= 1, TRUE, FALSE),
+         growth_rate_above_1 = ifelse(`2.2 Growth Rate Spawners` >= 0, TRUE, FALSE),
+         independent_population = ifelse(above_500_spawners & phos_less_than_5_percent &
+                                           growth_rate_above_1 & crr_above_1, TRUE, FALSE))
+
+results_df <- bind_rows(results_df_tortoise, results_df_baseline)
+```
+
+```{r}
+water_yt_lookup <- waterYearType::water_year_indices |>
+  filter(WY > 1977, WY < 2001, location == "Sacramento Valley") |>
+  mutate(water_year = WY,
+         year_type = Yr_type) 
+
+year_lookup <- tibble(year = 1:21,
+                      actual_year = 1980:2000)
+flow_spawn_plot_data <- results_df |>
+  filter(performance_metric == "1 All Spawners") |>
+  group_by(year, scenario, run) |>
+  summarize(value = sum(value, na.rm = TRUE)) |>
+  left_join(year_lookup) |>
+  mutate(date = as.Date(paste0(actual_year, "-12-31"))) |>
+  filter(scenario != "No Hatchery") 
+
+ggplot() +
+  geom_line(data = flow_spawn_plot_data, aes(x = date, y = value, color = scenario),linewidth = .5, alpha = 1) +
+  scale_color_manual(values = scenario_six_colors) +
+  # geom_line(data = flow_spawn_plot_data |> filter(scenario == "Baseline"), aes(x = date, y = value), color = "black", linewidth = .5, alpha = 1) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Total Spawner Abundance over Time",
+       y = "Spawner Abundance",
+       x = "Year",
+       color = "Scenario Name",
+       fill = "Hydrology",
+       #  caption = "Note: These numbers only reflect Upper Sacramento River Fall Run Chinook Spawners. Baseline and No Hatchery perform very similarly in the Upper Sacramento River."
+  ) +
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic"),# move caption to the left
+    legend.position = c(0.7, 0.77),
+    # legend.position = "none",
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 20),
+    plot.title = element_text(size = 20)
+  )
+
+```
+
+## Threshold Biological Performance Metrics {.tabset}
+
+The two tabs below show plots that describe if a tributary meets the recovery objective.
+
+-   Abundance and Genetic Diversity metrics are evaluated for each Independent population in every year of the scenario.
+
+-   Productivity Metrics are averaged for each independent population over the last 10 years of the simulation. Productivity metrics must on average for each independent population, meet recovery thresholds to consider the system at recovery*.*
+
+*(TODO: maybe color indicator pops differently)*
+
+### Abundance and Genetic Diversity
+
+```{r}
+ind_pop_Tortoise |>
+  select(year, location, above_500_spawners, phos_less_than_5_percent) |>
+  pivot_longer(above_500_spawners:phos_less_than_5_percent, names_to = "metric", values_to = "value") |>
+  mutate(metric = ifelse(metric == "above_500_spawners", "Above 500 Spawners", "PHOS < 5%")) |> 
+  # filter(year <= 17, year > 1) |> # removes last three years because CRR is NA,
+  # first year because growth rate is NA
+  ggplot(aes(x = year, y = location, color = value)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = c("#CCC591", "cadetblue4", "#CCC591"), name = "") +
+  theme_minimal() +
+  labs(y = "",
+       x = "",
+       title = "Population and Hatchery Biological Parameters") +
+  theme(legend.position = "bottom") +
+  facet_wrap(~metric)
+```
+
+### Productivity Metrics
+
+```{r}
+ind_pop_Tortoise |> 
+  filter(year > 5) |> 
+  group_by(location) |> 
+  summarise("Average CRR" = round(mean(`2.1 CRR: Total Adult to Returning Natural Adult`, na.rm = TRUE), 2),
+            "Average Growth Rate" = round(mean(`2.2 Growth Rate Spawners`, na.rm = TRUE), 2)) |> 
+  pivot_longer("Average CRR":"Average Growth Rate", names_to = "stat", values_to = "value") |> 
+  mutate(above_threshold = case_when(stat == "Average CRR" & value > 1 ~ TRUE,
+                                     stat ==  "Average Growth Rate" & value > 0 ~ TRUE,
+                                     T ~ FALSE)) |> 
+  ggplot(aes(x = location, y = value, fill = above_threshold)) +
+  geom_col(size = 4) +
+  scale_fill_manual(values = c("#CCC591", "cadetblue4"), name = "") +
+  theme_minimal() +
+  labs(y = "",
+       x = "",
+       title = "Average Productivity Metrics (yr 5 - 20) of simulation") +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  facet_wrap(~stat, nrow = 2)
+```
+
+## Additional Biological Performance Metics {.tabset}
+
+### Spatial Structure
+
+```{r, echo = FALSE}
+diversity_groups <- fallRunDSM::diversity_group
+fish_present_data <- bind_rows(results_df_tortoise, results_df_baseline) |>
+  filter(performance_metric == "1 All Spawners") |>
+  mutate(`Spawners Present` = ifelse(round(value) >= 1, 1, NA),
+         diversity_group = as.factor(diversity_group[location]),
+         div_group_with_watersheds = case_when(diversity_group == 1 ~ paste(names(which(diversity_group == 1)), collapse = ", "),
+                                               diversity_group == 2 ~ paste0("2:", paste(names(which(diversity_group == 2)), collapse = ", ")),
+                                               diversity_group == 3 ~ paste0("3:", paste(names(which(diversity_group == 3)), collapse = ", ")),
+                                               diversity_group == 4 ~ paste0("4:", paste(names(which(diversity_group == 4)), collapse = ", ")),
+                                               diversity_group == 5 ~ paste0("5:", paste(names(which(diversity_group == 5)), collapse = ", ")))) |> glimpse()
+
+fish_present_data |> filter(diversity_group == 2) |> distinct(location)
+
+fish_present <- fish_present_data |>
+  filter(!location %in% c("Sutter Bypass", "Yolo Bypass") & diversity_group != 6) |> 
+  ggplot(aes(x = year, y = `Spawners Present`, fill = diversity_group)) +
+  geom_col() +
+  theme_minimal() +
+  scale_fill_manual(values = colors_small) +
+  facet_wrap(~scenario, ncol = 2) +
+  labs(y = "Number of Tribs with Spawners Present",
+       x = "Simulation Year",
+       fill = "Diversity Group") +
+  theme(
+    plot.caption = element_text(hjust = 0, face = "italic"),# move caption to the left
+    # legend.text = "None",
+    legend.position = "bottom",
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 18),
+    plot.title = element_text(size = 18)
+  )
+
+ggplotly(fish_present)
+```
+
+### Life History Diversity

@@ -11,8 +11,9 @@ fall_run_model(
   scenario = NULL,
   mode = c("seed", "simulate", "calibrate"),
   seeds = NULL,
-  ..params = fallRunDSM::params,
-  stochastic = FALSE
+  ..params = fallRunDSM::r_to_r_baseline_params,
+  stochastic = FALSE,
+  delta_surv_inflation = FALSE
 )
 }
 \arguments{
@@ -29,7 +30,7 @@ returned value can be fed into the model again as the value for the seeds argume
 \item{stochastic}{\code{TRUE} \code{FALSE} value indicating if model should be run stochastically. Defaults to \code{FALSE}.}
 }
 \description{
-Fall Run Chinook life cycle model used for CVPIA's Structured
+Fall Run Chinook life cycle model used for Reorienting to Recovery's Structured
 Decision Making Process
 }
 \examples{

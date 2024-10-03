@@ -203,12 +203,9 @@ fall_run_model <- function(scenario = NULL,
       colnames(hatch_after_harvest_by_age) = c(2, 3, 4, 5)
       harvested_hatchery_adults <- hatch_adults - adults_after_harvest
       # NATURAL
-      # TODO assume tribal harvest is only of natural fish for now
-      # TODO check that current in-river harvest meet total tribal and sportfishing needs
-      # TODO what tributaries do we apply this harvest to?
       tribal_harvest_scalar <- rep(0, 31)
       if(..params$preserve_tribal_harvest) {
-        tribal_harvest_scalar[..params$tributary_harvest_percentage != 0] = 0.01 # TODO update when we get official tribal harvest numbers
+        tribal_harvest_scalar[..params$tributary_harvest_percentage != 0] = 0.01
       }
       if (..params$restrict_harvest_to_hatchery_ocean) {
         nat_adults <- annual_adults_hatch_removed *
@@ -221,11 +218,11 @@ fall_run_model <- function(scenario = NULL,
       if (..params$restrict_harvest_to_hatchery_ocean & ..params$restrict_harvest_to_hatchery_trib) {
         nat_adults <- annual_adults_hatch_removed *
           (1 - seeds$proportion_hatchery) * # remove hatchery fish
-          #(1 - tribal_harvest_scalar) * # if preserve tribal harvest, there is still in-river harvest of natural adults
+          (1 - tribal_harvest_scalar) * # if preserve tribal harvest, there is still in-river harvest of natural adults
           .9 # hooking mortality
         natutal_adults_by_age <- round(unname(natural_adults[, year] ) * as.matrix(default_nat_age_dist[2:5]))
-        harvested_natural_adults = rep(0, 31)
-        }
+        harvested_natural_adults = nat_adults * tribal_harvest_scalar # still take tribal harvest
+      }
       else {
         nat_adults <- annual_adults_hatch_removed * (1 - seeds$proportion_hatchery)
         natutal_adults_after_harvest <- nat_adults * (1 - (..params$ocean_harvest_percentage + ..params$tributary_harvest_percentage))

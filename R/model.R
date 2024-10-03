@@ -39,7 +39,7 @@ fall_run_model <- function(scenario = NULL,
                                                     species = R2Rscenario::species$FALL_RUN)
       } else {
 
-        scenario_group <- ifelse(scenario %in% c("elephant", "platypus", "tortoise"),
+        scenario_group <- ifelse(scenario %in% c("elephant", "platypus", "tortoise", "elephant_plus"),
                                  "balanced_scenarios",
                                  "blended_scenarios")
 

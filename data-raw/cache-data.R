@@ -19,6 +19,11 @@ adult_seeds[ , 1] <- adult_seed_values
 rownames(adult_seeds) <- DSMhabitat::watershed_species_present$watershed_name[-32]
 usethis::use_data(adult_seeds, overwrite = TRUE)
 
+# adult seeds using grandtab numbers
+
+usethis::use_data(adult_seeds_gt, overwrite = TRUE)
+
+
 proportion_hatchery <- c(0.37, 0.2, 0.9, 0.37968253968254, 0.2, 0.115, 0.2225, 0.3525,
                          0.2, 0.16, 0.37968253968254, 0.1525, 0.365, 0.37968253968254,
                          0.37968253968254, 0.37968253968254, 0.37968253968254, 0, 0.855,

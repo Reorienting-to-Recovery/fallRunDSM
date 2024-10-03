@@ -1,6 +1,6 @@
 ---
 title: "Recovery Overview - Platypus"
-date: "09/04/2024"
+date: "`r Sys.Date()`"
 output:
   html_document:
      code_folding: hide
@@ -138,6 +138,7 @@ r2r_seeds_platypus <- fallRunDSM::fall_run_model(mode = "seed",
                                         delta_surv_inflation = FALSE)
 
 # run model
+
 r2r_model_results_platypus <- fallRunDSM::fall_run_model(mode = "simulate",
                                                          scenario = "platypus",
                                                 ..params =  new_params,

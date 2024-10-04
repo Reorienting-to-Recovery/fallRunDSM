@@ -39,9 +39,9 @@ fall_run_model <- function(scenario = NULL,
                                                     species = R2Rscenario::species$FALL_RUN)
       } else {
 
-        scenario_group <- ifelse(scenario %in% c("elephant", "platypus", "tortoise", "elephant_plus"),
-                                 "balanced_scenarios",
-                                 "blended_scenarios")
+        scenario_group <- case_when(scenario %in% c("elephant", "platypus", "tortoise", "elephant_plus") ~ "balanced_scenarios",
+                                    scenario == "baseline" ~ "baseline_scenarios",
+                                    TRUE ~ "blended_scenarios")
 
         # Create new inputs consistent with R2Rscenario package
         scenario_path <- paste0(paste0("R2Rscenario::scenarios$", scenario_group, "$", scenario))

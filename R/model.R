@@ -255,13 +255,17 @@ fall_run_model <- function(scenario = NULL,
 
     }
     if (mode == "simulate") {
-    natural_adult_harvest <- sum(adults_after_harvest$harvested_natural_adults, na.rm = TRUE)
-    hatchery_adult_harvest <- sum(adults_after_harvest$harvested_hatchery_adults, na.rm = TRUE)
-    harvest <- tibble::tibble(year = year,
-                      hatchery_harvest = hatchery_adult_harvest,
-                      natural_harvest = natural_adult_harvest,
-                      total_harvest = hatchery_harvest + natural_harvest)
-    output$harvested_adults <- dplyr::bind_rows(output$harvested_adults, harvest)
+      # account for tribal harvest
+      tribal_harvest <- sum(adults_after_harvest$natural_adults * tribal_harvest_scalar, na.rm = T)
+      natural_adult_harvest <- sum(adults_after_harvest$harvested_natural_adults, na.rm = TRUE) + tribal_harvest
+      adults_after_harvest$natural_adults <- adults_after_harvest$natural_adults * (1 - tribal_harvest_scalar)
+      # original logic
+      hatchery_adult_harvest <- sum(adults_after_harvest$harvested_hatchery_adults, na.rm = TRUE)
+      harvest <- tibble::tibble(year = year,
+                        hatchery_harvest = hatchery_adult_harvest,
+                        natural_harvest = natural_adult_harvest,
+                        total_harvest = hatchery_harvest + natural_harvest)
+      output$harvested_adults <- dplyr::bind_rows(output$harvested_adults, harvest)
     }
     # STRAY --------------------------------------------------------------------
     if (mode == "simulate") {

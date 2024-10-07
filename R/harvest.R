@@ -37,6 +37,7 @@ harvest_adults <- function(adult_df,
 
   min_spawn_habitat <- apply(spawn_habitat[ , 10:12, year], 1, min)
   capacity <- min_spawn_habitat / fallRunDSM::params$spawn_success_redd_size
+  capacity <- capacity * 1.5 # quick fix for hab capacity
   hab_capacity <- tibble::tibble(watershed = fallRunDSM::watershed_labels,
                          habitat_capacity = capacity)
 

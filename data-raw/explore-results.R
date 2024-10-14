@@ -23,7 +23,7 @@ r2r_seeds <- fallRunDSM::fall_run_model(mode = "seed",
 r2r_seeds$adults
 # run model
 r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
-                                                scenario = "dry_year",
+                                                #scenario = "elephant_plus",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
                                                 delta_surv_inflation = FALSE)
@@ -41,14 +41,16 @@ spawn <- dplyr::as_tibble(r2r_model_results$spawners) |> #change which results t
   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
   tidyr::pivot_longer(cols = c(`1`:`20`), values_to = 'spawners', names_to = "year") %>%
   dplyr::filter(!location %in% non_spawn_regions) |>
-  dplyr::group_by(year,
-           location
-  ) |>
+  # dplyr::group_by(year,
+  #          location
+  # ) |>
+  group_by(year) |>
   dplyr::summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
   dplyr::mutate(year = as.numeric(year)) %>%
-  ggplot(aes(year, total_spawners,
-             color = location
-  )) +
+  # ggplot(aes(year, total_spawners,
+  #            color = location
+  # )) +
+  ggplot(aes(year, total_spawners)) +
   geom_line() +
   theme_minimal() +
   labs(y = "Spawners",
@@ -65,14 +67,16 @@ grandtab_totals <- dplyr::as_tibble(DSMCalibrationData::grandtab_observed$fall)|
   dplyr::mutate(location = fallRunDSM::watershed_labels) |>
   pivot_longer(cols = c(`1998`:`2017`), values_to = 'spawners', names_to = "year") %>%
   filter(!location %in% non_spawn_regions) |>
-  group_by(year,
-           location
-  ) |>
+  # group_by(year,
+  #          location
+  # ) |>
+  group_by(year) |>
   summarize(total_spawners = sum(spawners, na.rm = TRUE)) |>
   mutate(year = as.numeric(year)) %>%
-  ggplot(aes(year, total_spawners,
-             color = location
-  )) +
+  ggplot(aes(x = year, y= total_spawners)) +
+  # ggplot(aes(year, total_spawners,
+  #            color = location
+  # )) +
   geom_line() +
   theme_minimal() +
   labs(y = "Spawners",

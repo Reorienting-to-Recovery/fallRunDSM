@@ -1,0 +1,38 @@
+---
+title: "Fall Run Submodel Overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Fall Run Submodel Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+library(tidyverse)
+library(plotly)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+### Adult Survival 
+#### Adult Harvest
+#### Adult Enroute Migratory Survival 
+#### Adult Prespawn Survival
+
+### Adult Stray 
+
+### Juvenile Survival
+#### Egg to Fry Survival 
+#### Juvenile Rearing Survival 
+#### Juvenile Migratory Survival 
+#### Ocean entry survival 
+
+### Growth 
+### Movement 
+
+

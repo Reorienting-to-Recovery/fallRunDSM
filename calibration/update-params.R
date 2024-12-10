@@ -10,7 +10,7 @@ update_params <- function(x, params) {
   deer_surv_juv = x[8]
   mill_surv_juv = x[9]
   sac_surv_juv = x[10]
-  feather_and_bear_surv_juv = x[11]
+  feather_surv_juv = x[11]
   yuba_surv_juv = x[12]
   american_surv_juv = x[13]
   deltatribs_surv_juv = x[14]
@@ -61,8 +61,8 @@ update_params <- function(x, params) {
                                  `Thomes Creek` = deer_surv_juv,
                                  `Upper-mid Sacramento River` = sac_surv_juv,
                                  `Sutter Bypass` = bypass_surv_juv,
-                                 `Bear River` = feather_and_bear_surv_juv,
-                                 `Feather River` = feather_and_bear_surv_juv,
+                                 `Bear River` = deer_surv_juv,
+                                 `Feather River` = feather_surv_juv,
                                  `Yuba River` = yuba_surv_juv,
                                  `Lower-mid Sacramento River` = sac_surv_juv,
                                  `Yolo Bypass` = bypass_surv_juv,

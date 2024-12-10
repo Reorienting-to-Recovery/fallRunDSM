@@ -47,7 +47,7 @@ fall_hatchery_release = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDS
 # populate hatchery release as larger fish based on avg hatchery release data
 fall_hatchery_release[, 3] <- summarized_release$release_number
 
-usethis::use_data(fall_hatchery_release, overwrite = TRUE)
+# usethis::use_data(fall_hatchery_release, overwrite = TRUE)
 # TODO document data, figure out how we want to store for different scenarios
 # TODO decide if I want to move to cache data...
 

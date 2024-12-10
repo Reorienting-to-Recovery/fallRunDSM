@@ -1,14 +1,21 @@
 library(tidyverse)
-remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# remotes::install_github("Reorienting-to-Recovery/DSMflow")
+# remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
 library(DSMhabitat)
+library(DSMflow)
+library(DSMtemperature)
 
 # loads calibration data
-calib_results <- read_rds("calibration/result-test-known-nats-2.rds")
+calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")
 solution <- calib_results@solution
+# solution <- readr::read_rds("calibration/r2r-results-2024-02-28.rds")@solution[1,]
+
+harvest_percentage <- fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31)
+harvest_percentage[harvest_percentage < 0] <- 0
 
 # initial params
 r_to_r_baseline_params <- list(
-  #TODO add updated spawn decay multiplier for 2019 biop
   spawn_decay_multiplier = DSMhabitat::spawning_decay_multiplier$biop_itp_2018_2019$fr,
 
   # Data from DSMscenarios
@@ -26,6 +33,7 @@ r_to_r_baseline_params <- list(
   cross_channel_stray_rate = fallRunDSM::cross_channel_stray_rate,
   stray_rate = fallRunDSM::stray_rate,
   diversity_group = fallRunDSM::diversity_group,
+  crr_scaling = 2, # defaults to 2
 
   # Coefficients for adult submodules
   .adult_stray_intercept = 3,
@@ -36,7 +44,6 @@ r_to_r_baseline_params <- list(
   .adult_stray_prop_delta_trans = 2.89,
   .adult_en_route_migratory_temp = -0.26,
   .adult_en_route_bypass_overtopped = -0.019,
-  .adult_en_route_adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
   .adult_prespawn_deg_day = -0.000669526,
 
   # Ocean entry success coefficient and variable
@@ -114,6 +121,8 @@ r_to_r_baseline_params <- list(
   cc_gates_prop_days_closed = DSMflow::delta_cross_channel_closed$biop_itp_2018_2019["proportion", ],
   proportion_flow_bypass = DSMflow::proportion_flow_bypasses$biop_itp_2018_2019,
   gates_overtopped = DSMflow::gates_overtopped$biop_itp_2018_2019,
+  san_joaquin_flows = matrix(0, nrow = 12, ncol = 21, dimnames = list(month.abb, 1980:2000)),
+
 
   # DSMtemperature variables -----
   vernalis_temps = DSMtemperature::vernalis_temperature,
@@ -168,7 +177,7 @@ r_to_r_baseline_params <- list(
                           `Thomes Creek` = solution[8],
                           `Upper-mid Sacramento River` = solution[10],
                           `Sutter Bypass` = solution[4],
-                          `Bear River` = solution[11],
+                          `Bear River` = solution[8],
                           `Feather River` = solution[11],
                           `Yuba River` = solution[12],
                           `Lower-mid Sacramento River` = solution[10],
@@ -225,11 +234,32 @@ r_to_r_baseline_params <- list(
 
   # R2R specific metrics
   hatchery_release = fallRunDSM::fall_hatchery_release,
-  hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4, dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels)),
-  fecundity_lookup = fallRunDSM::fecundity_by_age
+  hatchery_release_proportion_bay = fallRunDSM::hatchery_release_proportion_bay,
+  fecundity_lookup = fallRunDSM::fecundity_by_age,
+  adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
+  restrict_harvest_to_hatchery_ocean = FALSE,
+  restrict_harvest_to_hatchery_trib = FALSE,
+  ocean_harvest_percentage = .5,
+  tributary_harvest_percentage = harvest_percentage,
+  no_cohort_harvest_years = c(),
+  intelligent_crr_harvest = FALSE,
+  intelligent_habitat_harvest = FALSE,
+  terminal_hatchery_logic = FALSE,
+  preserve_tribal_harvest = FALSE,
+
+  # stray model
+  flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,
+  flows_apr_may = DSMflow::hatchery_apr_may_flows$biop_itp_2018_2019,
+
+  # multi route
+  movement_hypo_weights = rep(1/8, 8),
+  ..habitat_capacity = 5,
+  ..floodplain_capacity = 5
 )
 
 usethis::use_data(r_to_r_baseline_params, overwrite = TRUE)
+
+
 
 
 

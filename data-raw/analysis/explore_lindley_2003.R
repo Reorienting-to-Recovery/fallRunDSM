@@ -160,7 +160,8 @@ ts |>
   geom_text(aes(x = 2014, y = Inf, label = gr,
                 color = positive),
             vjust = 1, size = 3) +
-  facet_wrap(~watershed, scales = "free_y")
+  facet_wrap(~watershed, scales = "free_y") +
+  theme(legend.position = "")
 
 # scratch ---------------------------------------------------
 

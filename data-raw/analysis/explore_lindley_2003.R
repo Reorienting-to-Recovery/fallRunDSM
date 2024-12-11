@@ -150,9 +150,14 @@ ts |>
                            "San Joaquin River", "Upper-mid Sacramento River",
                            "Yolo Bypass", "Thomes Creek")) |>
   mutate(year = as.numeric(str_remove(year, "X"))) |>
+  left_join(all_watersheds |>
+              distinct(watershed, lindley_growth_rate) |>
+              mutate(gr = round(lindley_growth_rate, 3))) |>
   ggplot(aes(x = year, y = abundance)) +
   theme_minimal() +
   geom_line() +
+  geom_text(aes(x = 2014, y = Inf, label = gr),
+            vjust = 1, size = 3) +
   facet_wrap(~watershed, scales = "free_y")
 
 # scratch ---------------------------------------------------

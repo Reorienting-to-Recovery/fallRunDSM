@@ -47,6 +47,7 @@ lindley_fn <- function(pars) {
 
 # set up data
 ts <- DSMCalibrationData::grandtab_imputed$fall
+years <- colnames(ts)
 
 # fit feather
 # log transform and turn into matrix

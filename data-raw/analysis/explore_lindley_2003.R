@@ -123,10 +123,37 @@ all_watersheds <- purrr::map(watersheds, get_pop_rate_watershed) |>
   bind_rows()
 
 all_watersheds |>
+  # don't plot streams with no data
+  filter(!watershed %in% c("Bear River", "Big Chico Creek",
+                           "Calaveras River", "Elder Creek",
+                           "Lower Sacramento River", "Lower-mid Sacramento River",
+                           "Stony Creek", "Sutter Bypass", "THomes Creek",
+                           "San Joaquin River", "Upper-mid Sacramento River",
+                           "Yolo Bypass", "Thomes Creek")) |>
   ggplot(aes(x = watershed, y = lindley_growth_rate)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+# compare to raw data
+ts |>
+  data.frame() |>
+  tibble::rownames_to_column("watershed") |>
+  pivot_longer(X1998:X2017,
+               names_to = "year",
+               values_to = "abundance") |>
+  # don't plot streams with no data
+  filter(!watershed %in% c("Bear River", "Big Chico Creek",
+                           "Calaveras River", "Elder Creek",
+                           "Lower Sacramento River", "Lower-mid Sacramento River",
+                           "Stony Creek", "Sutter Bypass", "THomes Creek",
+                           "San Joaquin River", "Upper-mid Sacramento River",
+                           "Yolo Bypass", "Thomes Creek")) |>
+  mutate(year = as.numeric(str_remove(year, "X"))) |>
+  ggplot(aes(x = year, y = abundance)) +
+  theme_minimal() +
+  geom_line() +
+  facet_wrap(~watershed, scales = "free_y")
 
 # scratch ---------------------------------------------------
 

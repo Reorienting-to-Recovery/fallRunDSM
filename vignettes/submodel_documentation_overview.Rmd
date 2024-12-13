@@ -17,22 +17,131 @@ knitr::opts_chunk$set(
 )
 ```
 
+This document describes the variables that contribute to each submodel within the Reorienting to Recovery Decision Support Model. When applicable, it also lists literature that contributed to the development of each submodel. 
 
+## Adult  
 
-### Adult Survival 
-#### Adult Harvest
-#### Adult Enroute Migratory Survival 
-#### Adult Prespawn Survival
+### Adult Removal For Hatchery 
+
+On tributaries with existing hatcheries, a percent of natural adults will be removed annually to be used in hatcheries. This is represented in the model by a natural adult removal rate that is applied to adult populations after they return to tributaries. In the model, this information is contained in the `natural_adult_removal_rate` data object and it is input to the `fall_run_model` as part of the params list. 
+
+*Source*
+
+Natural adult removal rate was derived using coded wire tag analysis. Details and methodology are available [here](https://reorienting-to-recovery.github.io/fallRunDSM/articles/hatchery-analysis.html).
+
+Compiled by: James T. Peterson jt.peterson@oregonstate.edu
+
+### Adult Harvest 
+
+Adult harvest is applied in the model as a percentage of ocean harvest and a percentage of in river tributary harvest. In the model, this information is contained in the `ocean_harvest_percentage` & `tributary_harvest_percentage` data objects and it is input to the `fall_run_model` as part of the params list. 
+
+Base model logic sets: 
+
+- Ocean harvest 50% 
+- In river harvest 8% for Sacramento River and its tributaries
+- And gives all fish have equal likelihood of being harvested 
+
+*Source*
+
+Harvest rates were pulled from table II-1 of the [Preseason Report I Stock Abundance Analysis and Environmental Assessment Part 1 for 2022 Ocean Salmon Fishery Regulations](https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf/).
+
+However additional model parameters can change harvest mode to one of the following: 
+
+- Intelligent habitat harvest
+- Intelligent cohort replacement rate harvest (CRR)
+- Age selective harvest 
+- Dry year harvest regulations 
+- Hatchery harvest only (ocean and/or tributary)
+
+For more information on these harvest strategies please see [DSM scenario harvest actions](https://reorienting-to-recovery.github.io/R2Rscenarios/articles/harvest-actions.html). 
+
+### Adult Enroute Migratory Survival 
+
+Adult enroute migratory survival is a function of migratory temperatures and wether or not the bypass is overtopped. This function also contains a calibrated intercept.  In the model, this information is contained in the following function input objects: 
+
+- data: `migratory_temp`
+- data: `bypass_overtopped`
+- coefficent: `.adult_en_route_bypass_overtopped`
+- coefficent: `.adult_en_route_migratory_temp`
+- calibrated intercept: `..surv_adult_enroute_int` 
+
+and it is input to the `fall_run_model` as part of the params list. 
+
+*Source*
+
+- `.enroute migratory_temp` coefficent from Schreck et al. (1994)
+- `.adult_en_route_bypass_overtopped`coefficient for bypass_overtopped variable, source: Expert opinion Ted Sommer, California Department of Water Resources (tributaries above bypasses only)
+- *Calibrated intercept.*
 
 ### Adult Stray 
 
-### Juvenile Survival
-#### Egg to Fry Survival 
-#### Juvenile Rearing Survival 
-#### Juvenile Migratory Survival 
-#### Ocean entry survival 
+The adult straying function is a beta regression model that including the following factors that straying rates:  transport distance, return year flows, fish age, release timing, and environmental conditions (PDO). This logic was developed by Sturrock et al. (2019). Within the DSM, the `compute_adult_stray_rates` function, takes in: 
+@param release_type river or bay representing where the hatchery fish were released
 
+- `run_year` year of run
+- `age` age of fish
+- `released` total number of fish released at hatchery
+- `flow_oct_nov` the median flow for October and November
+- `flow_apr_may` the median flow for April and May
+- `mean_pdo_return` environmental conditions 
+
+And based on the location of fish assigns a transport distance to bay, and then computes a stray rate for each release group. 
+
+*Source*
+[Sturrock et al. (2019)](https://afspubs.onlinelibrary.wiley.com/doi/epdf/10.1002/fsh.10267) Examining eight decades of hatchery release data in California’s Central Valley.
+
+Please see the [stray rate documentation](https://reorienting-to-recovery.s3.us-west-1.amazonaws.com/updated-stray-rates.html) for more information on how Sturrock et al. (2019) stray logic is incorporated into the R2R DSMs. 
+
+### Adult Prespawn Survival
+Adult prespawn survival is a function of migratory temperatures and wether or not the bypass is overtopped. This function also contains a calibrated intercept.  In the model, this information is contained in the following data objects: 
+
+- data: `degree_days`
+- data: `month_return_proportions`
+- coefficent: `.adult_prespawn_deg_day`
+- calibrated intercept: `..surv_adult_prespawn_int` 
+
+and it is input to the `fall_run_model` as part of the params list. 
+
+*Source*
+
+- `.adult_prespawn_deg_day` coefficent from Colvin et al. (2018)
+- `month_return_proportions` TODO
+- *Calibrated intercept.*
+
+
+### Spawn Success
+
+prob_nest_scoured: More details at prob_nest_scoured
+
+spawn_success_sex_ratio: Variable describing the female to male spawning ratio, default 0.5, source: expert opinion from SIT members.
+
+spawn_success_redd_size: Variable describing the size of redds including defensible space, default value 9.29 square meters, source: expert opinion from SIT members.
+
+spawn_success_fecundity: Variable describing the number of eggs per female, default value 5522, source: Moyle, P. B. 2002. Inland Fishes of California. University of California Press, Berkeley CA
+- Updated to have fecundity by size based on. 
+
+### Egg to Fry Survival
+
+proportion_hatchery: More details at proportion_hatchery
+
+prob_nest_scoured: More details at prob_nest_scoured
+
+mean_egg_temp_effect: More details at egg_temperature_effect
+
+.surv_egg_to_fry_proportion_natural: Coefficient for proportion_natural variable, source: Chilcote et al. 2011
+
+.surv_egg_to_fry_scour: Coefficient for scour variable, source: Montgomery et al. 1996
+
+..surv_egg_to_fry_int: Intercept, source: Calibration
+
+
+
+## Juvenile 
 ### Growth 
 ### Movement 
+### Juvenile Rearing Survival 
+### Juvenile Migratory Survival 
+### Ocean entry survival 
+
 
 

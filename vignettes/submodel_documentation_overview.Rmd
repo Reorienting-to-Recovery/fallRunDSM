@@ -109,30 +109,26 @@ and it is input to the `fall_run_model` as part of the params list.
 - *Calibrated intercept.*
 
 
-### Spawn Success
+### Spawn Success (TODO, add egg to fry to this so that they are together)
 
-prob_nest_scoured: More details at prob_nest_scoured
+Adult spawning success is a function of scouring, sex rations, redd size, and fecundity. In the model, this information is contained in the following data objects: 
 
-spawn_success_sex_ratio: Variable describing the female to male spawning ratio, default 0.5, source: expert opinion from SIT members.
+- data: `prob_nest_scoured`
+- data: `spawn_success_sex_ratio`
+- data: `spawn_success_redd_size`
+- data: `spawn_success_fecundity`
 
-spawn_success_redd_size: Variable describing the size of redds including defensible space, default value 9.29 square meters, source: expert opinion from SIT members.
+and it is input to the `fall_run_model` as part of the params list. 
 
-spawn_success_fecundity: Variable describing the number of eggs per female, default value 5522, source: Moyle, P. B. 2002. Inland Fishes of California. University of California Press, Berkeley CA
-- Updated to have fecundity by size based on. 
+*Source*
 
-### Egg to Fry Survival
+- `prob_nest_scoured`: Experts estimated probabilities for predation, stranding, and nest scouring
+- `spawn_success_sex_ratio`: Variable describing the female to male spawning ratio, default 0.5, source: expert opinion from SIT members.
+- `spawn_success_redd_size`: Variable describing the size of redds including defensible space, default value 9.29 square meters, source: expert opinion from SIT members.
+- `spawn_success_fecundity`: Variable describing the number of eggs per female, default value 5522, source: Moyle, P. B. 2002. Inland Fishes of California. University of California Press, Berkeley CA
+- Updated to have fecundity vary by size of fish, Roni and Quinn 1995 logic was used to map fu=ish age to size. Then we scaled fecundity by size using logic from Malick et all 2023. 
 
-proportion_hatchery: More details at proportion_hatchery
 
-prob_nest_scoured: More details at prob_nest_scoured
-
-mean_egg_temp_effect: More details at egg_temperature_effect
-
-.surv_egg_to_fry_proportion_natural: Coefficient for proportion_natural variable, source: Chilcote et al. 2011
-
-.surv_egg_to_fry_scour: Coefficient for scour variable, source: Montgomery et al. 1996
-
-..surv_egg_to_fry_int: Intercept, source: Calibration
 
 
 

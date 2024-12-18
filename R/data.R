@@ -156,7 +156,6 @@ NULL
 #'   \item \code{spawn_success_fecundity}: Variable describing the number of eggs per female, default value 5522, source: \href{https://www.ucpress.edu/book/9780520227545/inland-fishes-of-california}{Moyle, P. B. 2002. Inland Fishes of California. University of California Press, Berkeley CA}
 #'   \item \code{fecundity_lookup}: More details at \code{\link{fecundity_by_age}}
 #'   \item \code{hatchery_release}: More details at \code{\link{fall_hatchery_release}}
-#'   \item \code{hatchery_release_proportion_bay}: More details at \code{\link{hatchery_release_proportion_bay}}
 #'   \item \code{natural_adult_removal_rate}: More details at \code{\link{natural_adult_removal_rate}}
 #'   \item \code{adult_harvest_rate}: More details at \code{\link{r2r_adult_harvest_rate}}
 #'   \item \code{restrict_harvest_to_hatchery_ocean}: Boolean value describing if harvest should be restricted to hatchery fish in the ocean. Defaults to FALSE
@@ -166,7 +165,6 @@ NULL
 #'   \item \code{no_cohort_harvest_years}: Vector listing cohort of fish with restricted harvest.
 #'   \item \code{intelligent_crr_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on cohort replacement rate. Defaults to FALSE
 #'   \item \code{intelligent_habitat_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on habitat. Defaults to FALSE
-#'   \item \code{terminal_hatchery_logic}: Boolean value describing if terminal hatchery logic in place. Defaults to FALSE
 #'   \item \code{preserve_tribal_harvest}: Boolean value describing if tribal in river harvest should be preserved. Defaults to FALSE
 
 #' }
@@ -182,8 +180,8 @@ NULL
 #' @section Hatchery Releases:
 #' \itemize{
 #'   \item \code{hatchery_release}: More details at \code{\link[fallRunDSM]{fall_hatchery_release}}
-#'   \item \code{hatchery_releases_at_chipps}: More details at \code{\link[fallRunDSM]{hatchery_releases_at_chipps}}
-#'   \item \code{terminal_hatchery_logic}: Boolean value describing if terminal hatchery exist
+#'   \item \code{hatchery_release_proportion_bay}: More details at \code{\link{hatchery_release_proportion_bay}}
+#'   \item \code{terminal_hatchery_logic}: Boolean value describing if terminal hatchery logic in place. Defaults to FALSE
 #' }
 #' @section Tributary Rearing Survival:
 #' \itemize{

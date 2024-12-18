@@ -125,8 +125,9 @@ NULL
 #'   \item \code{sutter_habitat}: More details at \code{\link[DSMhabitat]{sutter_habitat}}
 #'   \item \code{yolo_habitat}: More details at \code{\link[DSMhabitat]{yolo_habitat}}
 #'   \item \code{delta_habitat}: More details at \code{\link[DSMhabitat]{delta_habitat}}
-#'   \item \code{spawn_decay_rate}: More details at \code{\link[DSMscenario]{spawn_decay_rate}}
-#'   \item \code{rear_decay_rate}: More details at \code{\link[DSMscenario]{rear_decay_rate}}
+#'   \item \code{spawn_decay_rate}: More details at \code{\link[R2Rscenario]{spawn_decay_rate}}
+#'   \item \code{spawn_decay_multiplier}: More details at \code{\link[R2Rscenario]{spawn_decay_multiplier}}
+#'   \item \code{rear_decay_rate}: More details at \code{\link[R2Rscenario]{rear_decay_rate}}
 #' }
 #' @section Spawning Adults:
 #' \itemize{
@@ -134,38 +135,40 @@ NULL
 #'   \item \code{south_delta_routed_watersheds}: More details at \code{\link[DSMhabitat]{south_delta_routed_watersheds}}
 #'   \item \code{cc_gates_days_closed}: More details at \code{\link[DSMflow]{delta_cross_channel_closed}}
 #'   \item \code{cross_channel_stray_rate}: More details at \code{\link{cross_channel_stray_rate}}
-#'   \item \code{stray_rate}: More details at \code{\link{stray_rate}}
 #'   \item \code{gates_overtopped}: More details at \code{\link[DSMflow]{gates_overtopped}}
 #'   \item \code{tisdale_bypass_watershed}: More details at \code{\link[DSMhabitat]{tisdale_bypass_watershed}}
 #'   \item \code{yolo_bypass_watershed}: More details at \code{\link[DSMhabitat]{yolo_bypass_watershed}}
 #'   \item \code{migratory_temperature_proportion_over_20}: More details at \code{\link[DSMtemperature]{migratory_temperature_proportion_over_20}}
+#'   \item \code{flows_oct_nov}: More details at \code{\link[DSMflow]{flows_oct_nov}}
+#'   \item \code{flows_apr_may}: More details at \code{\link[DSMflow]{flows_apr_may}}
+#'   \item \code{monthly_mean_pdo}: More details at \code{\link[fallRunDSM]{monthly_mean_pdo}}
 #'   \item \code{..surv_adult_enroute_int}:  Intercept, source: calibration
-#'   \item \code{.adult_stray_intercept}: Empirical model fit using 2008–2011 tagging data provided by East Bay Municipal Utility District
-#'   \item \code{.adult_stray_wild}: Coefficient for \code{wild} variable, source: Estimated with coded wire tag data 2010–2013 \href{https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=162355&usg= AOvVaw0VgMOwD7knFfSxRZy6k8RG}{(Kormos et al. 2012, Palmer-Zwahlen & Kormos 2013-2015, Palmer-Zwahlen et al. 2018)}
-#'   \item \code{.adult_stray_natal_flow}: Coefficient for \code{natal_flow} variable, source: Empirical model fit using 2008–2011 tagging data provided by East Bay Municipal Utility District
-#'   \item \code{.adult_stray_cross_channel_gates_closed}: Coefficient for \code{cross_channel_gates_closed} variable, source: Empirical model fit using  2008–2011 tagging data provided by East Bay Municipal Utility District.
-#'   \item \code{.adult_stray_prop_bay_trans}: Coefficient for \code{prop_bay_trans} variable, source: Estimated with coded wire tag data 2010–2013 \href{https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=162355&usg= AOvVaw0VgMOwD7knFfSxRZy6k8RG}{(Kormos et al. 2012, Palmer-Zwahlen & Kormos 2013-2015, Palmer-Zwahlen et al. 2018)}
-#'   \item \code{.adult_stray_prop_delta_trans}: Coefficient for \code{prop_delta_trans} variable, source: Estimated with coded wire tag data 2010–2013 \href{https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=162355&usg= AOvVaw0VgMOwD7knFfSxRZy6k8RG}{(Kormos et al. 2012, Palmer-Zwahlen & Kormos 2013-2015, Palmer-Zwahlen et al. 2018)}
 #'   \item \code{.adult_en_route_migratory_temp}: Coefficient for \code{migratory_temp} variable, source: \href{https://dsm-docs.s3.us-west-2.amazonaws.com/schrek_cb_1994.pdf}{Schreck et al. (1994)}
 #'   \item \code{.adult_en_route_bypass_overtopped}: Coefficient for \code{bypass_overtopped} variable, source: Expert opinion Ted Sommer, California Department of Water Resources (tributaries above bypasses only)
 #'   \item \code{.adult_en_route_adult_harvest_rate}:  Adult harvest rate, source:  \href{https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=162355&usg= AOvVaw0VgMOwD7knFfSxRZy6k8RG}{(Palmer-Zwahlen & Kormos 2013-2015, Palmer-Zwahlen et al. 2018)}
 #'   \item \code{degree_days}: More details at \code{\link[DSMtemperature]{degree_days}}
-#'   \item \code{month_return_proportions}: More details at \code{\link[fallRunDSM]{month_return_proportions}}
+#'   \item \code{month_return_proportions}: More details at \code{\link{month_return_proportions}}
 #'   \item \code{..surv_adult_prespawn_int}:  Intercept, source: Calibration Estimate
 #'   \item \code{.adult_prespawn_deg_day}: Coefficient for \code{deg_day} variable, source: \href{https://onlinelibrary.wiley.com/doi/epdf/10.1002/rra.3348}{Colvin et al. (2018)}
 #'   \item \code{prob_nest_scoured}: More details at \code{\link[DSMhabitat]{prob_nest_scoured}}
 #'   \item \code{spawn_success_sex_ratio}: Variable describing the female to male spawning ratio, default 0.5, source: expert opinion from SIT members.
 #'   \item \code{spawn_success_redd_size}: Variable describing the size of redds including defensible space, default value 9.29 square meters, source: expert opinion from SIT members.
 #'   \item \code{spawn_success_fecundity}: Variable describing the number of eggs per female, default value 5522, source: \href{https://www.ucpress.edu/book/9780520227545/inland-fishes-of-california}{Moyle, P. B. 2002. Inland Fishes of California. University of California Press, Berkeley CA}
-#'   \item \code{hatchery_allocation}: More details at \code{\link{hatchery_allocation}}
+#'   \item \code{fecundity_lookup}: More details at \code{\link{fecundity_by_age}}
+#'   \item \code{hatchery_release}: More details at \code{\link{fall_hatchery_release}}
+#'   \item \code{hatchery_release_proportion_bay}: More details at \code{\link{hatchery_release_proportion_bay}}
 #'   \item \code{natural_adult_removal_rate}: More details at \code{\link{natural_adult_removal_rate}}
 #'   \item \code{adult_harvest_rate}: More details at \code{\link{r2r_adult_harvest_rate}}
-#'   \item \code{restrict_harvest_to_hatchery}: Boolean value describing if harvest should be restricted to hatchery fish. Defaults to FALSE
+#'   \item \code{restrict_harvest_to_hatchery_ocean}: Boolean value describing if harvest should be restricted to hatchery fish in the ocean. Defaults to FALSE
+#'   \item \code{restrict_harvest_to_hatchery_trib}: Boolean value describing if harvest should be restricted to hatchery fish in tributaries. Defaults to FALSE
 #'   \item \code{ocean_harvest_percentage}: Numeric value describing the proportion of ocean fish that are harvested. Defaults to .5 based on \href{https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf}{Table II-1}
 #'   \item \code{tributary_harvest_percentage}: Numeric value describing the proportion of in-river fish that are harvested. Quantities vary by tributary as described by \href{https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf}{Table II-1}
 #'   \item \code{no_cohort_harvest_years}: Vector listing cohort of fish with restricted harvest.
 #'   \item \code{intelligent_crr_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on cohort replacement rate. Defaults to FALSE
 #'   \item \code{intelligent_habitat_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on habitat. Defaults to FALSE
+#'   \item \code{terminal_hatchery_logic}: Boolean value describing if terminal hatchery logic in place. Defaults to FALSE
+#'   \item \code{preserve_tribal_harvest}: Boolean value describing if tribal in river harvest should be preserved. Defaults to FALSE
+
 #' }
 #' @section Egg to Fry Survival:
 #' \itemize{

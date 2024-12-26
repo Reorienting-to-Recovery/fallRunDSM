@@ -156,9 +156,37 @@ Empirical prey density data were aggregated from multiple authors and across man
 #### Route 
 The route function determines if juveniles stay in their natal tributary, are detoured to a bypass, or out migrate during a simulated month. Routing is based on amount of habitat, and flows. 
 
-TODO add details
+The route function takes in the following data objects: 
 
+- data: `inchannel_habitat`
+- data: `floodplain_habitat` 
+- data: `prop_pulse_flows`
+- data: `proportion_flow_bypass`
+- data: `territory_size`
+- data: `freeport_flows`
+- data: `vernalis_flows`
+- coefficient: `.pulse_movement_intercept`
+- coefficient: `.pulse_movement_proportion_pulse`
+- coefficient: `.pulse_movement_medium`
+- coefficient: `.pulse_movement_large`
+- coefficient: `.pulse_movement_vlarge`
+- coefficient: `.pulse_movement_medium_pulse`
+- coefficient: `.pulse_movement_large_pulse`
+- coefficient: `.pulse_movement_very_large_pulse`
+- filling ruleset, defaults to regional: `fill_regional`
 
+*Sources*
+- `prop_pulse_flows`: Flow data from DSMflow package. 
+- `proportion_flow_bypass`: Flow data from DSMflow package. 
+- `.pulse_movement_intercept`: Intercept, source: Empirical model fit to CVPIA Chinook salmon screw trap abundance estimates from American River, Stanislaus River, Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear Creek 2008–2015.
+- `.pulse_movement_proportion_pulse`: Coefficient for proportion_pulse variable, source: Empirical model fit to CVPIA Chinook salmon screw trap abundance estimates from American River, Stanislaus River, Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear Creek 2008–2015.
+- `.pulse_movement_medium`: Size related intercept for medium sized fish, source: Empirical model fit to CVPIA Chinook salmon screw trap abundance estimates from American River, Stanislaus River, Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear Creek 2008–2015.
+- `.pulse_movement_large`: Size related intercept for large sized fish, source: Empirical model fit to CVPIA Chinook salmon screw trap abundance estimates from American River, Stanislaus River, Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear Creek 2008–2015.
+- `.pulse_movement_vlarge`: Size related intercept for very large sized fish, source: Empirical model fit to CVPIA Chinook salmon screw trap abundance estimates from American River, Stanislaus River, Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear Creek 2008–2015.
+- `.pulse_movement_medium_pulse`: Additional coefficient for proportion_pulse variable for medium size fish, source: Empirical model fit to CVPIA Chinook salmon screw trap abundance estimates from American River, Stanislaus River, Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear Creek 2008–2015.
+- `.pulse_movement_large_pulse`: Additional coefficient for proportion_pulse variable for large size fish, source: Empirical model fit to CVPIA Chinook salmon screw trap abundance estimates from American River, Stanislaus River, Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear Creek 2008–2015.
+- `.pulse_movement_very_large_pulse`: Additional coefficient for proportion_pulse variable for very large size fish, source: Empirical model fit to CVPIA Chinook salmon screw trap abundance estimates from American River, Stanislaus River, Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear Creek 2008–2015.
+- `territory_size`: More details at territory_by_size
 
 
 ### Juvenile Rearing Survival 
@@ -217,10 +245,20 @@ Tributary rearing survival is a function of average tributary temperatures, stra
 
 
 #### Delta 
-prey_density_delta: More details at prey_density_delta
 
 ### Juvenile Migratory Survival 
+
 ### Ocean entry survival 
+Ocean entry survival is a function of the timing that juveniles enter the ocean. This function also contains a calibrated intercept and calibrated coefficients.  In the model, this information is contained in the following data objects: 
 
+- data: `avg_ocean_transition_month`
+- coefficient: `.ocean_entry_success_length`
+- coefficient: `.ocean_entry_success_months`
+- calibrated intercept: `..ocean_entry_success_int`
 
+**Source**
+- `avg_ocean_transition_month`: Set for each chinook run based on average outmigration timing.  
+- `.ocean_entry_success_length`: Size related intercept representing the fork lengths for each size classes, source: Satterthwaite et al.2014
+- `..ocean_entry_success_int`: Intercept, source: Calibration (Varies by tributary)
+- `.ocean_entry_success_months`: Coefficient for month variable, source: Satterthwaite et al.2014
 

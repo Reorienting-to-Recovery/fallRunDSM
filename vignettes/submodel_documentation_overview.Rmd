@@ -76,7 +76,6 @@ and it is input to the `fall_run_model` as part of the params list.
 ### Adult Stray 
 
 The adult straying function is a beta regression model that including the following factors that straying rates:  transport distance, return year flows, fish age, release timing, and environmental conditions (PDO). This logic was developed by Sturrock et al. (2019). Within the DSM, the `compute_adult_stray_rates` function, takes in: 
-@param release_type river or bay representing where the hatchery fish were released
 
 - `run_year` year of run
 - `age` age of fish
@@ -153,6 +152,7 @@ Empirical prey density data were aggregated from multiple authors and across man
 
 ### Movement 
 
+# TODO could spruce up this section 
 #### Route 
 The route function determines if juveniles stay in their natal tributary, are detoured to a bypass, or out migrate during a simulated month. Routing is based on amount of habitat, and flows. 
 
@@ -174,6 +174,9 @@ The route function takes in the following data objects:
 - coefficient: `.pulse_movement_large_pulse`
 - coefficient: `.pulse_movement_very_large_pulse`
 - filling ruleset, defaults to regional: `fill_regional`
+
+and it is input to the `fall_run_model` as part of the params list. 
+
 
 *Sources*
 - `prop_pulse_flows`: Flow data from DSMflow package. 
@@ -219,6 +222,9 @@ Tributary rearing survival is a function of average tributary temperatures, stra
 - calibrated coefficient: `.surv_juv_rear_prop_diversions`
 - calibrated coefficient: `.surv_juv_rear_prop_diversions`
 
+and it is input to the `fall_run_model` as part of the params list. 
+
+
 *Sources*
 -`avg_temp`: Temperature data from DSMtemperature. More details at [stream_temperature](https://reorienting-to-recovery.github.io/DSMtemperature/reference/stream_temperature.html)
 -`prob_strand_early` & `prob_strand_late`: Expert estimated stranding probabilites. 
@@ -236,25 +242,149 @@ Tributary rearing survival is a function of average tributary temperatures, stra
 -`.surv_juv_rear_avg_temp_thresh`: Coefficient for avg_temp_thresh variable, source: Runge et al 2008
 -`.surv_juv_rear_high_predation`: Coefficient for high_predation variable, source: Cavallo et al. 2012
 -`.surv_juv_rear_stranded`: Coefficient for stranded variable, source: USFWS 2006 and CDWR 2006
--`.surv_juv_rear_medium`: Size related intercept for medium sized fish, source: Connor et al. 2004
--`.surv_juv_rear_large`: Size related intercept for large sized fish, source: Connor et al. 2004
+-`.surv_juv_rear_medium`: Size related intercept for medium sized fish, source: [Connor et al. 2004](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1)
+-`.surv_juv_rear_large`: Size related intercept for large sized fish, source: [Connor et al. 2004](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1)
 -`.surv_juv_rear_floodplain`: Additional intercept for floodplain rearing benefit, source: Sommer et al. (2001)`
 
 
 #### Bypass
+Bypass survival is a function of the temperatures, predation, habitat type, and size of fish. This function also contains a calibrated intercept.  In the model, this information is contained in the following data objects: 
+
+* data: `average_temp`  
+* data: `max_temp_thresh`
+* data: `avg_temp_thresh`
+* data: `high_predation`
+* calibrated intercept: `..surv_juv_bypass_int`
+* coefficient: `.high_predation`
+* coefficient: `.medium`
+* coefficient: `.large`
+* coefficient: `.floodplain`
+* coefficient: `min_survival_rate`
+
+and it is input to the `fall_run_model` as part of the params list. 
+
+
+**Source:**
+* `average_temp` More details at stream_temperature
+* `max_temp_thresh` Variable representing the probability of exceeding the max temp threshold. Coefficient for high_predation variable, source: [Cavallo et al. 2012] (https://search.nal.usda.gov/discovery/search?query=lds35,contains,512123-01nal_inst,AND&tab=LibraryCatalog&search_scope=MyInstitution&vid=01NAL_INST:MAIN&mode=advanced&offset=0)
+* `avg_temp_thresh` Variable representing the probability of exceeding the average temperature.  Coefficient for avg_temp_thresh variable, source: [Marine and Chech 2004](https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf)
+* `high_predation` Variable representing an indicator for high predation in watershed. Experts estimated probabilities for predation. ()
+* `..surv_juv_bypass_int` Intercept, source: calibration
+* `.medium` Size related intercept for medium sized fish, source: [Connor et al. 2004](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1)
+* `.large` Size related intercept for large sized fish, sourec: [Connor et al. 2004](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1)
+* `.floodplain`  Additional intercept for floodplain rearing benefit, source: [Sommer et al. 2001](https://dsm-docs.s3-us-west-2.amazonaws.com/SOMMER_T-SDWA+180+Floodplain+rearing+of+juvenile+chinook+salmon+evidence+of+enhanced+growth+and+survival+.pdf)
 
 
 #### Delta 
 
+Delta rearing survival is a function of average tributary temperatures, stranding probabilities, flow diversions, weeks flooded, and predation. This function also contains a calibrated intercept and calibrated coefficients.  In the model, this information is contained in the following data objects: 
+
+- data: `avg_temp_delta`
+- data: `delta_proportion_diverted`
+- data: `delta_total_diverted`
+- data: `delta_contact_points`
+- data: `delta_prop_high_predation`
+- calibrated intercept: `..surv_juv_delta_int`
+- coefficient: `.surv_juv_delta_contact_points`
+- coefficient: `..surv_juv_delta_contact_points`
+- coefficient: `.surv_juv_delta_total_diverted`
+- calibrated intercept: `..surv_juv_delta_total_diverted`
+- coefficient: `.surv_juv_delta_avg_temp_thresh`
+- coefficient: `.surv_juv_delta_high_predation`
+- coefficient: `.surv_juv_delta_prop_diverted`
+- coefficient: `.surv_juv_delta_medium`
+- coefficient: `.surv_juv_delta_large`
+
+and it is input to the `fall_run_model` as part of the params list. 
+
+
+**Source**
+
+- `avg_temp_delta`: Temperature data from DSMtemperature. 
+- `delta_proportion_diverted`: Delta diversion data from DSMtemperature. 
+- `delta_total_diverted`: Delta diversion data from DSMtemperature. 
+- `delta_contact_points`: Delta contact points from PAD database. 
+- `delta_prop_high_predation`: More details at delta_prop_high_predation
+- `..surv_juv_delta_int`: Intercept, source: calibration
+- `.surv_juv_delta_contact_points`: Coefficient for contact_points variable, source: inherited from previous calibration
+- `..surv_juv_delta_contact_points`: Coefficient for contact_points variable, source: calibration
+- `.surv_juv_delta_total_diverted`: Coefficient for total_diversions variable, source: inherited from previous calibration
+- `..surv_juv_delta_total_diverted`: Coefficient for total_diversions variable, source: calibration
+- `.surv_juv_delta_avg_temp_thresh`: Coefficient for avg_temp_thresh variable, source: Marine and Chech 2004
+- `.surv_juv_delta_high_predation`: Coefficient for high_predation variable, source: Cavallo et al. 2012
+- `.surv_juv_delta_prop_diverted`: Coefficient for prop_diversions variable, source: Newman and Brandes 2010
+- `.surv_juv_delta_medium`: Size related intercept for medium sized fish, source: Connor et al. 2004
+- `.surv_juv_delta_large`: Size related intercept for large sized fish, source: Connor et al. 2004
+
 ### Juvenile Migratory Survival 
 
-### Ocean entry survival 
+#### Sacramento Migratory Survival 
+
+Sacramento river migratory survival is directly tied to flow through a step function. A flow of less than 122 cubic meters per second on the Upper Sacramento River indicates a survival is 3 %, a flow of between 122 and 303 cubic meters per second gives a survival rate of 19 % and a flow above 303 cubic meters per second gives a survival rate of 50 %. In the model, flow data is contained in `upper_sacramento_flows` which is produced in the DSMflow package. 
+
+#### San Joaquin Migratory Survival 
+
+Delta migratory survival is a function of the size of fish outmigrating. This function also contains a calibrated intercept. In the model, this information is contained in the following data objects: 
+
+* calibrated intercept: `..surv_juv_outmigration_sj_int` 
+* coefficient: `.medium` 
+* coefficient: `.large` 
+
+and it is input to the `fall_run_model` as part of the params list. 
+
+**Source:**
+
+* `..surv_juv_outmigration_sj_int` source: calibration
+* `.medium` Size related intercept for medium sized fish, source: [Connor et al. 2004](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1)
+* `.large`Size related intercept for large sized fish, source: [Connor et al. 2004](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1)
+
+#### Delta Migratory Survival 
+
+Delta migratory survival is a function of flow, temperature, proportion of DCC gates closed. The function returns proportion of fish from the Sacramento at Feeeport (northern_fish), Mokelumne and Cosumnes (cosumnes_mokelumne_fish), Calaveras (calaveras_fish) and
+San Joaquin tributaries from Vernalis (southern_fish) arriving alive at Chipps Island in four size groups (35-42mm, 42-72mm, 72-110mm, >110mm). This function also contains a calibrated intercept and calibrated coefficients.  In the model, this information is contained in the following data objects: 
+
+* data: `prop_DCC_closed`
+* data: `hor_barr` defaults to 0 
+* data: `freeport_flow`
+* data:`vernalis_flow`
+* data:`stockton_flow`
+* data:`vernalis_temperature`
+* data: `prisoners_point_temperature`
+* data: `CVP_exp`
+* data: `SWP_exp`
+* data: `trap_trans`, defaults to 0 
+
+and it is input to the `fall_run_model` as part of the params list. 
+
+ 
+**Source:**
+ All parameters were derived from Perry et al. (2018). 
+Note that the models were fit to data that were >80 mm. Therefore, this does not
+predict outside of the data so sizes <= 80mm are assumed to me 80mm long as
+requested by Russ Perry. All flow related data provided to the function is pulled from CalSim and processed in the DSMflow data package. All temperature related data provided to the funciton is processed in the DSMtemperature data package. 
+
+* `prop_DCC_closed` Proportion of days the Delta Cross Channel Gates are closed. 
+* `hor_barr` Indicator if head of old river physical barrier in place
+* `freeport_flow` Average daily discharge at Freeport in cubic meters per second
+* `vernalis_flow` Average daily discharge at Vernalis in cubic meters per second
+* `stockton_flow` Average daily discharge at Stockton in cubic meters per second
+* `vernalis_temperature` Average daily temperature at Vernalis in °C
+* `prisoners_point_temperature` Average daily temperature of the San Joaquin River at Prisoners Point °C
+* `CVP_exp` Average daily exports Central Valley Project in cubic meters per second
+* `SWP_exp` Average daily exports State Water Project in cubic meters per second
+* `trap_trans` Proportion of smolts trapped at Vernalis and transported to Chips island
+
+
+#### Ocean entry survival 
 Ocean entry survival is a function of the timing that juveniles enter the ocean. This function also contains a calibrated intercept and calibrated coefficients.  In the model, this information is contained in the following data objects: 
 
 - data: `avg_ocean_transition_month`
 - coefficient: `.ocean_entry_success_length`
 - coefficient: `.ocean_entry_success_months`
 - calibrated intercept: `..ocean_entry_success_int`
+
+and it is input to the `fall_run_model` as part of the params list. 
+
 
 **Source**
 - `avg_ocean_transition_month`: Set for each chinook run based on average outmigration timing.  

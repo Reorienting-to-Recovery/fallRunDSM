@@ -71,7 +71,7 @@ and it is input to the `fall_run_model` as part of the params list.
 
 - `.enroute migratory_temp` coefficent from Schreck et al. (1994)
 - `.adult_en_route_bypass_overtopped`coefficient for bypass_overtopped variable, source: Expert opinion Ted Sommer, California Department of Water Resources (tributaries above bypasses only)
-- *Calibrated intercept.* # TODO link to calibration process markdown
+- *Calibrated intercept.* 
 
 ### Adult Stray 
 
@@ -152,7 +152,6 @@ Empirical prey density data were aggregated from multiple authors and across man
 
 ### Movement 
 
-# TODO could spruce up this section 
 #### Route 
 The route function determines if juveniles stay in their natal tributary, are detoured to a bypass, or out migrate during a simulated month. Routing is based on amount of habitat, and flows. 
 
@@ -387,6 +386,7 @@ and it is input to the `fall_run_model` as part of the params list.
 
 
 **Source**
+
 - `avg_ocean_transition_month`: Set for each chinook run based on average outmigration timing.  
 - `.ocean_entry_success_length`: Size related intercept representing the fork lengths for each size classes, source: Satterthwaite et al.2014
 - `..ocean_entry_success_int`: Intercept, source: Calibration (Varies by tributary)

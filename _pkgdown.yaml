@@ -119,6 +119,8 @@ navbar:
         href: 'articles/temperature-model.html'
       - text: 'Model FAQ'
         href: 'articles/model_faq.html'
+      - text: 'Submodel Documentation'
+        href: 'articles/submodel_documentation_overview.html'
 
 repo:
  url:

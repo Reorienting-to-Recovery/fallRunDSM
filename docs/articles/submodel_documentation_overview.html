@@ -112,12 +112,12 @@ of each submodel.</p>
 <h3 id="adult-removal-for-hatchery">Adult Removal For Hatchery<a class="anchor" aria-label="anchor" href="#adult-removal-for-hatchery"></a>
 </h3>
 <p>On tributaries with existing hatcheries, a percent of natural adults
-will be removed annually to be used in hatcheries. This is represented
-in the model by a natural adult removal rate that is applied to adult
-populations after they return to tributaries. In the model, this
-information is contained in the <code>natural_adult_removal_rate</code>
-data object and it is input to the <code>fall_run_model</code> as part
-of the params list.</p>
+will be removed annually from in river spawning grounds to be spawned in
+hatcheries. This is represented in the model by a natural adult removal
+rate that is applied to adult populations after they return to
+tributaries. In the model, this information is contained in the
+<code>natural_adult_removal_rate</code> data object and it is input to
+the <code>fall_run_model</code> as part of the params list.</p>
 <p><em>Source</em></p>
 <p>Natural adult removal rate was derived using coded wire tag analysis.
 Details and methodology are available <a href="https://reorienting-to-recovery.github.io/fallRunDSM/articles/hatchery-analysis.html">here</a>.</p>
@@ -137,7 +137,7 @@ to the <code>fall_run_model</code> as part of the params list.</p>
 <ul>
 <li>Ocean harvest 50%</li>
 <li>In river harvest 8% for Sacramento River and its tributaries</li>
-<li>And gives all fish have equal likelihood of being harvested</li>
+<li>And gives all fish equal likelihood of being harvested</li>
 </ul>
 <p><em>Source</em></p>
 <p>Harvest rates were pulled from table II-1 of the <a href="https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf/" class="external-link">Preseason
@@ -193,10 +193,11 @@ only)</li>
 <h3 id="adult-stray">Adult Stray<a class="anchor" aria-label="anchor" href="#adult-stray"></a>
 </h3>
 <p>The adult straying function is a beta regression model that including
-the following factors that straying rates: transport distance, return
-year flows, fish age, release timing, and environmental conditions
-(PDO). This logic was developed by Sturrock et al. (2019). Within the
-DSM, the <code>compute_adult_stray_rates</code> function, takes in:</p>
+the following factors that affect straying rates: transport distance,
+return year flows, fish age, release timing, and environmental
+conditions (PDO). This logic was developed by Sturrock et al. (2019).
+Within the DSM, the <code>compute_adult_stray_rates</code> function,
+takes in:</p>
 <ul>
 <li>
 <code>run_year</code> year of run</li>
@@ -214,7 +215,8 @@ November</li>
 </ul>
 <p>And based on the location of fish assigns a transport distance to
 bay, and then computes a stray rate for each release group.</p>
-<p><em>Source</em> <a href="https://afspubs.onlinelibrary.wiley.com/doi/epdf/10.1002/fsh.10267" class="external-link">Sturrock
+<p><em>Source</em></p>
+<p><a href="https://afspubs.onlinelibrary.wiley.com/doi/epdf/10.1002/fsh.10267" class="external-link">Sturrock
 et al. (2019)</a> Examining eight decades of hatchery release data in
 California’s Central Valley.</p>
 <p>Please see the <a href="https://reorienting-to-recovery.s3.us-west-1.amazonaws.com/updated-stray-rates.html" class="external-link">stray
@@ -233,7 +235,7 @@ following data objects:</p>
 </li>
 <li>data: <code>month_return_proportions</code>
 </li>
-<li>coefficent: <code>.adult_prespawn_deg_day</code>
+<li>coefficient: <code>.adult_prespawn_deg_day</code>
 </li>
 <li>calibrated intercept: <code>..surv_adult_prespawn_int</code>
 </li>
@@ -243,10 +245,11 @@ params list.</p>
 <p><em>Source</em></p>
 <ul>
 <li>
-<code>.adult_prespawn_deg_day</code> coefficent from Colvin et
+<code>.adult_prespawn_deg_day</code> coefficient from Colvin et
 al. (2018)</li>
 <li>
-<code>month_return_proportions</code> TODO</li>
+<code>month_return_proportions</code> expert opinion provided by
+Science Integration Team (SIT) members</li>
 <li><em>Calibrated intercept.</em></li>
 </ul>
 </div>
@@ -293,12 +296,15 @@ of redds including defensible space, default value 9.29 square meters,
 source: expert opinion from SIT members.</li>
 <li>
 <code>spawn_success_fecundity</code>: Variable describing the number
-of eggs per female, default value 5522, source: Moyle, P. B. 2002.
+of eggs per female, default value 5522, source: <em>Moyle, P. B. 2002.
 Inland Fishes of California. University of California Press, Berkeley
-CA</li>
-<li>Updated to have fecundity vary by size of fish, Roni and Quinn 1995
-logic was used to map fu=ish age to size. Then we scaled fecundity by
-size using logic from Malick et all 2023.</li>
+CA</em>
+</li>
+<li>Updated to have fecundity vary by size of fish, <a href="https://reorienting-to-recovery.s3.us-west-1.amazonaws.com/RoniandQuinn1995.pdf" class="external-link">Roni
+and Quinn 1995</a> logic was used to map fish age to size. Then we
+scaled fecundity by size using logic from <a href="https://www.x-mol.net/paper/article/1664889742509719552" class="external-link">Malick et
+all 2023.</a>
+</li>
 <li>
 <code>fecundity_lookup</code>: <a href="https://reorienting-to-recovery.s3.us-west-1.amazonaws.com/RoniandQuinn1995.pdf" class="external-link">Roni
 and Quinn 1995</a> logic was used to map age to size. Then we scaled
@@ -338,11 +344,11 @@ lower in inchannel habitat.</p>
 <li>data: <code>prey_density_delta</code> (max, high, medium, or
 low)</li>
 </ul>
-<p><em>Source</em> Empirical prey density data were aggregated from
-multiple authors and across many watersheds. For each dataset, the
-habitat type was assigned. Specific methods and supporting documents for
-data aggregation and decisions in every watershed are provided by
-author. See <a href="https://github.com/CVPIA-OSC/preyDataProcessing" class="external-link">preyDataProcessing</a>
+<p><em>Source</em></p>
+<p>Empirical prey density data were aggregated from multiple authors and
+across many watersheds. For each dataset, the habitat type was assigned.
+Specific methods and supporting documents for data aggregation and
+decisions in every watershed are provided by author. See <a href="https://github.com/CVPIA-OSC/preyDataProcessing" class="external-link">preyDataProcessing</a>
 for more details. Data processed in bioenergetics model which provides
 distinct growth rates for max, high, medium, and low prey. Model inputs
 are prey data quantities for each tributary and the delta. model is
@@ -395,47 +401,64 @@ month. Routing is based on amount of habitat, and flows.</p>
 </ul>
 <p>and it is input to the <code>fall_run_model</code> as part of the
 params list.</p>
-<p><em>Sources</em> - <code>prop_pulse_flows</code>: Flow data from
-DSMflow package. - <code>proportion_flow_bypass</code>: Flow data from
-DSMflow package. - <code>.pulse_movement_intercept</code>: Intercept,
-source: Empirical model fit to CVPIA Chinook salmon screw trap abundance
-estimates from American River, Stanislaus River, Feather River,
-Mokelumne River, Sacramento River, Tuolumne River, Clear Creek
-2008–2015. - <code>.pulse_movement_proportion_pulse</code>: Coefficient
-for proportion_pulse variable, source: Empirical model fit to CVPIA
-Chinook salmon screw trap abundance estimates from American River,
-Stanislaus River, Feather River, Mokelumne River, Sacramento River,
-Tuolumne River, Clear Creek 2008–2015. -
-<code>.pulse_movement_medium</code>: Size related intercept for medium
+<p><em>Sources</em></p>
+<ul>
+<li>
+<code>prop_pulse_flows</code>: Flow data from DSMflow package.</li>
+<li>
+<code>proportion_flow_bypass</code>: Flow data from DSMflow
+package.</li>
+<li>
+<code>.pulse_movement_intercept</code>: Intercept, source: Empirical
+model fit to CVPIA Chinook salmon screw trap abundance estimates from
+American River, Stanislaus River, Feather River, Mokelumne River,
+Sacramento River, Tuolumne River, Clear Creek 2008–2015.</li>
+<li>
+<code>.pulse_movement_proportion_pulse</code>: Coefficient for
+proportion_pulse variable, source: Empirical model fit to CVPIA Chinook
+salmon screw trap abundance estimates from American River, Stanislaus
+River, Feather River, Mokelumne River, Sacramento River, Tuolumne River,
+Clear Creek 2008–2015.</li>
+<li>
+<code>.pulse_movement_medium</code>: Size related intercept for
+medium sized fish, source: Empirical model fit to CVPIA Chinook salmon
+screw trap abundance estimates from American River, Stanislaus River,
+Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear
+Creek 2008–2015.</li>
+<li>
+<code>.pulse_movement_large</code>: Size related intercept for large
 sized fish, source: Empirical model fit to CVPIA Chinook salmon screw
 trap abundance estimates from American River, Stanislaus River, Feather
 River, Mokelumne River, Sacramento River, Tuolumne River, Clear Creek
-2008–2015. - <code>.pulse_movement_large</code>: Size related intercept
-for large sized fish, source: Empirical model fit to CVPIA Chinook
-salmon screw trap abundance estimates from American River, Stanislaus
-River, Feather River, Mokelumne River, Sacramento River, Tuolumne River,
-Clear Creek 2008–2015. - <code>.pulse_movement_vlarge</code>: Size
-related intercept for very large sized fish, source: Empirical model fit
-to CVPIA Chinook salmon screw trap abundance estimates from American
-River, Stanislaus River, Feather River, Mokelumne River, Sacramento
-River, Tuolumne River, Clear Creek 2008–2015. -
-<code>.pulse_movement_medium_pulse</code>: Additional coefficient for
-proportion_pulse variable for medium size fish, source: Empirical model
-fit to CVPIA Chinook salmon screw trap abundance estimates from American
-River, Stanislaus River, Feather River, Mokelumne River, Sacramento
-River, Tuolumne River, Clear Creek 2008–2015. -
+2008–2015.</li>
+<li>
+<code>.pulse_movement_vlarge</code>: Size related intercept for very
+large sized fish, source: Empirical model fit to CVPIA Chinook salmon
+screw trap abundance estimates from American River, Stanislaus River,
+Feather River, Mokelumne River, Sacramento River, Tuolumne River, Clear
+Creek 2008–2015.</li>
+<li>
+<code>.pulse_movement_medium_pulse</code>: Additional coefficient
+for proportion_pulse variable for medium size fish, source: Empirical
+model fit to CVPIA Chinook salmon screw trap abundance estimates from
+American River, Stanislaus River, Feather River, Mokelumne River,
+Sacramento River, Tuolumne River, Clear Creek 2008–2015.</li>
+<li>
 <code>.pulse_movement_large_pulse</code>: Additional coefficient for
 proportion_pulse variable for large size fish, source: Empirical model
 fit to CVPIA Chinook salmon screw trap abundance estimates from American
 River, Stanislaus River, Feather River, Mokelumne River, Sacramento
-River, Tuolumne River, Clear Creek 2008–2015. -
-<code>.pulse_movement_very_large_pulse</code>: Additional coefficient
-for proportion_pulse variable for very large size fish, source:
-Empirical model fit to CVPIA Chinook salmon screw trap abundance
+River, Tuolumne River, Clear Creek 2008–2015.</li>
+<li>
+<code>.pulse_movement_very_large_pulse</code>: Additional
+coefficient for proportion_pulse variable for very large size fish,
+source: Empirical model fit to CVPIA Chinook salmon screw trap abundance
 estimates from American River, Stanislaus River, Feather River,
 Mokelumne River, Sacramento River, Tuolumne River, Clear Creek
-2008–2015. - <code>territory_size</code>: More details at
-territory_by_size</p>
+2008–2015.</li>
+<li>
+<code>territory_size</code>: More details at territory_by_size</li>
+</ul>
 </div>
 </div>
 <div class="section level3">
@@ -504,42 +527,73 @@ the following data objects:</p>
 </ul>
 <p>and it is input to the <code>fall_run_model</code> as part of the
 params list.</p>
-<p><em>Sources</em> -<code>avg_temp</code>: Temperature data from
-DSMtemperature. More details at <a href="https://reorienting-to-recovery.github.io/DSMtemperature/reference/stream_temperature.html" class="external-link">stream_temperature</a>
--<code>prob_strand_early</code> &amp; <code>prob_strand_late</code>:
-Expert estimated stranding probabilites.
--<code>proportion_diverted</code> &amp; <code>total_diverted</code>:
+<p><em>Sources</em></p>
+<ul>
+<li>
+<code>avg_temp</code>: Temperature data from DSMtemperature. More
+details at <a href="https://reorienting-to-recovery.github.io/DSMtemperature/reference/stream_temperature.html" class="external-link">stream_temperature</a>
+</li>
+<li>
+<code>prob_strand_early</code> &amp; <code>prob_strand_late</code>:
+Expert estimated stranding probabilites.</li>
+<li>
+<code>proportion_diverted</code> &amp; <code>total_diverted</code>:
 Proportion and total flows diverted from DSMflow data package. More
 details at <a href="https://reorienting-to-recovery.github.io/DSMflow/reference/proportion_diverted.html" class="external-link">proportion_diverted</a>
--<code>weeks_flooded</code>: More details at weeks_flooded
--<code>prop_high_predation</code>: More details at prop_high_predation
--<code>contact_points</code>: More details at contact_points
--<code>..surv_juv_rear_int</code>: Intercept, source: calibration
-(varies by tributary) -<code>.surv_juv_rear_contact_points</code>:
-Coefficient for contact_points variable, source: inherited from previous
-calibration -<code>..surv_juv_rear_contact_points</code>: Coefficient
-for contact_points variable, source: calibration
--<code>.surv_juv_rear_prop_diversions</code>: Coefficient for
-prop_diversions variable, source: Newman and Brandes 2010
--<code>..surv_juv_rear_prop_diversions</code>: Coefficient for
-prop_diversions variable, source: calibration
--<code>.surv_juv_rear_total_diversions</code>: Coefficient for
-total_diversions variable, source: inherited from previous calibration
--<code>..surv_juv_rear_total_diversions</code>: Coefficient for
-total_diversions variable, source: calibration
--<code>.surv_juv_rear_avg_temp_thresh</code>: Coefficient for
-avg_temp_thresh variable, source: Runge et al 2008
--<code>.surv_juv_rear_high_predation</code>: Coefficient for
-high_predation variable, source: Cavallo et al. 2012
--<code>.surv_juv_rear_stranded</code>: Coefficient for stranded
-variable, source: USFWS 2006 and CDWR 2006
--<code>.surv_juv_rear_medium</code>: Size related intercept for medium
+</li>
+<li>
+<code>weeks_flooded</code>: More details at weeks_flooded</li>
+<li>
+<code>prop_high_predation</code>: More details at
+prop_high_predation</li>
+<li>
+<code>contact_points</code>: More details at contact_points</li>
+<li>
+<code>..surv_juv_rear_int</code>: Intercept, source: calibration
+(varies by tributary)</li>
+<li>
+<code>.surv_juv_rear_contact_points</code>: Coefficient for
+contact_points variable, source: inherited from previous
+calibration</li>
+<li>
+<code>..surv_juv_rear_contact_points</code>: Coefficient for
+contact_points variable, source: calibration</li>
+<li>
+<code>.surv_juv_rear_prop_diversions</code>: Coefficient for
+prop_diversions variable, source: Newman and Brandes 2010</li>
+<li>
+<code>..surv_juv_rear_prop_diversions</code>: Coefficient for
+prop_diversions variable, source: calibration</li>
+<li>
+<code>.surv_juv_rear_total_diversions</code>: Coefficient for
+total_diversions variable, source: inherited from previous
+calibration</li>
+<li>
+<code>..surv_juv_rear_total_diversions</code>: Coefficient for
+total_diversions variable, source: calibration</li>
+<li>
+<code>.surv_juv_rear_avg_temp_thresh</code>: Coefficient for
+avg_temp_thresh variable, source: Runge et al 2008</li>
+<li>
+<code>.surv_juv_rear_high_predation</code>: Coefficient for
+high_predation variable, source: Cavallo et al. 2012</li>
+<li>
+<code>.surv_juv_rear_stranded</code>: Coefficient for stranded
+variable, source: USFWS 2006 and CDWR 2006</li>
+<li>
+<code>.surv_juv_rear_medium</code>: Size related intercept for
+medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor
+et al. 2004</a>
+</li>
+<li>
+<code>.surv_juv_rear_large</code>: Size related intercept for large
 sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor
-et al. 2004</a> -<code>.surv_juv_rear_large</code>: Size related
-intercept for large sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor
-et al. 2004</a> -<code>.surv_juv_rear_floodplain</code>: Additional
-intercept for floodplain rearing benefit, source: Sommer et
-al. (2001)`</p>
+et al. 2004</a>
+</li>
+<li>
+<code>.surv_juv_rear_floodplain</code>: Additional intercept for
+floodplain rearing benefit, source: Sommer et al. (2001)`</li>
+</ul>
 </div>
 <div class="section level4">
 <h4 id="bypass">Bypass<a class="anchor" aria-label="anchor" href="#bypass"></a>
@@ -572,23 +626,45 @@ data objects:</p>
 </ul>
 <p>and it is input to the <code>fall_run_model</code> as part of the
 params list.</p>
-<p><strong>Source:</strong> * <code>average_temp</code> More details at
-stream_temperature * <code>max_temp_thresh</code> Variable representing
-the probability of exceeding the max temp threshold. Coefficient for
-high_predation variable, source: [Cavallo et al. 2012] (<a href="https://search.nal.usda.gov/discovery/search?query=lds35,contains,512123-01nal_inst,AND&amp;tab=LibraryCatalog&amp;search_scope=MyInstitution&amp;vid=01NAL_INST:MAIN&amp;mode=advanced&amp;offset=0" class="external-link uri">https://search.nal.usda.gov/discovery/search?query=lds35,contains,512123-01nal_inst,AND&amp;tab=LibraryCatalog&amp;search_scope=MyInstitution&amp;vid=01NAL_INST:MAIN&amp;mode=advanced&amp;offset=0</a>)
-* <code>avg_temp_thresh</code> Variable representing the probability of
-exceeding the average temperature. Coefficient for avg_temp_thresh
+<p><strong>Source:</strong></p>
+<ul>
+<li>
+<code>average_temp</code> More details at stream_temperature</li>
+<li>
+<code>max_temp_thresh</code> Variable representing the probability
+of exceeding the max temp threshold. Coefficient for high_predation
+variable, source: <a href="https://search.nal.usda.gov/discovery/search?query=lds35,contains,512123-01nal_inst,AND&amp;tab=LibraryCatalog&amp;search_scope=MyInstitution&amp;vid=01NAL_INST:MAIN&amp;mode=advanced&amp;offset=0" class="external-link">Cavallo
+et al. 2012</a>
+</li>
+<li>
+<code>avg_temp_thresh</code> Variable representing the probability
+of exceeding the average temperature. Coefficient for avg_temp_thresh
 variable, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf" class="external-link">Marine
-and Chech 2004</a> * <code>high_predation</code> Variable representing
-an indicator for high predation in watershed. Experts estimated
-probabilities for predation. () * <code>..surv_juv_bypass_int</code>
-Intercept, source: calibration * <code>.medium</code> Size related
-intercept for medium sized fish, source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor
-et al. 2004</a> * <code>.large</code> Size related intercept for large
-sized fish, sourec: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor
-et al. 2004</a> * <code>.floodplain</code> Additional intercept for
-floodplain rearing benefit, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/SOMMER_T-SDWA+180+Floodplain+rearing+of+juvenile+chinook+salmon+evidence+of+enhanced+growth+and+survival+.pdf" class="external-link">Sommer
-et al. 2001</a></p>
+and Chech 2004</a>
+</li>
+<li>
+<code>high_predation</code> Variable representing an indicator for
+high predation in watershed. Experts estimated probabilities for
+predation. ()</li>
+<li>
+<code>..surv_juv_bypass_int</code> Intercept, source:
+calibration</li>
+<li>
+<code>.medium</code> Size related intercept for medium sized fish,
+source: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor
+et al. 2004</a>
+</li>
+<li>
+<code>.large</code> Size related intercept for large sized fish,
+sourec: <a href="https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1" class="external-link">Connor
+et al. 2004</a>
+</li>
+<li>
+<code>.floodplain</code> Additional intercept for floodplain rearing
+benefit, source: <a href="https://dsm-docs.s3-us-west-2.amazonaws.com/SOMMER_T-SDWA+180+Floodplain+rearing+of+juvenile+chinook+salmon+evidence+of+enhanced+growth+and+survival+.pdf" class="external-link">Sommer
+et al. 2001</a>
+</li>
+</ul>
 </div>
 <div class="section level4">
 <h4 id="delta">Delta<a class="anchor" aria-label="anchor" href="#delta"></a>
@@ -698,6 +774,11 @@ Upper Sacramento River indicates a survival is 3 %, a flow of between
 flow above 303 cubic meters per second gives a survival rate of 50 %. In
 the model, flow data is contained in <code>upper_sacramento_flows</code>
 which is produced in the DSMflow package.</p>
+<p><strong>Source:</strong></p>
+<p>This logic is pulled directly from Cyril Michel’s paper:
+<em>Nonlinear survival of imperiled fish informs managed flows in a
+highly modified river</em> (<a href="https://esajournals.onlinelibrary.wiley.com/doi/10.1002/ecs2.3498" class="external-link">Cyril
+J. Michel, 2021</a>).</p>
 </div>
 <div class="section level4">
 <h4 id="san-joaquin-migratory-survival">San Joaquin Migratory Survival<a class="anchor" aria-label="anchor" href="#san-joaquin-migratory-survival"></a>
@@ -750,12 +831,12 @@ following data objects:</p>
 <li>data: <code>hor_barr</code> defaults to 0</li>
 <li>data: <code>freeport_flow</code>
 </li>
-<li>
-<a href="data:%60vernalis_flow" class="uri">data:`vernalis_flow</a>`</li>
-<li>
-<a href="data:%60stockton_flow" class="uri">data:`stockton_flow</a>`</li>
-<li>
-<a href="data:%60vernalis_temperature" class="uri">data:`vernalis_temperature</a>`</li>
+<li>data: <code>vernalis_flow</code>
+</li>
+<li>data: <code>stockton_flow</code>
+</li>
+<li>data: <code>vernalis_temperature</code>
+</li>
 <li>data: <code>prisoners_point_temperature</code>
 </li>
 <li>data: <code>CVP_exp</code>
@@ -766,13 +847,14 @@ following data objects:</p>
 </ul>
 <p>and it is input to the <code>fall_run_model</code> as part of the
 params list.</p>
-<p><strong>Source:</strong> All parameters were derived from Perry et
-al. (2018). Note that the models were fit to data that were &gt;80 mm.
-Therefore, this does not predict outside of the data so sizes &lt;= 80mm
-are assumed to me 80mm long as requested by Russ Perry. All flow related
+<p><strong>Source:</strong></p>
+<p>All parameters were derived from Perry et al. (2018).</p>
+<p>Note that the models were fit to data that were &gt;80 mm. Therefore,
+this does not predict outside of the data so sizes &lt;= 80mm are
+assumed to me 80mm long as requested by Russ Perry. All flow related
 data provided to the function is pulled from CalSim and processed in the
 DSMflow data package. All temperature related data provided to the
-funciton is processed in the DSMtemperature data package.</p>
+function is processed in the DSMtemperature data package.</p>
 <ul>
 <li>
 <code>prop_DCC_closed</code> Proportion of days the Delta Cross

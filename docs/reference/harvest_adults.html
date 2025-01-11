@@ -47,6 +47,9 @@ This function is called within the larger model.R file before stray rates and pr
     <li>
       <a href="../articles/model_faq.html">Model FAQ</a>
     </li>
+    <li>
+      <a href="../articles/submodel_documentation_overview.html">Submodel Documentation</a>
+    </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/reorienting-to-recovery/fallRunDSM" class="external-link">
@@ -82,11 +85,13 @@ This function is called within the larger model.R file before stray rates and pr
 <span>  terminal_hatchery_logic <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">T</span>, <span class="cn">F</span><span class="op">)</span>,</span>
 <span>  <span class="va">ocean_harvest_percentage</span>,</span>
 <span>  <span class="va">tributary_harvest_percentage</span>,</span>
-<span>  restrict_harvest_to_hatchery <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span>,</span>
+<span>  restrict_harvest_to_hatchery_ocean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span>,</span>
+<span>  restrict_harvest_to_hatchery_trib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span>,</span>
 <span>  no_cohort_harvest_years <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  intelligent_habitat_harvest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span>,</span>
 <span>  intelligent_crr_harvest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span>,</span>
-<span>  crr_scaling <span class="op">=</span> <span class="fl">2</span></span>
+<span>  crr_scaling <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  preserve_tribal_harvest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">F</span>, <span class="cn">T</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -108,16 +113,16 @@ This function is called within the larger model.R file before stray rates and pr
 <dd><p>The percentage of harvest from tributaries, can vary by tributary.</p></dd>
 
 
-<dt>restrict_harvest_to_hatchery</dt>
-<dd><p>A logical vector indicating whether to restrict harvest to hatcheries for each tributary.</p></dd>
-
-
 <dt>no_cohort_harvest_years</dt>
 <dd><p>A vector of years where no cohort harvest is allowed.</p></dd>
 
 
 <dt>intelligent_crr_harvest</dt>
 <dd><p>A logical vector indicating whether to apply intelligent harvest based on Coho Retention Rate (CRR).</p></dd>
+
+
+<dt>restrict_harvest_to_hatchery</dt>
+<dd><p>A logical vector indicating whether to restrict harvest to hatcheries for each tributary.</p></dd>
 
 </dl></div>
     <div id="value">

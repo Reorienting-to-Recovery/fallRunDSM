@@ -436,6 +436,25 @@ surv_juv_outmigration_sac <- function(flow_cms){
   setNames(result, fallRunDSM::size_class_labels)
 }
 
+#' @title Juvenile San Joaquin Outmigration Survival
+#' @description Calculates the San Joaquin River juvenile out migration survival
+#' @details See \code{\link{params}} for details on parameter sources
+#' @param ..surv_juv_outmigration_sj_int Intercept
+#' @param .medium Size related intercept for medium sized fish
+#' @param .large Size related intercept for large sized fish
+#' @source IP-117068
+#' @export
+surv_juv_outmigration_san_joaquin <- function(..surv_juv_outmigration_sj_int = fallRunDSM::params$..surv_juv_outmigration_sj_int,
+                                              .medium = fallRunDSM::params$.surv_juv_outmigration_san_joaquin_medium,
+                                              .large = fallRunDSM::params$.surv_juv_outmigration_san_joaquin_large){
+
+  s <- boot::inv.logit(..surv_juv_outmigration_sj_int)
+  m <- boot::inv.logit(..surv_juv_outmigration_sj_int + .medium)
+  l <- vl <- boot::inv.logit(..surv_juv_outmigration_sj_int + .large)
+
+  cbind(s = s, m = m, l = l, vl = vl)
+}
+
 #' @title Juvenile Mainstem San Joaquin Outmigration Survival
 #' @description Calculates the Mainstem San Joaquin juvenile out migration survival
 #' @param flow_cms Variable representing upper San Joaquin River flow in cubic meters per second

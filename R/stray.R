@@ -1,13 +1,15 @@
 #' Apply Straying
-#'
-#' @param year
-#' @param natural_adults
-#' @param hatchery_adults
-#' @param total_releases = ..params$hatchery_release,
-#' @param release_month = 1,
-#' @param flows_oct_nov = ..params$flows_oct_nov,
-#' @param flows_apr_may = ..params$flows_apr_may,
-#' @param monthly_mean_pdo = fallRunDSM::monthly_mean_pdo,
+#' @title Apply Straying
+#' @description Function to apply adult upstream straying
+#' @param year Simulation year
+#' @param natural_adults Number of natural adults
+#' @param hatchery_adults Number of hatchery adults
+#' @param total_releases Total hatchery fish released from..params$hatchery_release,
+#' @param release_month Hatchery release month, defaults to 1,
+#' @param flows_oct_nov Mean flows from October and November from ..params$flows_oct_nov,
+#' @param flows_apr_may Mean flows from April and May ..params$flows_apr_may,
+#' @param monthly_mean_pdo Mean pdo from fallRunDSM::monthly_mean_pdo,
+#' @export
 apply_straying <- function(year, natural_adults, hatchery_adults, total_releases,
                            release_month, flows_oct_nov, flows_apr_may, monthly_mean_pdo) {
 
@@ -45,7 +47,13 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
   strayed_natural_adults[is.nan(strayed_natural_adults)] <- 0
 
 
-
+  # Stop straying to non spawn destinations
+  straying_destinations[16, ] <- rep(0, 6) # uper mid sac
+  straying_destinations[17, ] <- rep(0, 6) # sutter bypass
+  straying_destinations[21, ] <- rep(0, 6) # lower mid sac
+  straying_destinations[22, ] <- rep(0, 6) # yolo bypass
+  straying_destinations[24, ] <- rep(0, 6) # lower sac
+  straying_destinations[31, ] <- rep(0, 6) # san joaquin
   # hatchery origin
   hatchery_strays <- lapply(1:hatchery_ages, function(age) {
 
@@ -69,6 +77,14 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
   }
 
   hatchery_adults_after_stray <- hatchery_adults - strayed_hatchery_adults + hatchery_strays_allocated
+
+  # Stop straying to non spawn destinations
+  straying_destinations[16, ] <- rep(0, 6) # uper mid sac
+  straying_destinations[17, ] <- rep(0, 6) # sutter bypass
+  straying_destinations[21, ] <- rep(0, 6) # lower mid sac
+  straying_destinations[22, ] <- rep(0, 6) # yolo bypass
+  straying_destinations[24, ] <- rep(0, 6) # lower sac
+  straying_destinations[31, ] <- rep(0, 6) # san joaquin
 
   # natural origin
   natural_strays <- lapply(1:natural_ages, function(age) {
@@ -106,12 +122,9 @@ apply_straying <- function(year, natural_adults, hatchery_adults, total_releases
 
 }
 
-
-
 #' @title Adult Straying for Hatchery Origin Fish
 #' @description
 #' Calculates stray rates for all hatchery originating fish.
-#'
 #' @param release_type river or bay representing where the hatchery fish were released
 #' @param run_year year of run
 #' @param age age of fish
@@ -126,7 +139,7 @@ compute_adult_stray_rates <- function(type = c("natural", "hatchery"), sim_year,
 
 
   # create "newdata" for each of the hatcheries to be used in the prediction
-  new_data <- map_df(names(fallRunDSM::hatchery_to_watershed_lookup), function(x) {
+  new_data <- purrr::map_df(names(fallRunDSM::hatchery_to_watershed_lookup), function(x) {
 
     # prepare initial data
     w <- fallRunDSM::hatchery_to_watershed_lookup[x]
@@ -144,7 +157,7 @@ compute_adult_stray_rates <- function(type = c("natural", "hatchery"), sim_year,
   stray_type <-  if (type == "natural") "natural" else rep(rep(c("release bay", "release river"),
                                                             each = 4), 5)
 
-  stray_rates <- new_data |> transmute(
+  stray_rates <- new_data |> dplyr::transmute(
     sim_year = sim_year,
     watershed = fallRunDSM::hatchery_to_watershed_lookup[hatchery],
     age = age_unorm,
@@ -156,22 +169,21 @@ compute_adult_stray_rates <- function(type = c("natural", "hatchery"), sim_year,
 }
 
 #' @title Normalize data with context data
-#' @description
-#' transform data to be normalized given data to calculate mean and standard deviation from
+#' @description transform data to be normalized given data to calculate mean and standard deviation from
 #' @keywords internal
 normalize_with_context <- function(x, context_data) {
   (x - mean(context_data, na.rm = TRUE))/sd(context_data, na.rm = TRUE)
 }
 
 #' @title Normalize data with known params
-#' @description
-#' transform data to be normalized given the mean and standard deviation from the data
+#' @description transform data to be normalized given the mean and standard deviation from the data
 #' @keywords internal
 normalize_with_params <- function(x, mean_val, sd_val) {
   (x - mean_val)/sd_val
 }
 
-
+#' @title Creates matrix from stray rates
+#' @description transforms stray rates from betareg output into matrix
 #' @keywords internal
 stray_rates_to_matrix <- function(data, type) {
   out <- vector(mode = "list")
@@ -182,34 +194,34 @@ stray_rates_to_matrix <- function(data, type) {
   if (type == "natural") {
     # natural origin fish
     out$natural <- data |>
-      filter(watershed == "American River", stray_type == "natural") |>
-      pivot_wider(names_from = "age", values_from = "stray_rate") |>
-      slice(rep(1:n(), each = 31)) |>
-      select(`2`:`5`) |>
+      dplyr::filter(watershed == "American River", stray_type == "natural") |>
+      tidyr::pivot_wider(names_from = "age", values_from = "stray_rate") |>
+      dplyr::slice(rep(1:dplyr::n(), each = 31)) |>
+      dplyr::select(`2`:`5`) |>
       as.matrix() |>
       `row.names<-`(watershed_labels)
   } else {
     # rates dataframe to the matrix for bay hatchery
     out$release_bay <- data |>
-      filter(stray_type == "release bay") |>
-      pivot_wider(values_from = "stray_rate", names_from = "age") |>
-      select(-sim_year, -stray_type) |>
-      right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
-      arrange(order) |>
-      mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
-      select(-watershed, -order) |>
+      dplyr::filter(stray_type == "release bay") |>
+      tidyr::pivot_wider(values_from = "stray_rate", names_from = "age") |>
+      dplyr::select(-sim_year, -stray_type) |>
+      dplyr::right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
+      dplyr::arrange(order) |>
+      dplyr::mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
+      dplyr::select(-watershed, -order) |>
       as.matrix() |>
       `row.names<-`(watershed_labels)
 
     # rates for river release fish
     out$release_river <- data |>
-      filter(stray_type == "release river") |>
-      pivot_wider(values_from = "stray_rate", names_from = "age") |>
-      select(-sim_year, -stray_type) |>
-      right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
-      arrange(order) |>
-      mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
-      select(-watershed, -order) |>
+      dplyr::filter(stray_type == "release river") |>
+      tidyr::pivot_wider(values_from = "stray_rate", names_from = "age") |>
+      dplyr::select(-sim_year, -stray_type) |>
+      dplyr::right_join(select(watershed_attributes, watershed, order), by = "watershed") |>
+      dplyr::arrange(order) |>
+      dplyr::mutate(across(everything(), \(x) ifelse(is.na(x), 0, x))) |>
+      dplyr::select(-watershed, -order) |>
       as.matrix() |>
       `row.names<-`(watershed_labels)
   }

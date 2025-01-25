@@ -1,15 +1,18 @@
 library(tidyverse)
 # remotes::install_github("Reorienting-to-Recovery/DSMflow")
+# remotes::install_github("Reorienting-to-Recovery/DSMhabitat")
+# remotes::install_github("Reorienting-to-Recovery/DSMtemperature")
 library(DSMhabitat)
 library(DSMflow)
+library(DSMtemperature)
 
 # loads calibration data
 calib_results <- read_rds("calibration/r2r-results-2023-12-11.rds")
 solution <- calib_results@solution
+# solution <- readr::read_rds("calibration/r2r-results-2024-02-28.rds")@solution[1,]
 
 harvest_percentage <- fallRunDSM::r2r_adult_harvest_rate - rep(.5, 31)
 harvest_percentage[harvest_percentage < 0] <- 0
-
 
 # initial params
 r_to_r_baseline_params <- list(
@@ -118,6 +121,7 @@ r_to_r_baseline_params <- list(
   cc_gates_prop_days_closed = DSMflow::delta_cross_channel_closed$biop_itp_2018_2019["proportion", ],
   proportion_flow_bypass = DSMflow::proportion_flow_bypasses$biop_itp_2018_2019,
   gates_overtopped = DSMflow::gates_overtopped$biop_itp_2018_2019,
+  san_joaquin_flows = matrix(0, nrow = 12, ncol = 21, dimnames = list(month.abb, 1980:2000)),
 
 
   # DSMtemperature variables -----
@@ -233,13 +237,15 @@ r_to_r_baseline_params <- list(
   hatchery_release_proportion_bay = fallRunDSM::hatchery_release_proportion_bay,
   fecundity_lookup = fallRunDSM::fecundity_by_age,
   adult_harvest_rate = fallRunDSM::r2r_adult_harvest_rate,
-  restrict_harvest_to_hatchery = FALSE,
+  restrict_harvest_to_hatchery_ocean = FALSE,
+  restrict_harvest_to_hatchery_trib = FALSE,
   ocean_harvest_percentage = .5,
   tributary_harvest_percentage = harvest_percentage,
   no_cohort_harvest_years = c(),
   intelligent_crr_harvest = FALSE,
   intelligent_habitat_harvest = FALSE,
   terminal_hatchery_logic = FALSE,
+  preserve_tribal_harvest = FALSE,
 
   # stray model
   flows_oct_nov = DSMflow::hatchery_oct_nov_flows$biop_itp_2018_2019,

@@ -53,7 +53,7 @@ fill_regional <- function(juveniles, habitat, floodplain_habitat = NULL,
                           territory_size = fallRunDSM::params$territory_size,
                           up_to_size_class = 3){
 
-  all_sheds <- orig_tot <- colSums(juveniles)
+  all_sheds <- orig_tot <- colSums(juveniles, na.rm = TRUE)
 
   migrants <- flood_rear <- river_rear <- matrix(0, ncol = 4, nrow = 1)
 
@@ -131,7 +131,8 @@ fill_natal_dens_depend <- function(juveniles, inchannel_habitat, floodplain_habi
   list(inchannel = river_rear, floodplain = flood_rear, migrants = migrants)
 }
 
-# Alternative density dependent version of fill_regional with two additional parameters
+#' Fill Regional - Density Dependent Fill Hypothesis
+#' @description Alternative density dependent version of fill_regional with two additional parameters
 #' @param ..habitat_capacity the maximum number of rearing juveniles in channel habitat
 #' @param floodplain_capacity the maximum number of rearing juveniles in floodplain habitat
 #' @export

@@ -1,23 +1,20 @@
 Package: fallRunDSM
 Type: Package
-Title: Structured Decision Fall Run Model for CVPIA
-Version: 2.1
+Title: Structured Decision Fall Run Model for Reorienting to Recovery
+Version: 2.0
 Authors@R: c(
     person("James", "Petterson", email = "jt.peterson@oregonstate.edu", role = "aut"),
     person("Adam", "Duarte", email = "adam.duarte@oregonstate.edu", role = "aut"), 
     person("Sadie", "Gill", email = "sgill@flowwest.com", role = "aut"), 
-    person("Emanuel", "Rodriguez", email = "erodriguez@flowwest.com", role = "cre"))
-Description: SDM is a key effort by CVPIA agencies to continuously improve project 
-    recommendations and prioritization toward the anadromous fish doubling goal. 
-    Our intent is to improve collaboration under a science-based framework that is 
-    both transparent and efficient. This package contains life cycle models for the 
-    for the key species impacted by CVPIA.
+    person("Emanuel", "Rodriguez", email = "erodriguez@flowwest.com", role = "aut"),
+    person("Erin", "Cain", email = "ecain@flowwest.com", role = "cre"))
+Description: This package contains the R2R life cycle model. This model was adapted from the CVPIA-OSC and updated to account for Reorienting to Recovery values. This model is used to compare the affects of different scenarios on salmonid populations. 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
-URL: https://CVPIA-OSC.github.io/fallRunDSM/
-BugReports: https://github.com/CVPIA-OSC/fallRunDSM/issues
+RoxygenNote: 7.3.1
+URL: https://reorienting-to-recovery.github.io/fallRunDSM/
+BugReports: https://github.com/reorienting-to-recovery/fallRunDSM/issues
 Imports: 
     boot
 Suggests: 

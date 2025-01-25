@@ -8,9 +8,10 @@ articles:
   model_faq: model_faq.html
   scenario: scenario.html
   sensitivity-analysis: sensitivity-analysis.html
+  submodel_documentation_overview: submodel_documentation_overview.html
   temperature-model: temperature-model.html
-last_built: 2025-01-25T05:10Z
+last_built: 2025-01-25T05:38Z
 urls:
-  reference: https://CVPIA-OSC.github.io/fallRunDSM/reference
-  article: https://CVPIA-OSC.github.io/fallRunDSM/articles
+  reference: https://reorienting-to-recovery.github.io/fallRunDSM/reference
+  article: https://reorienting-to-recovery.github.io/fallRunDSM/articles
 

@@ -5,8 +5,16 @@
 \title{Juvenile San Joaquin Outmigration Survival}
 \source{
 IP-117068
+
+IP-117068
 }
 \usage{
+surv_juv_outmigration_san_joaquin(
+  ..surv_juv_outmigration_sj_int = fallRunDSM::params$..surv_juv_outmigration_sj_int,
+  .medium = fallRunDSM::params$.surv_juv_outmigration_san_joaquin_medium,
+  .large = fallRunDSM::params$.surv_juv_outmigration_san_joaquin_large
+)
+
 surv_juv_outmigration_san_joaquin(
   ..surv_juv_outmigration_sj_int = fallRunDSM::params$..surv_juv_outmigration_sj_int,
   .medium = fallRunDSM::params$.surv_juv_outmigration_san_joaquin_medium,
@@ -22,7 +30,11 @@ surv_juv_outmigration_san_joaquin(
 }
 \description{
 Calculates the San Joaquin River juvenile out migration survival
+
+Calculates the San Joaquin River juvenile out migration survival
 }
 \details{
+See \code{\link{params}} for details on parameter sources
+
 See \code{\link{params}} for details on parameter sources
 }

@@ -12,11 +12,13 @@ harvest_adults(
   terminal_hatchery_logic = c(T, F),
   ocean_harvest_percentage,
   tributary_harvest_percentage,
-  restrict_harvest_to_hatchery = c(F, T),
+  restrict_harvest_to_hatchery_ocean = c(F, T),
+  restrict_harvest_to_hatchery_trib = c(F, T),
   no_cohort_harvest_years = NULL,
   intelligent_habitat_harvest = c(F, T),
   intelligent_crr_harvest = c(F, T),
-  crr_scaling = 2
+  crr_scaling = 2,
+  preserve_tribal_harvest = c(F, T)
 )
 }
 \arguments{
@@ -28,11 +30,11 @@ harvest_adults(
 
 \item{tributary_harvest_percentage}{The percentage of harvest from tributaries, can vary by tributary.}
 
-\item{restrict_harvest_to_hatchery}{A logical vector indicating whether to restrict harvest to hatcheries for each tributary.}
-
 \item{no_cohort_harvest_years}{A vector of years where no cohort harvest is allowed.}
 
 \item{intelligent_crr_harvest}{A logical vector indicating whether to apply intelligent harvest based on Coho Retention Rate (CRR).}
+
+\item{restrict_harvest_to_hatchery}{A logical vector indicating whether to restrict harvest to hatcheries for each tributary.}
 }
 \value{
 A numeric value representing the total adult salmon harvest.

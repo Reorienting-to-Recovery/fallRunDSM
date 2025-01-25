@@ -19,6 +19,11 @@ adult_seeds[ , 1] <- adult_seed_values
 rownames(adult_seeds) <- DSMhabitat::watershed_species_present$watershed_name[-32]
 usethis::use_data(adult_seeds, overwrite = TRUE)
 
+# adult seeds using grandtab numbers
+
+usethis::use_data(adult_seeds_gt, overwrite = TRUE)
+
+
 proportion_hatchery <- c(0.37, 0.2, 0.9, 0.37968253968254, 0.2, 0.115, 0.2225, 0.3525,
                          0.2, 0.16, 0.37968253968254, 0.1525, 0.365, 0.37968253968254,
                          0.37968253968254, 0.37968253968254, 0.37968253968254, 0, 0.855,
@@ -116,12 +121,15 @@ bioenergetics_transitions <- read_rds("data-raw/misc/growTPM.rds")
 usethis::use_data(bioenergetics_transitions, overwrite = TRUE)
 
 
-# prey_density <- rep("med", 31) # NOTE this is to drive the new prey density dependent growth
-prey_density <- rep("med", 31) # NOTE this is to drive the new prey density dependent growth
+# prey density varies by year
+# this is to drive the new prey density-dependent growth
+prey_density <- matrix("med", nrow = 31, ncol = 20)
+rownames(prey_density) <- fallRunDSM::watershed_labels
 usethis::use_data(prey_density, overwrite = TRUE)
 
 # should be moved to a data package?
-prey_density_delta <- c("med", "med")
+prey_density_delta <- matrix("med", nrow = 2, ncol = 20)
+rownames(prey_density_delta) <- c("North Delta", "South Delta")
 usethis::use_data(prey_density_delta, overwrite = TRUE)
 
 # watershed attributes
@@ -219,4 +227,8 @@ natural_straying_destinations <- matrix(1/31, nrow = 31, ncol = 4)
 
 rmultinom(n = 1, size = matrix(1:4, ncol = 2), prob = matrix(1:4, ncol = 2))
 
+# Cache hatchery releases at Chipps
+hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4,
+                                     dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
+usethis::use_data(hatchery_releases_at_chipps,overwrite = TRUE)
 

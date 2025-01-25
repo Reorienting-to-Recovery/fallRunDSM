@@ -1,15 +1,15 @@
 title: fallRunDSM
-url: https://CVPIA-OSC.github.io/fallRunDSM/
+url: https://reorienting-to-recovery.github.io/fallRunDSM/
 template:
   params:
-    bootswatch: yeti
+    bootswatch: flatly
 
 home:
   links:
-  - text: Fish and Wildlife Service's CVPIA website
-    href: https://www.fws.gov/cno/fisheries/CAMP/CVPIA/
-  - text: Bureau of Reclamation's CVPIA website
-    href: https://www.usbr.gov/mp/cvpia/
+  - text: Reorienting to Recovery Project Website
+    href: https://csamp.baydeltalive.com/recovery/reorienting-to-recovery
+  - text: Reorienting to Recovery Modeling Overview Website
+    href: https://reorienting-to-recovery.gitbook.io/documentation-site/zCZ2Z2yqFYMUQrtZdTlg/
 
 reference:
 - title: Life Cycle Model and Model Parameters
@@ -30,6 +30,7 @@ reference:
   - surv_juv_outmigration_delta
   - surv_juv_outmigration_sac
   - surv_juv_outmigration_san_joaquin
+  - surv_juv_outmigration_san_joaquin_flow_based
   - surv_juv_rear
   - spawn_success
   - ocean_entry_success
@@ -40,10 +41,18 @@ reference:
   contents:
   - adult_stray
   - apply_straying
+  - stray_returning_adults
   - hatchery_stray_betareg
   - straying_destinations
+  - compute_adult_stray_rates
+  - harvest_adults
+  - juvenile_month_dynamic
   - pulse_movement
+  - snow_globe_movement
+  - temperature_movement
+  - time_movement
   - fill
+  - fill_regional_dens_depend
   - route
   - route_and_rear_deltas
   - route_bypass
@@ -59,6 +68,9 @@ reference:
   - migrate
   - hatchery_release_proportion_bay
   - ocean_transition_month
+  - bioenergetics_transitions
+  - get_growth_rates
+
 
 - title: Datasets
   desc: Data used by the lifecycle model
@@ -74,6 +86,16 @@ reference:
   - natural_adult_removal_rate
   - proportion_hatchery
   - stray_rate
+  - hatchery_release_proportion_bay
+  - hatchery_stray_betareg
+  - hatchery_to_bay_distance
+  - prey_density
+  - prey_density_delta
+  - straying_destinations
+  - fall_hatchery_release
+  - hatchery_releases_at_chipps
+  - fecundity_by_age
+  - r2r_adult_harvest_rate
 
 - title: Wrapper and Helper Functions
   desc: Convenience functions that call multiple sub-models or are used within submodels.
@@ -108,10 +130,10 @@ navbar:
         href: 'articles/temperature-model.html'
       - text: 'Model FAQ'
         href: 'articles/model_faq.html'
-  - text: 'News'
-    href: news/index.html
+      - text: 'Submodel Documentation'
+        href: 'articles/submodel_documentation_overview.html'
 
 repo:
  url:
-  home: https://github.com/CVPIA-OSC/fallRunDSM
-  issue: https://github.com/CVPIA-OSC/fallRunDSM/issues/
+  home: https://github.com/reorienting-to-recovery/fallRunDSM
+  issue: https://github.com/reorienting-to-recovery/fallRunDSM/issues/

@@ -8,14 +8,14 @@
 #' Compiled by: James T. Peterson \email{jt.peterson@@oregonstate.edu}
 "adult_harvest_rate"
 
-#' Natural Spawners Removal Rate
-#' @title Natural Spawners Removal Rate
+#' Spawners Removal Rate
+#' @title Spawners Removal Rate
 #' @description Spawners removed for hatcheries
 #' @format 1 dimensional array [31 watersheds]
 #' @source
 #' Various \href{https://s3-us-west-2.amazonaws.com/cvpia-reference-docs/AWP+Attachment+1.pdf}{CVPIA Science Integration Team: FY18 Decision Support Model activities and FY17 priorities Memorandum}
 #'
-#' Natural adult removal rate was derived using coded wire tag analysis. Details and methodology are available \href{https://cvpia-osc.github.io/fallRunDSM/articles/hatchery-analysis.html}{here}.
+#' Spawner removal rate was derived using coded wire tag analysis. Details and methodology are available \href{https://cvpia-osc.github.io/fallRunDSM/articles/hatchery-analysis.html}{here}.
 #'
 #' Compiled by: James T. Peterson \email{jt.peterson@@oregonstate.edu}
 "natural_adult_removal_rate"
@@ -34,7 +34,7 @@
 #' Adult Seeds
 #' @title Adult Seeds
 #' @description Adult fish for the initial 5 years of the simulations.
-#' @format A matrix with dimension 31 x 30 (watershed x year)
+#'
 #' @source Derived from average escapement estimates from 2013 to 2017 \href{https://dsm-docs.s3.us-west-2.amazonaws.com/Azat+2019.pdf}{Azat 2019}.
 "adult_seeds"
 
@@ -125,8 +125,9 @@ NULL
 #'   \item \code{sutter_habitat}: More details at \code{\link[DSMhabitat]{sutter_habitat}}
 #'   \item \code{yolo_habitat}: More details at \code{\link[DSMhabitat]{yolo_habitat}}
 #'   \item \code{delta_habitat}: More details at \code{\link[DSMhabitat]{delta_habitat}}
-#'   \item \code{spawn_decay_rate}: More details at \code{\link[DSMscenario]{spawn_decay_rate}}
-#'   \item \code{rear_decay_rate}: More details at \code{\link[DSMscenario]{rear_decay_rate}}
+#'   \item \code{spawn_decay_rate}: More details at \code{\link[R2Rscenario]{spawn_decay_rate}}
+#'   \item \code{spawn_decay_multiplier}: More details at \code{\link[R2Rscenario]{spawn_decay_multiplier}}
+#'   \item \code{rear_decay_rate}: More details at \code{\link[R2Rscenario]{rear_decay_rate}}
 #' }
 #' @section Spawning Adults:
 #' \itemize{
@@ -134,41 +135,53 @@ NULL
 #'   \item \code{south_delta_routed_watersheds}: More details at \code{\link[DSMhabitat]{south_delta_routed_watersheds}}
 #'   \item \code{cc_gates_days_closed}: More details at \code{\link[DSMflow]{delta_cross_channel_closed}}
 #'   \item \code{cross_channel_stray_rate}: More details at \code{\link{cross_channel_stray_rate}}
-#'   \item \code{stray_rate}: More details at \code{\link{stray_rate}}
 #'   \item \code{gates_overtopped}: More details at \code{\link[DSMflow]{gates_overtopped}}
 #'   \item \code{tisdale_bypass_watershed}: More details at \code{\link[DSMhabitat]{tisdale_bypass_watershed}}
 #'   \item \code{yolo_bypass_watershed}: More details at \code{\link[DSMhabitat]{yolo_bypass_watershed}}
 #'   \item \code{migratory_temperature_proportion_over_20}: More details at \code{\link[DSMtemperature]{migratory_temperature_proportion_over_20}}
+#'   \item \code{flows_oct_nov}: More details at \code{\link[DSMflow]{flows_oct_nov}}
+#'   \item \code{flows_apr_may}: More details at \code{\link[DSMflow]{flows_apr_may}}
+#'   \item \code{monthly_mean_pdo}: More details at \code{\link[fallRunDSM]{monthly_mean_pdo}}
 #'   \item \code{..surv_adult_enroute_int}:  Intercept, source: calibration
-#'   \item \code{.adult_stray_intercept}: Empirical model fit using 2008–2011 tagging data provided by East Bay Municipal Utility District
-#'   \item \code{.adult_stray_wild}: Coefficient for \code{wild} variable, source: Estimated with coded wire tag data 2010–2013 \href{https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=162355&usg= AOvVaw0VgMOwD7knFfSxRZy6k8RG}{(Kormos et al. 2012, Palmer-Zwahlen & Kormos 2013-2015, Palmer-Zwahlen et al. 2018)}
-#'   \item \code{.adult_stray_natal_flow}: Coefficient for \code{natal_flow} variable, source: Empirical model fit using 2008–2011 tagging data provided by East Bay Municipal Utility District
-#'   \item \code{.adult_stray_cross_channel_gates_closed}: Coefficient for \code{cross_channel_gates_closed} variable, source: Empirical model fit using  2008–2011 tagging data provided by East Bay Municipal Utility District.
-#'   \item \code{.adult_stray_prop_bay_trans}: Coefficient for \code{prop_bay_trans} variable, source: Estimated with coded wire tag data 2010–2013 \href{https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=162355&usg= AOvVaw0VgMOwD7knFfSxRZy6k8RG}{(Kormos et al. 2012, Palmer-Zwahlen & Kormos 2013-2015, Palmer-Zwahlen et al. 2018)}
-#'   \item \code{.adult_stray_prop_delta_trans}: Coefficient for \code{prop_delta_trans} variable, source: Estimated with coded wire tag data 2010–2013 \href{https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=162355&usg= AOvVaw0VgMOwD7knFfSxRZy6k8RG}{(Kormos et al. 2012, Palmer-Zwahlen & Kormos 2013-2015, Palmer-Zwahlen et al. 2018)}
 #'   \item \code{.adult_en_route_migratory_temp}: Coefficient for \code{migratory_temp} variable, source: \href{https://dsm-docs.s3.us-west-2.amazonaws.com/schrek_cb_1994.pdf}{Schreck et al. (1994)}
 #'   \item \code{.adult_en_route_bypass_overtopped}: Coefficient for \code{bypass_overtopped} variable, source: Expert opinion Ted Sommer, California Department of Water Resources (tributaries above bypasses only)
 #'   \item \code{.adult_en_route_adult_harvest_rate}:  Adult harvest rate, source:  \href{https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=162355&usg= AOvVaw0VgMOwD7knFfSxRZy6k8RG}{(Palmer-Zwahlen & Kormos 2013-2015, Palmer-Zwahlen et al. 2018)}
 #'   \item \code{degree_days}: More details at \code{\link[DSMtemperature]{degree_days}}
-#'   \item \code{month_return_proportions}: More details at \code{\link[fallRunDSM]{month_return_proportions}}
+#'   \item \code{month_return_proportions}: More details at \code{\link{month_return_proportions}}
 #'   \item \code{..surv_adult_prespawn_int}:  Intercept, source: Calibration Estimate
 #'   \item \code{.adult_prespawn_deg_day}: Coefficient for \code{deg_day} variable, source: \href{https://onlinelibrary.wiley.com/doi/epdf/10.1002/rra.3348}{Colvin et al. (2018)}
 #'   \item \code{prob_nest_scoured}: More details at \code{\link[DSMhabitat]{prob_nest_scoured}}
 #'   \item \code{spawn_success_sex_ratio}: Variable describing the female to male spawning ratio, default 0.5, source: expert opinion from SIT members.
 #'   \item \code{spawn_success_redd_size}: Variable describing the size of redds including defensible space, default value 9.29 square meters, source: expert opinion from SIT members.
 #'   \item \code{spawn_success_fecundity}: Variable describing the number of eggs per female, default value 5522, source: \href{https://www.ucpress.edu/book/9780520227545/inland-fishes-of-california}{Moyle, P. B. 2002. Inland Fishes of California. University of California Press, Berkeley CA}
-#'   \item \code{hatchery_allocation}: More details at \code{\link{hatchery_allocation}}
+#'   \item \code{fecundity_lookup}: More details at \code{\link{fecundity_by_age}}
+#'   \item \code{hatchery_release}: More details at \code{\link{fall_hatchery_release}}
 #'   \item \code{natural_adult_removal_rate}: More details at \code{\link{natural_adult_removal_rate}}
-#'
+#'   \item \code{adult_harvest_rate}: More details at \code{\link{r2r_adult_harvest_rate}}
+#'   \item \code{restrict_harvest_to_hatchery_ocean}: Boolean value describing if harvest should be restricted to hatchery fish in the ocean. Defaults to FALSE
+#'   \item \code{restrict_harvest_to_hatchery_trib}: Boolean value describing if harvest should be restricted to hatchery fish in tributaries. Defaults to FALSE
+#'   \item \code{ocean_harvest_percentage}: Numeric value describing the proportion of ocean fish that are harvested. Defaults to .5 based on \href{https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf}{Table II-1}
+#'   \item \code{tributary_harvest_percentage}: Numeric value describing the proportion of in-river fish that are harvested. Quantities vary by tributary as described by \href{https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf}{Table II-1}
+#'   \item \code{no_cohort_harvest_years}: Vector listing cohort of fish with restricted harvest.
+#'   \item \code{intelligent_crr_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on cohort replacement rate. Defaults to FALSE
+#'   \item \code{intelligent_habitat_harvest}: Boolean value describing if harvest should be restricted to limit quantities based on habitat. Defaults to FALSE
+#'   \item \code{preserve_tribal_harvest}: Boolean value describing if tribal in river harvest should be preserved. Defaults to FALSE
+
 #' }
 #' @section Egg to Fry Survival:
 #' \itemize{
 #'   \item \code{proportion_hatchery}: More details at \code{\link[fallRunDSM]{proportion_hatchery}}
 #'   \item \code{prob_nest_scoured}: More details at \code{\link[DSMhabitat]{prob_nest_scoured}}
 #'   \item \code{mean_egg_temp_effect}: More details at \code{\link[DSMtemperature]{egg_temperature_effect}}
-#'   \item \code{.surv_egg_to_fry_proportion_natural}: Coefficient for \code{proportion_natural} variable, source: \href{https://cdnsciencepub.com/doi/abs/10.1139/F10-168}{Chilcote et al. (2011)}
-#'   \item \code{.surv_egg_to_fry_scour}: Coefficient for \code{scour} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/montogemery_1996.pdf}{Montgomery et al. (1996)}
+#'   \item \code{.surv_egg_to_fry_proportion_natural}: Coefficient for \code{proportion_natural} variable, source: \href{https://cdnsciencepub.com/doi/abs/10.1139/F10-168}{Chilcote et al. 2011}
+#'   \item \code{.surv_egg_to_fry_scour}: Coefficient for \code{scour} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/montogemery_1996.pdf}{Montgomery et al. 1996}
 #'   \item \code{..surv_egg_to_fry_int}:  Intercept, source: Calibration
+#' }
+#' @section Hatchery Releases:
+#' \itemize{
+#'   \item \code{hatchery_release}: More details at \code{\link[fallRunDSM]{fall_hatchery_release}}
+#'   \item \code{hatchery_release_proportion_bay}: More details at \code{\link{hatchery_release_proportion_bay}}
+#'   \item \code{terminal_hatchery_logic}: Boolean value describing if terminal hatchery logic in place. Defaults to FALSE
 #' }
 #' @section Tributary Rearing Survival:
 #' \itemize{
@@ -183,15 +196,15 @@ NULL
 #'   \item \code{..surv_juv_rear_int}: Intercept, source: calibration (varies by tributary)
 #'   \item \code{.surv_juv_rear_contact_points}: Coefficient for \code{contact_points} variable, source: inherited from previous calibration
 #'   \item \code{..surv_juv_rear_contact_points}: Coefficient for \code{contact_points} variable, source: calibration
-#'   \item \code{.surv_juv_rear_prop_diversions}: Coefficient for \code{prop_diversions} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/Hierarchical_Modeling_of_Juvenile_Chinook_Salmon_S+(1).pdf}{Newman and Brandes (2010)}
+#'   \item \code{.surv_juv_rear_prop_diversions}: Coefficient for \code{prop_diversions} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/Hierarchical_Modeling_of_Juvenile_Chinook_Salmon_S+(1).pdf}{Newman and Brandes 2010}
 #'   \item \code{..surv_juv_rear_prop_diversions}: Coefficient for \code{prop_diversions} variable, source: calibration
 #'   \item \code{.surv_juv_rear_total_diversions}: Coefficient for \code{total_diversions} variable, source: inherited from previous calibration
 #'   \item \code{..surv_juv_rear_total_diversions}: Coefficient for \code{total_diversions} variable, source: calibration
-#'   \item \code{.surv_juv_rear_avg_temp_thresh}:  Coefficient for \code{avg_temp_thresh} variable, source: \href{https://www.tandfonline.com/doi/full/10.1577/M07-130.1?scroll=top&needAccess=true}{Runge et al (2008)}
-#'   \item \code{.surv_juv_rear_high_predation}: Coefficient for \code{high_predation} variable, source: \href{https://pubag.nal.usda.gov/catalog/512123}{Cavallo et al. (2012)}
-#'   \item \code{.surv_juv_rear_stranded}: Coefficient for \code{stranded} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/DWR-1140+USFWS+2006.pdf}{USFWS (2006) and CDWR (2006)}
-#'   \item \code{.surv_juv_rear_medium}: Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
-#'   \item \code{.surv_juv_rear_large}: Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
+#'   \item \code{.surv_juv_rear_avg_temp_thresh}:  Coefficient for \code{avg_temp_thresh} variable, source: \href{https://www.tandfonline.com/doi/full/10.1577/M07-130.1?scroll=top&needAccess=true}{Runge et al 2008}
+#'   \item \code{.surv_juv_rear_high_predation}: Coefficient for \code{high_predation} variable, source: \href{https://pubag.nal.usda.gov/catalog/512123}{Cavallo et al. 2012}
+#'   \item \code{.surv_juv_rear_stranded}: Coefficient for \code{stranded} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/DWR-1140+USFWS+2006.pdf}{USFWS 2006 and CDWR 2006}
+#'   \item \code{.surv_juv_rear_medium}: Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
+#'   \item \code{.surv_juv_rear_large}: Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
 #'   \item \code{.surv_juv_rear_floodplain}: Additional intercept for floodplain rearing benefit, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/SOMMER_T-SDWA+180+Floodplain+rearing+of+juvenile+chinook+salmon+evidence+of+enhanced+growth+and+survival+.pdf}{Sommer et al. (2001)}
 #'   \item \code{prey_density}: More details at \code{\link{prey_density}}
 #'   \item \code{prey_density_delta}: More details at \code{\link{prey_density_delta}}
@@ -201,11 +214,11 @@ NULL
 #'   \item \code{avg_temp}: See Tributary Rearing Survival \code{avg_temp} above
 #'   \item \code{prop_high_predation}: See Tributary Rearing Survival \code{prop_high_predation} above
 #'   \item \code{..surv_juv_bypass_int}: Intercept, source: calibration
-#'   \item \code{.surv_juv_bypass_avg_temp_thresh}: Coefficient for \code{avg_temp_thresh} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf}{Marine and Chech (2004)}
-#'   \item \code{.surv_juv_bypass_high_predation}: Coefficient for \code{high_predation} variable, source: \href{https://pubag.nal.usda.gov/catalog/512123}{Cavallo et al. (2012)}
-#'   \item \code{.surv_juv_bypass_medium}: Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
-#'   \item \code{.surv_juv_bypass_large}: Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
-#'   \item \code{.surv_juv_bypass_floodplain}: Additional intercept for floodplain rearing benefit, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/SOMMER_T-SDWA+180+Floodplain+rearing+of+juvenile+chinook+salmon+evidence+of+enhanced+growth+and+survival+.pdf}{Sommer et al. (2001)}
+#'   \item \code{.surv_juv_bypass_avg_temp_thresh}: Coefficient for \code{avg_temp_thresh} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf}{Marine and Chech 2004}
+#'   \item \code{.surv_juv_bypass_high_predation}: Coefficient for \code{high_predation} variable, source: \href{https://pubag.nal.usda.gov/catalog/512123}{Cavallo et al. 2012}
+#'   \item \code{.surv_juv_bypass_medium}: Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
+#'   \item \code{.surv_juv_bypass_large}: Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
+#'   \item \code{.surv_juv_bypass_floodplain}: Additional intercept for floodplain rearing benefit, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/SOMMER_T-SDWA+180+Floodplain+rearing+of+juvenile+chinook+salmon+evidence+of+enhanced+growth+and+survival+.pdf}{Sommer et al. 2001}
 #' }
 #' @section Delta Rearing Survival:
 #' \itemize{
@@ -219,11 +232,11 @@ NULL
 #'   \item \code{..surv_juv_delta_contact_points}: Coefficient for \code{contact_points} variable, source: calibration
 #'   \item \code{.surv_juv_delta_total_diverted}: Coefficient for \code{total_diversions} variable, source: inherited from previous calibration
 #'   \item \code{..surv_juv_delta_total_diverted}: Coefficient for \code{total_diversions} variable, source: calibration
-#'   \item \code{.surv_juv_delta_avg_temp_thresh}: Coefficient for \code{avg_temp_thresh} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf}{Marine and Chech (2004)}
-#'   \item \code{.surv_juv_delta_high_predation}: Coefficient for \code{high_predation} variable, source: \href{https://pubag.nal.usda.gov/catalog/512123}{Cavallo et al. (2012)}
-#'   \item \code{.surv_juv_delta_prop_diverted}: Coefficient for \code{prop_diversions} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/Hierarchical_Modeling_of_Juvenile_Chinook_Salmon_S+(1).pdf}{Newman and Brandes (2010)}
-#'   \item \code{.surv_juv_delta_medium}: Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
-#'   \item \code{.surv_juv_delta_large}: Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
+#'   \item \code{.surv_juv_delta_avg_temp_thresh}: Coefficient for \code{avg_temp_thresh} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/marine_cech_water_temp_effects.pdf}{Marine and Chech 2004}
+#'   \item \code{.surv_juv_delta_high_predation}: Coefficient for \code{high_predation} variable, source: \href{https://pubag.nal.usda.gov/catalog/512123}{Cavallo et al. 2012}
+#'   \item \code{.surv_juv_delta_prop_diverted}: Coefficient for \code{prop_diversions} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/Hierarchical_Modeling_of_Juvenile_Chinook_Salmon_S+(1).pdf}{Newman and Brandes 2010}
+#'   \item \code{.surv_juv_delta_medium}: Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
+#'   \item \code{.surv_juv_delta_large}: Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
 #' }
 #' @section Tributary Migratory Survival:
 #' \itemize{
@@ -237,8 +250,8 @@ NULL
 #'   \item \code{CVP_exports}: More details at \code{\link[DSMflow]{cvp_exports}}
 #'   \item \code{SWP_exports}: More details at \code{\link[DSMflow]{swp_exports}}
 #'   \item \code{..surv_juv_outmigration_sj_int} Intercept, source: calibration
-#'   \item \code{.surv_juv_outmigration_san_joquin_medium} Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
-#'   \item \code{.surv_juv_outmigration_san_joaquin_large} Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
+#'   \item \code{.surv_juv_outmigration_san_joquin_medium} Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
+#'   \item \code{.surv_juv_outmigration_san_joaquin_large} Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
 #'   \item \code{min_survival_rate} Estimated survival rate if temperature threshold is exceeded, source: expert opinion
 #'   \item \code{avg_temp}: More details at \code{\link[DSMtemperature]{stream_temperature}}
 #'   }
@@ -253,8 +266,8 @@ NULL
 #'   \item \code{.surv_juv_outmigration_sac_delta_delta_flow} Coefficient for \code{delta_flow} variable, source: this parameter and function have been deprecated and its documentation is for archival purposes.
 #'   \item \code{.surv_juv_outmigration_sac_delta_avg_temp} Coefficient for \code{avg_temp} variable, source: this parameter and function have been deprecated and its documentation is for archival purposes.
 #'   \item \code{.surv_juv_outmigration_sac_delta_perc_diversions} Coefficient for \code{perc_diversions} variable, source: this parameter and function have been deprecated and its documentation is for archival purposes.
-#'   \item \code{.surv_juv_outmigration_sac_delta_medium} Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
-#'   \item \code{.surv_juv_outmigration_sac_delta_large} Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. (2004)}
+#'   \item \code{.surv_juv_outmigration_sac_delta_medium} Size related intercept for medium sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
+#'   \item \code{.surv_juv_outmigration_sac_delta_large} Size related intercept for large sized fish, source: \href{https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1577/M02-161.1}{Connor et al. 2004}
 #' }
 #' @section Delta Routing and Rearing:
 #' \itemize{
@@ -281,13 +294,12 @@ NULL
 #'   \item \code{growth_rates}: More details at: \code{\link{growth_rates_inchannel}}
 #'   \item \code{growth_rates_floodplain}: More details at: \code{\link{growth_rates_floodplain}}
 #'   \item \code{weeks_flooded}: More details at: \code{\link[DSMhabitat]{weeks_flooded}}
-#'
 #' }
 #' @section Ocean Entry Success:
 #' \itemize{
-#'   \item \code{.ocean_entry_success_length}: Size related intercept representing the fork lengths for each size classes, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/Satterthwaite_et_al_2014.pdf}{Satterthwaite et al. (2014)}
+#'   \item \code{.ocean_entry_success_length}: Size related intercept representing the fork lengths for each size classes, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/Satterthwaite_et_al_2014.pdf}{Satterthwaite et al.2014}
 #'   \item \code{..ocean_entry_success_int}: Intercept, source: Calibration (Varies by tributary)
-#'   \item \code{.ocean_entry_success_months}: Coefficient for \code{month} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/Satterthwaite_et_al_2014.pdf}{Satterthwaite et al. (2014)}
+#'   \item \code{.ocean_entry_success_months}: Coefficient for \code{month} variable, source: \href{https://dsm-docs.s3-us-west-2.amazonaws.com/Satterthwaite_et_al_2014.pdf}{Satterthwaite et al.2014}
 #' }
 #' @section Generating Model Outputs:
 #' \itemize{
@@ -310,25 +322,57 @@ NULL
 "r_to_r_baseline_params"
 
 #' @title Hatchery Stray Model
-#' @description
-#' A serialized version of the beta-regression model for hatchery origin fish straying
+#' @description A serialized version of the beta-regression model for hatchery origin fish straying
+#' @source Model from
+#'  \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019}
 "hatchery_stray_betareg"
 
-
 #' @title Hatchery to Chipps Island (rkm)
-#' @description
-#' Lookup for distances from hatchery to the Chipps Island, measured in river kilometers
+#' @description Lookup table for distances from hatchery to the Chipps Island, measured in river kilometers
+#' @format Named vector of length five corresponding to hatchery locations [5 hatchery names]
+#' @source Distance from hatchery to Chipps Island pulled from table 1 of
+#'  \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019}
 "hatchery_to_bay_distance"
 
 #' @title Bay Proportion Hatchery Releases
-#' @description
-#' The proporiton of hatchery releases occuring at the Bay. Note that the complement
-#' `1 - hatchery_release_proportion_bay` is the proportion of releases occuring in-river.
-#'@md
+#' @description The proportion of hatchery releases occurring at the Bay. Note that the complement
+#' 1 - hatchery_release_proportion_bay is the proportion of releases occurring in-river.
 "hatchery_release_proportion_bay"
 
 
-#' @title Straying Destnations
-#' @description
-#' Given a hatchery this matrix returns as rows the proportion of fish to stray at perticular watersheds.
+#' @title Straying Destinations
+#' @description Given a hatchery this matrix returns as rows the proportion of fish to stray at particular watersheds.
+#' @format A matrix with dimension 31 x 6 (watershed x hatchery)
+#' @source Top 3 straying destination pulled from table 1 of
+#' \href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019.}
+#' Additional proportion of stays equally allocated to remaining tributaries based on expert opinion
 "straying_destinations"
+
+
+#' @title Fall Hatchery Release
+#' @description Hatchery release by size class and hatchery
+#' @format A list of 20 elements (representing simulation year), each containing a matrix with dimensions 31 x 4 (watershed x size class)
+#' @source Hatchery return data comes from the production targets defined in the
+#' \href{https://swfsc-publications.fisheries.noaa.gov/publications/CR/2012/2012California.pdf}{California HSRG (Pages 65 - 95)}
+"fall_hatchery_release"
+
+#' @title Hatchery Release at Chipps
+#' @description Hatchery release at Chipps by size class and hatchery
+#' @format A matrix with dimension 31 x 4 (watershed x size class)
+#' @source Hatchery return data comes from the production targets defined in the
+#' \href{https://swfsc-publications.fisheries.noaa.gov/publications/CR/2012/2012California.pdf}{California HSRG (Pages 65 - 95)}
+"hatchery_releases_at_chipps"
+
+#' @title Fecundity Lookup
+#' @description a lookup table describing the fecundity of fish by age and origin
+#' @format a data frame with 7 rows and 3 columns (age, origin, fecundity)
+#' @source \href{https://www.x-mol.net/paper/article/1664889742509719552}{Roni and Quinn 1995} logic was used to map age to size.
+#' Then we scaled fecundity by size using logic from \href{https://reorienting-to-recovery.s3.us-west-1.amazonaws.com/RoniandQuinn1995.pdf}{Malick et all 2023}
+"fecundity_by_age"
+
+#' @title Adult Harvest Rate
+#' @description Adult harvest rate percentage by watershed
+#' @format Named vector of length 31 corresponding to watersheds [31 watershed names]
+#' @source average exploitation rate over the past ten years from the \href{https://www.pcouncil.org/documents/2022/03/2022-preseason-report-i.pdf/}{Ocean Salmon fishery preseason report 2022 table II-1}
+"r2r_adult_harvest_rate"
+

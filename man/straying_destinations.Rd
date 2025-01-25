@@ -3,14 +3,19 @@
 \docType{data}
 \name{straying_destinations}
 \alias{straying_destinations}
-\title{Straying Destnations}
+\title{Straying Destinations}
 \format{
-An object of class \code{matrix} (inherits from \code{array}) with 31 rows and 6 columns.
+A matrix with dimension 31 x 6 (watershed x hatchery)
+}
+\source{
+Top 3 straying destination pulled from table 1 of
+\href{https://afspubs.onlinelibrary.wiley.com/doi/10.1002/fsh.10267}{Sturrock et al 2019.}
+Additional proportion of stays equally allocated to remaining tributaries based on expert opinion
 }
 \usage{
 straying_destinations
 }
 \description{
-Given a hatchery this matrix returns as rows the proportion of fish to stray at perticular watersheds.
+Given a hatchery this matrix returns as rows the proportion of fish to stray at particular watersheds.
 }
 \keyword{datasets}

@@ -136,7 +136,7 @@ datatable(hatchery_per_trib,
 ```
 
 ### Natural Adult Removal Rate
-`natural_adult_removal_rate` is used in the fallRunDSM by the `get_spawning_adults()` function.  The number of `natural_adults_by_month` is determined by the binomial distribution with the probability equal to the `1 - natural_adult_removal_rate`. 
+`natural_adult_removal_rate` is used in the fallRunDSM by the `apply_enroute_survival()` function.  The number of `natural_adults_by_month` is determined by the binomial distribution with the probability equal to the `1 - natural_adult_removal_rate`. 
 
 We calculated the natural adult removal rate for each tributary by estimating the proportion of naturally produced fish used in a hatchery (i.e., they did not spawn). 
 

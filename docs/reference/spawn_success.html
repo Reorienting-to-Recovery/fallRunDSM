@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -75,17 +75,21 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">spawn_success</span><span class="op">(</span>
-  <span class="va">escapement</span>,
-  <span class="va">adult_prespawn_survival</span>,
-  <span class="va">egg_to_fry_survival</span>,
-  <span class="va">prob_scour</span>,
-  <span class="va">spawn_habitat</span>,
-  sex_ratio <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">spawn_success_sex_ratio</span>,
-  redd_size <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">spawn_success_redd_size</span>,
-  fecundity <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">spawn_success_fecundity</span>,
-  <span class="va">stochastic</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">spawn_success</span><span class="op">(</span></span>
+<span>  <span class="va">escapement</span>,</span>
+<span>  <span class="va">proportion_natural</span>,</span>
+<span>  <span class="va">hatchery_age_distribution</span>,</span>
+<span>  <span class="va">natural_age_distribution</span>,</span>
+<span>  fecundity_lookup <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">fecundity_lookup</span>,</span>
+<span>  <span class="va">adult_prespawn_survival</span>,</span>
+<span>  <span class="va">egg_to_fry_survival</span>,</span>
+<span>  <span class="va">prob_scour</span>,</span>
+<span>  <span class="va">spawn_habitat</span>,</span>
+<span>  sex_ratio <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">spawn_success_sex_ratio</span>,</span>
+<span>  redd_size <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">spawn_success_redd_size</span>,</span>
+<span>  fecundity <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">spawn_success_fecundity</span>,</span>
+<span>  <span class="va">stochastic</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="source">
@@ -96,22 +100,39 @@
     <h2>Arguments</h2>
     <dl><dt>escapement</dt>
 <dd><p>The number of returning adults</p></dd>
+
+
 <dt>adult_prespawn_survival</dt>
 <dd><p>The adult prespawn survival rate</p></dd>
+
+
 <dt>egg_to_fry_survival</dt>
 <dd><p>The egg to fry survival rate</p></dd>
+
+
 <dt>prob_scour</dt>
 <dd><p>The probability of nest scouring</p></dd>
+
+
 <dt>spawn_habitat</dt>
 <dd><p>The available spawning habitat in square meters</p></dd>
+
+
 <dt>sex_ratio</dt>
 <dd><p>The female to male spawning ratio</p></dd>
+
+
 <dt>redd_size</dt>
 <dd><p>The size of redds including defensible space</p></dd>
+
+
 <dt>fecundity</dt>
 <dd><p>The number of eggs per female</p></dd>
+
+
 <dt>stochastic</dt>
 <dd><p><code>TRUE</code> <code>FALSE</code> value indicating if model is being run stochastically</p></dd>
+
 </dl></div>
 
   </div>
@@ -126,7 +147,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

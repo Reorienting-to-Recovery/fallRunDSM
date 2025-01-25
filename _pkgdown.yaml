@@ -22,6 +22,7 @@ reference:
   desc: Functions that calculate survival
   contents:
   - surv_adult_enroute
+  - apply_enroute_survival
   - surv_adult_prespawn
   - surv_egg_to_fry
   - surv_juv_bypass
@@ -32,11 +33,16 @@ reference:
   - surv_juv_rear
   - spawn_success
   - ocean_entry_success
+  - harvest_adults
 
 - title: Growth and Movement Sub-models
   desc: Functions that calculate growth and movement
   contents:
   - adult_stray
+  - apply_straying
+  - hatchery_stray_betareg
+  - stray_returning_adults
+  - straying_destinations
   - pulse_movement
   - fill
   - route
@@ -44,10 +50,15 @@ reference:
   - route_bypass
   - route_regional
   - route_to_south_delta
+  - juvenile_month_dynamic
+  - snow_globe_movement
+  - temperature_movement
+  - time_movement
   - growth
   - growth_floodplain
   - rear
   - migrate
+  - hatchery_release_proportion_bay
   - ocean_transition_month
 
 - title: Datasets
@@ -71,10 +82,14 @@ reference:
   - get_habitat
   - get_rearing_survival
   - get_migratory_survival
-  - get_spawning_adults
+  - bioenergetics_transitions
+  - compute_adult_stray_rates
+  - hatchery_to_bay_distance
+  - get_growth_rates
   - territory_by_size
   - gamma_MOM
   - days_in_month
+  - pretty_num
 
 navbar:
   structure:

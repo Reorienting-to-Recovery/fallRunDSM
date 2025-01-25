@@ -369,7 +369,8 @@ hatchery adults initiated into the model based on (CWT data?). Hatchery
 adults are split between tribs based on values from
 <code>fallRunDSM::hatchery_allocation</code></li>
 <li>Percent natural is output from model in the
-<code>get_spawning_adults()</code> submodel</li>
+<code>get_spawning_adults()</code> submodel (now split into multiple
+functions)</li>
 <li>Both natural adults and hatchery adults spawn, all surviving
 juveniles outmigrate and are carried over to the next year but origin is
 not tracked.</li>
@@ -383,9 +384,8 @@ dynamic logic into the model.</p>
 <li>The first two years there are 307650 hatchery adults initiated into
 the model based on CWT data. In subsequent years hatchery adults are
 carried over from prior generations and not initated annually.</li>
-<li>Percent natural is output from model in the
-<code>get_spawning_adults()</code> submodel<br />
-</li>
+<li>Percent natural is output from model after the adult enroute and
+harvest logic is applied</li>
 <li>PHOS initiated as <code>1 - percent_natural</code> and adjusted to
 describe hatchery fish renaturing every 2 generations. Renaturing
 adjustment assumes that if PHOS is decreasing in two prior years than

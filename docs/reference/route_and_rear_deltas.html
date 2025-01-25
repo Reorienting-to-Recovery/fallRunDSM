@@ -19,7 +19,7 @@ during a simulated month. Then the remaining juveniles in the delta rear
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -79,25 +79,26 @@ during a simulated month. Then the remaining juveniles in the delta rear
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">route_and_rear_deltas</span><span class="op">(</span>
-  <span class="va">year</span>,
-  <span class="va">month</span>,
-  <span class="va">migrants</span>,
-  <span class="va">north_delta_fish</span>,
-  <span class="va">south_delta_fish</span>,
-  <span class="va">north_delta_habitat</span>,
-  <span class="va">south_delta_habitat</span>,
-  <span class="va">freeport_flows</span>,
-  <span class="va">cc_gates_days_closed</span>,
-  <span class="va">rearing_survival_delta</span>,
-  <span class="va">migratory_survival_delta</span>,
-  <span class="va">migratory_survival_bay_delta</span>,
-  <span class="va">juveniles_at_chipps</span>,
-  <span class="va">growth_rates</span>,
-  location_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">24</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,
-  <span class="va">territory_size</span>,
-  <span class="va">stochastic</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">route_and_rear_deltas</span><span class="op">(</span></span>
+<span>  <span class="va">year</span>,</span>
+<span>  <span class="va">month</span>,</span>
+<span>  <span class="va">migrants</span>,</span>
+<span>  <span class="va">north_delta_fish</span>,</span>
+<span>  <span class="va">south_delta_fish</span>,</span>
+<span>  <span class="va">north_delta_habitat</span>,</span>
+<span>  <span class="va">south_delta_habitat</span>,</span>
+<span>  <span class="va">freeport_flows</span>,</span>
+<span>  <span class="va">cc_gates_days_closed</span>,</span>
+<span>  <span class="va">rearing_survival_delta</span>,</span>
+<span>  <span class="va">migratory_survival_delta</span>,</span>
+<span>  <span class="va">migratory_survival_bay_delta</span>,</span>
+<span>  <span class="va">juveniles_at_chipps</span>,</span>
+<span>  <span class="va">growth_rates</span>,</span>
+<span>  location_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">24</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="va">territory_size</span>,</span>
+<span>  filling_fn <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="fill.html">fill_regional</a></span>,</span>
+<span>  <span class="va">stochastic</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="source">
@@ -108,39 +109,76 @@ during a simulated month. Then the remaining juveniles in the delta rear
     <h2>Arguments</h2>
     <dl><dt>year</dt>
 <dd><p>The current simulation year, 1-20</p></dd>
+
+
 <dt>month</dt>
 <dd><p>The current simulation month, 1-8</p></dd>
+
+
 <dt>migrants</dt>
 <dd><p>An n by 4 matrix of juvenile fish by watershed and size class</p></dd>
+
+
 <dt>north_delta_fish</dt>
 <dd><p>An n by 4 matrix of juvenile fish by watershed and size class</p></dd>
+
+
 <dt>south_delta_fish</dt>
 <dd><p>An n by 4 matrix of juvenile fish by watershed and size class</p></dd>
+
+
 <dt>north_delta_habitat</dt>
 <dd><p>A vector of available habitat in square meters</p></dd>
+
+
 <dt>south_delta_habitat</dt>
 <dd><p>A vector of available habitat in square meters</p></dd>
+
+
 <dt>freeport_flows</dt>
 <dd><p>Monthly mean flow at freeport in cubic feet per second</p></dd>
+
+
 <dt>cc_gates_days_closed</dt>
 <dd><p>Number of days the Cross Channel gates are closed during the month</p></dd>
+
+
 <dt>rearing_survival_delta</dt>
 <dd><p>The rearing survival rate for North and South Delta</p></dd>
+
+
 <dt>migratory_survival_delta</dt>
 <dd><p>The outmigration survival rate for North and South Delta</p></dd>
+
+
 <dt>migratory_survival_bay_delta</dt>
 <dd><p>The outmigration survival rate in the Bay Delta</p></dd>
+
+
 <dt>juveniles_at_chipps</dt>
 <dd><p>The accumulated juveniles at Chipps Island for the current year</p></dd>
+
+
 <dt>growth_rates</dt>
 <dd><p>The delta growth rate</p></dd>
+
+
 <dt>location_index</dt>
 <dd><p>Migratory survival probability location index for fish coming from 4 areas (1-4) representing
 "northern_fish", "cosumnes_mokelumne_fish", "calaveras_fish", or "southern_fish" respectively</p></dd>
+
+
 <dt>territory_size</dt>
 <dd><p>Array of juvenile fish territory requirements for <code><a href="fill.html">fill_natal</a></code></p></dd>
+
+
+<dt>filling_fn</dt>
+<dd><p>optional filling function to use in routing procedure, by default it uses fallRunDSM::fill_regional</p></dd>
+
+
 <dt>stochastic</dt>
 <dd><p><code>TRUE</code> <code>FALSE</code> value indicating if model is being run stochastically</p></dd>
+
 </dl></div>
 
   </div>
@@ -155,7 +193,7 @@ during a simulated month. Then the remaining juveniles in the delta rear
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

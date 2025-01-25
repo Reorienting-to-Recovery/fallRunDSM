@@ -1,5 +1,3 @@
-# TODO remove harvest from get_spawning_adults()
-# TODO add this harvest adults function to line 124
 #' Harvest Adults Function
 #'
 #' This function calculates the total adult salmon harvest based on various parameters.

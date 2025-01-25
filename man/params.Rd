@@ -5,6 +5,8 @@
 \alias{params}
 \alias{params_2019}
 \alias{params_2022}
+\alias{r_to_r_baseline_params}
+\alias{r_to_r_kitchen_sink_params}
 \title{Model Parameters}
 \usage{
 params
@@ -12,6 +14,10 @@ params
 params_2019
 
 params_2022
+
+r_to_r_baseline_params
+
+r_to_r_kitchen_sink_params
 }
 \description{
 A list containing all parameters needed for running the \code{\link{fall_run_model}}. Parameters with a single

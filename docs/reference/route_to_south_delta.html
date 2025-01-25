@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -75,54 +75,81 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">route_to_south_delta</span><span class="op">(</span>
-  <span class="va">freeport_flow</span>,
-  <span class="va">dcc_closed</span>,
-  <span class="va">month</span>,
-  mean_freeport_flow <span class="op">=</span> <span class="fl">21546.19</span>,
-  sd_freeport_flow <span class="op">=</span> <span class="fl">14375.9</span>,
-  .sss_int <span class="op">=</span> <span class="fl">1.892235</span>,
-  .sss_freeport_discharge <span class="op">=</span> <span class="fl">2.170375</span>,
-  .sss_upper_asymptote <span class="op">=</span> <span class="fl">0.3512465</span>,
-  .dcc_intercept <span class="op">=</span> <span class="op">-</span><span class="fl">1.48962</span>,
-  .dcc_freeport_discharge <span class="op">=</span> <span class="op">-</span><span class="fl">1.248865</span>,
-  .gs_intercept <span class="op">=</span> <span class="op">-</span><span class="fl">2.948145</span>,
-  .gs_freeport_discharge <span class="op">=</span> <span class="op">-</span><span class="fl">2.911835</span>,
-  .gs_dcc_effect_on_routing <span class="op">=</span> <span class="op">-</span><span class="fl">0.554843</span>,
-  .gs_lower_asymptote <span class="op">=</span> <span class="fl">0.2729845</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">route_to_south_delta</span><span class="op">(</span></span>
+<span>  <span class="va">freeport_flow</span>,</span>
+<span>  <span class="va">dcc_closed</span>,</span>
+<span>  <span class="va">month</span>,</span>
+<span>  mean_freeport_flow <span class="op">=</span> <span class="fl">21546.19</span>,</span>
+<span>  sd_freeport_flow <span class="op">=</span> <span class="fl">14375.9</span>,</span>
+<span>  .sss_int <span class="op">=</span> <span class="fl">1.892235</span>,</span>
+<span>  .sss_freeport_discharge <span class="op">=</span> <span class="fl">2.170375</span>,</span>
+<span>  .sss_upper_asymptote <span class="op">=</span> <span class="fl">0.3512465</span>,</span>
+<span>  .dcc_intercept <span class="op">=</span> <span class="op">-</span><span class="fl">1.48962</span>,</span>
+<span>  .dcc_freeport_discharge <span class="op">=</span> <span class="op">-</span><span class="fl">1.248865</span>,</span>
+<span>  .gs_intercept <span class="op">=</span> <span class="op">-</span><span class="fl">2.948145</span>,</span>
+<span>  .gs_freeport_discharge <span class="op">=</span> <span class="op">-</span><span class="fl">2.911835</span>,</span>
+<span>  .gs_dcc_effect_on_routing <span class="op">=</span> <span class="op">-</span><span class="fl">0.554843</span>,</span>
+<span>  .gs_lower_asymptote <span class="op">=</span> <span class="fl">0.2729845</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>freeport_flow</dt>
 <dd><p>Monthly mean flow at freeport in cubic feet per second</p></dd>
+
+
 <dt>dcc_closed</dt>
 <dd><p>Number of days the Delta Cross Channel gates are closed during the month</p></dd>
+
+
 <dt>month</dt>
 <dd><p>Current simulation month as an integer for calculating number of days the Delta Cross Channel gates are open</p></dd>
+
+
 <dt>mean_freeport_flow</dt>
 <dd><p>Mean of flow at freeport for standardizing discharge</p></dd>
+
+
 <dt>sd_freeport_flow</dt>
 <dd><p>Standard Deviation of flow at freeport for standardizing discharge</p></dd>
+
+
 <dt>.sss_int</dt>
 <dd><p>Intercept for Sutter and Steamboat Sloughs, source: <a href="https://doi.org/10.1139/cjfas-2017-0310" class="external-link">This submodel is adapted from Perry et al. (2018)</a></p></dd>
+
+
 <dt>.sss_freeport_discharge</dt>
 <dd><p>Coefficient for <code>freeport_flow</code> for Sutter and Steamboat Sloughs, source: <a href="https://doi.org/10.1139/cjfas-2017-0310" class="external-link">This submodel is adapted from Perry et al. (2018)</a></p></dd>
+
+
 <dt>.sss_upper_asymptote</dt>
 <dd><p>Parameter representing the upper asymptote for Sutter and Steamboat Sloughs, source: <a href="https://doi.org/10.1139/cjfas-2017-0310" class="external-link">This submodel is adapted from Perry et al. (2018)</a></p></dd>
+
+
 <dt>.dcc_intercept</dt>
 <dd><p>Intercept for Delta Cross Channel, source: <a href="https://doi.org/10.1139/cjfas-2017-0310" class="external-link">This submodel is adapted from Perry et al. (2018)</a></p></dd>
+
+
 <dt>.dcc_freeport_discharge</dt>
 <dd><p>Coefficient for <code>freeport_flow</code> for Delta Cross Channel Gates, source: <a href="https://doi.org/10.1139/cjfas-2017-0310" class="external-link">This submodel is adapted from Perry et al. (2018)</a></p></dd>
+
+
 <dt>.gs_intercept</dt>
 <dd><p>Intercept for Georgiana Slough, source: <a href="https://doi.org/10.1139/cjfas-2017-0310" class="external-link">This submodel is adapted from Perry et al. (2018)</a></p></dd>
+
+
 <dt>.gs_freeport_discharge</dt>
 <dd><p>Coefficient for <code>freeport_flow</code> for Georgiana Slough, source: <a href="https://doi.org/10.1139/cjfas-2017-0310" class="external-link">This submodel is adapted from Perry et al. (2018)</a></p></dd>
+
+
 <dt>.gs_dcc_effect_on_routing</dt>
 <dd><p>Parameter representing the dcc effect on routing, source: <a href="https://doi.org/10.1139/cjfas-2017-0310" class="external-link">This submodel is adapted from Perry et al. (2018)</a></p></dd>
+
+
 <dt>.gs_lower_asymptote</dt>
 <dd><p>Parameter representing the lower asymptote for Georgiana Slough, source: <a href="https://doi.org/10.1139/cjfas-2017-0310" class="external-link">This submodel is adapted from Perry et al. (2018)</a></p></dd>
+
 </dl></div>
 
   </div>
@@ -137,7 +164,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

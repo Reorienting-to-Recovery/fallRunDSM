@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -75,21 +75,21 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">adult_stray</span><span class="op">(</span>
-  <span class="va">wild</span>,
-  <span class="va">natal_flow</span>,
-  <span class="va">south_delta_watershed</span>,
-  <span class="va">cross_channel_gates_closed</span>,
-  prop_bay_trans <span class="op">=</span> <span class="fl">0</span>,
-  prop_delta_trans <span class="op">=</span> <span class="fl">0</span>,
-  .intercept <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_intercept</span>,
-  .wild <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_wild</span>,
-  .natal_flow <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_natal_flow</span>,
- 
-    .cross_channel_gates_closed <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_cross_channel_gates_closed</span>,
-  .prop_bay_trans <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_prop_bay_trans</span>,
-  .prop_delta_trans <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_prop_delta_trans</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adult_stray</span><span class="op">(</span></span>
+<span>  <span class="va">wild</span>,</span>
+<span>  <span class="va">natal_flow</span>,</span>
+<span>  <span class="va">south_delta_watershed</span>,</span>
+<span>  <span class="va">cross_channel_gates_closed</span>,</span>
+<span>  prop_bay_trans <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  prop_delta_trans <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  .intercept <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_intercept</span>,</span>
+<span>  .wild <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_wild</span>,</span>
+<span>  .natal_flow <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_natal_flow</span>,</span>
+<span>  .cross_channel_gates_closed <span class="op">=</span></span>
+<span>    <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_cross_channel_gates_closed</span>,</span>
+<span>  .prop_bay_trans <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_prop_bay_trans</span>,</span>
+<span>  .prop_delta_trans <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">.adult_stray_prop_delta_trans</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="source">
@@ -100,28 +100,51 @@
     <h2>Arguments</h2>
     <dl><dt>wild</dt>
 <dd><p>Variable indicator of wild fish returning</p></dd>
+
+
 <dt>natal_flow</dt>
 <dd><p>Variable describing proportion flows at tributary junctions coming from natal watershed in October</p></dd>
+
+
 <dt>south_delta_watershed</dt>
 <dd><p>Variable indicator if watershed feeds into South Delta</p></dd>
+
+
 <dt>cross_channel_gates_closed</dt>
 <dd><p>Variable describing number of days gates are closed for each month</p></dd>
+
+
 <dt>prop_bay_trans</dt>
 <dd><p>Variable describing proportion transport to the bay</p></dd>
+
+
 <dt>prop_delta_trans</dt>
 <dd><p>Variable describing proportion transport to the delta</p></dd>
+
+
 <dt>.intercept</dt>
 <dd><p>Intercept</p></dd>
+
+
 <dt>.wild</dt>
 <dd><p>Coefficient for <code>wild</code> variable</p></dd>
+
+
 <dt>.natal_flow</dt>
 <dd><p>Coefficient for <code>natal_flow</code> variable</p></dd>
+
+
 <dt>.cross_channel_gates_closed</dt>
 <dd><p>Coefficient for <code>cross_channel_gates_closed</code> variable</p></dd>
+
+
 <dt>.prop_bay_trans</dt>
 <dd><p>Coefficient for <code>prop_bay_trans</code> variable</p></dd>
+
+
 <dt>.prop_delta_trans</dt>
 <dd><p>Coefficient for <code>prop_delta_trans</code> variable</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -140,7 +163,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

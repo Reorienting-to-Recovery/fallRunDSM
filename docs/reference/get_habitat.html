@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -75,16 +75,16 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_habitat</span><span class="op">(</span>
-  <span class="va">year</span>,
-  <span class="va">month</span>,
-  <span class="va">inchannel_habitat_fry</span>,
-  <span class="va">inchannel_habitat_juvenile</span>,
-  <span class="va">floodplain_habitat</span>,
-  <span class="va">sutter_habitat</span>,
-  <span class="va">yolo_habitat</span>,
-  <span class="va">delta_habitat</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_habitat</span><span class="op">(</span></span>
+<span>  <span class="va">year</span>,</span>
+<span>  <span class="va">month</span>,</span>
+<span>  <span class="va">inchannel_habitat_fry</span>,</span>
+<span>  <span class="va">inchannel_habitat_juvenile</span>,</span>
+<span>  <span class="va">floodplain_habitat</span>,</span>
+<span>  <span class="va">sutter_habitat</span>,</span>
+<span>  <span class="va">yolo_habitat</span>,</span>
+<span>  <span class="va">delta_habitat</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="source">
@@ -95,20 +95,35 @@
     <h2>Arguments</h2>
     <dl><dt>year</dt>
 <dd><p>The current simulation year, 1-20</p></dd>
+
+
 <dt>month</dt>
 <dd><p>The current simulation month, 1-8</p></dd>
+
+
 <dt>inchannel_habitat_fry</dt>
 <dd><p>3 dimensional array [watersheds, months, years] representing fry inchannel habitat in square meters</p></dd>
+
+
 <dt>inchannel_habitat_juvenile</dt>
 <dd><p>3 dimensional array [watersheds, months, years] representing juvenile inchannel habitat in square meters</p></dd>
+
+
 <dt>floodplain_habitat</dt>
 <dd><p>3 dimensional array [watersheds, months, years] representing floodplain habitat in square meters</p></dd>
+
+
 <dt>sutter_habitat</dt>
 <dd><p>2 dimensional array [months, years] representing sutter bypass habitat in square meters</p></dd>
+
+
 <dt>yolo_habitat</dt>
 <dd><p>2 dimensional array [months, years] representing yolo bypass habitat in square meters</p></dd>
+
+
 <dt>delta_habitat</dt>
 <dd><p>3 dimensional array [months, years, delta] representing north delta habitat [,, 1] and south delta habitat [,, 2] in square meters</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -127,7 +142,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

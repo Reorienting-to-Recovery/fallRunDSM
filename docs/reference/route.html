@@ -18,7 +18,7 @@ to a bypass, or out migrate during a simulated month"><!-- mathjax --><script sr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -77,24 +77,31 @@ to a bypass, or out migrate during a simulated month</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">route</span><span class="op">(</span>
-  <span class="va">year</span>,
-  <span class="va">month</span>,
-  <span class="va">juveniles</span>,
-  <span class="va">inchannel_habitat</span>,
-  <span class="va">floodplain_habitat</span>,
-  <span class="va">prop_pulse_flows</span>,
-  <span class="va">.pulse_movement_intercept</span>,
-  <span class="va">.pulse_movement_proportion_pulse</span>,
-  <span class="va">.pulse_movement_medium</span>,
-  <span class="va">.pulse_movement_large</span>,
-  <span class="va">.pulse_movement_vlarge</span>,
-  <span class="va">.pulse_movement_medium_pulse</span>,
-  <span class="va">.pulse_movement_large_pulse</span>,
-  <span class="va">.pulse_movement_very_large_pulse</span>,
-  <span class="va">territory_size</span>,
-  <span class="va">stochastic</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">route</span><span class="op">(</span></span>
+<span>  <span class="va">year</span>,</span>
+<span>  <span class="va">month</span>,</span>
+<span>  <span class="va">juveniles</span>,</span>
+<span>  <span class="va">inchannel_habitat</span>,</span>
+<span>  <span class="va">floodplain_habitat</span>,</span>
+<span>  <span class="va">prop_pulse_flows</span>,</span>
+<span>  <span class="va">vernalis_flows</span>,</span>
+<span>  <span class="va">freeport_flows</span>,</span>
+<span>  <span class="va">.pulse_movement_intercept</span>,</span>
+<span>  <span class="va">.pulse_movement_proportion_pulse</span>,</span>
+<span>  <span class="va">.pulse_movement_medium</span>,</span>
+<span>  <span class="va">.pulse_movement_large</span>,</span>
+<span>  <span class="va">.pulse_movement_vlarge</span>,</span>
+<span>  <span class="va">.pulse_movement_medium_pulse</span>,</span>
+<span>  <span class="va">.pulse_movement_large_pulse</span>,</span>
+<span>  <span class="va">.pulse_movement_very_large_pulse</span>,</span>
+<span>  filling_fn <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="fill.html">fill_natal</a></span>,</span>
+<span>  filling_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  movement_fn <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  movement_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  movement_months <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">territory_size</span>,</span>
+<span>  <span class="va">stochastic</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="source">
@@ -105,36 +112,67 @@ to a bypass, or out migrate during a simulated month</p>
     <h2>Arguments</h2>
     <dl><dt>year</dt>
 <dd><p>The current simulation year, 1-20</p></dd>
+
+
 <dt>month</dt>
 <dd><p>The current simulation month, 1-8</p></dd>
+
+
 <dt>juveniles</dt>
 <dd><p>An n by 4 matrix of juvenile fish by watershed and size class</p></dd>
+
+
 <dt>inchannel_habitat</dt>
 <dd><p>A vector of available habitat in square meters</p></dd>
+
+
 <dt>floodplain_habitat</dt>
 <dd><p>A vector of available floodplain habitat in square meters</p></dd>
+
+
 <dt>prop_pulse_flows</dt>
 <dd><p>The proportion of pulse flows</p></dd>
+
+
 <dt>.pulse_movement_intercept</dt>
 <dd><p>Intercept for <code><a href="pulse_movement.html">pulse_movement</a></code></p></dd>
+
+
 <dt>.pulse_movement_proportion_pulse</dt>
 <dd><p>Coefficient for <code><a href="pulse_movement.html">pulse_movement</a></code> <code>proportion_pulse</code> variable</p></dd>
+
+
 <dt>.pulse_movement_medium</dt>
 <dd><p>Size related intercept for <code><a href="pulse_movement.html">pulse_movement</a></code> medium sized fish</p></dd>
+
+
 <dt>.pulse_movement_large</dt>
 <dd><p>Size related intercept for <code><a href="pulse_movement.html">pulse_movement</a></code> large sized fish</p></dd>
+
+
 <dt>.pulse_movement_vlarge</dt>
 <dd><p>Size related intercept for <code><a href="pulse_movement.html">pulse_movement</a></code> very large sized fish</p></dd>
+
+
 <dt>.pulse_movement_medium_pulse</dt>
 <dd><p>Additional coefficient for <code><a href="pulse_movement.html">pulse_movement</a></code> <code>proportion_pulse</code> variable for medium size fish</p></dd>
+
+
 <dt>.pulse_movement_large_pulse</dt>
 <dd><p>Additional coefficient for <code><a href="pulse_movement.html">pulse_movement</a></code> <code>proportion_pulse</code> variable for large size fish</p></dd>
+
+
 <dt>.pulse_movement_very_large_pulse</dt>
 <dd><p>Additional coefficient for <code><a href="pulse_movement.html">pulse_movement</a></code> <code>proportion_pulse</code> variable for very large size fish</p></dd>
+
+
 <dt>territory_size</dt>
 <dd><p>Array of juvenile fish territory requirements for <code><a href="fill.html">fill_natal</a></code></p></dd>
+
+
 <dt>stochastic</dt>
 <dd><p><code>TRUE</code> <code>FALSE</code> value indicating if model is being run stochastically</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -153,7 +191,7 @@ to a bypass, or out migrate during a simulated month</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -77,7 +77,7 @@
         </td>
         <td><p>Fall Run Chinook Model</p></td>
       </tr><tr><td>
-          <p><code><a href="params.html">params</a></code> <code><a href="params.html">params_2019</a></code> </p>
+          <p><code><a href="params.html">params</a></code> <code><a href="params.html">params_2019</a></code> <code><a href="params.html">params_2022</a></code> <code><a href="params.html">r_to_r_baseline_params</a></code> <code><a href="params.html">r_to_r_kitchen_sink_params</a></code> </p>
         </td>
         <td><p>Model Parameters</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
@@ -88,6 +88,10 @@
           <p><code><a href="surv_adult_enroute.html">surv_adult_enroute()</a></code> </p>
         </td>
         <td><p>Adult En Route Survival</p></td>
+      </tr><tr><td>
+          <p><code><a href="apply_enroute_survival.html">apply_enroute_survival()</a></code> </p>
+        </td>
+        <td><p>Apply enroute survival to adult salmon</p></td>
       </tr><tr><td>
           <p><code><a href="surv_adult_prespawn.html">surv_adult_prespawn()</a></code> </p>
         </td>
@@ -128,6 +132,10 @@
           <p><code><a href="ocean_entry_success.html">ocean_entry_success()</a></code> </p>
         </td>
         <td><p>Ocean Entry Success</p></td>
+      </tr><tr><td>
+          <p><code><a href="harvest_adults.html">harvest_adults()</a></code> </p>
+        </td>
+        <td><p>Harvest Adults Function</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="growth-and-movement-sub-models">Growth and Movement Sub-models <a href="#growth-and-movement-sub-models" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Functions that calculate growth and movement</p>
@@ -137,11 +145,27 @@
         </td>
         <td><p>Adult Straying</p></td>
       </tr><tr><td>
+          <p><code><a href="apply_straying.html">apply_straying()</a></code> </p>
+        </td>
+        <td><p>Apply Straying</p></td>
+      </tr><tr><td>
+          <p><code><a href="hatchery_stray_betareg.html">hatchery_stray_betareg</a></code> </p>
+        </td>
+        <td><p>Hatchery Stray Model</p></td>
+      </tr><tr><td>
+          <p><code><a href="stray_returning_adults.html">stray_returning_adults()</a></code> </p>
+        </td>
+        <td><p>Apply Straying to Returning Adults</p></td>
+      </tr><tr><td>
+          <p><code><a href="straying_destinations.html">straying_destinations</a></code> </p>
+        </td>
+        <td><p>Straying Destnations</p></td>
+      </tr><tr><td>
           <p><code><a href="pulse_movement.html">pulse_movement()</a></code> </p>
         </td>
         <td><p>Juvenile Pulse Movement</p></td>
       </tr><tr><td>
-          <p><code><a href="fill.html">fill_natal()</a></code> <code><a href="fill.html">fill_regional()</a></code> </p>
+          <p><code><a href="fill.html">fill_natal()</a></code> <code><a href="fill.html">fill_regional()</a></code> <code><a href="fill.html">fill_natal_dens_depend()</a></code> </p>
         </td>
         <td><p>Filling Natal Tributary and Regional Habitat</p></td>
       </tr><tr><td>
@@ -165,6 +189,22 @@
         </td>
         <td><p>Route To South Delta</p></td>
       </tr><tr><td>
+          <p><code><a href="juvenile_month_dynamic.html">juvenile_month_dynamic()</a></code> </p>
+        </td>
+        <td><p>Juvenile Month Dynamics</p></td>
+      </tr><tr><td>
+          <p><code><a href="movement.html">snow_globe_movement()</a></code> <code><a href="movement.html">genetic_movement()</a></code> </p>
+        </td>
+        <td><p>Fry fish movement out of natal tributaries</p></td>
+      </tr><tr><td>
+          <p><code><a href="temperature_movement.html">temperature_movement()</a></code> </p>
+        </td>
+        <td><p>Temperature Movement</p></td>
+      </tr><tr><td>
+          <p><code><a href="time_movement.html">time_movement()</a></code> </p>
+        </td>
+        <td><p>Time Movmenet</p></td>
+      </tr><tr><td>
           <p><code><a href="growth.html">growth()</a></code> </p>
         </td>
         <td><p>Growth Transition Probability</p></td>
@@ -180,6 +220,10 @@
           <p><code><a href="migrate.html">migrate()</a></code> </p>
         </td>
         <td><p>Juvenile Migration</p></td>
+      </tr><tr><td>
+          <p><code><a href="hatchery_release_proportion_bay.html">hatchery_release_proportion_bay</a></code> </p>
+        </td>
+        <td><p>Bay Proportion Hatchery Releases</p></td>
       </tr><tr><td>
           <p><code><a href="ocean_transition_month.html">ocean_transition_month()</a></code> </p>
         </td>
@@ -249,9 +293,21 @@
         </td>
         <td><p>Get Migratory Survival Rates</p></td>
       </tr><tr><td>
-          <p><code><a href="get_spawning_adults.html">get_spawning_adults()</a></code> </p>
+          <p><code><a href="bioenergetics_transitions.html">bioenergetics_transitions</a></code> </p>
         </td>
-        <td><p>Get Spawning Adults</p></td>
+        <td><p>Bioenergetics Transistion Matrices</p></td>
+      </tr><tr><td>
+          <p><code><a href="compute_adult_stray_rates.html">compute_adult_stray_rates()</a></code> </p>
+        </td>
+        <td><p>Adult Straying for Hatchery Origin Fish</p></td>
+      </tr><tr><td>
+          <p><code><a href="hatchery_to_bay_distance.html">hatchery_to_bay_distance</a></code> </p>
+        </td>
+        <td><p>Hatchery to Chipps Island (rkm)</p></td>
+      </tr><tr><td>
+          <p><code><a href="get_growth_rates.html">get_growth_rates()</a></code> </p>
+        </td>
+        <td><p>Get Growth Rates</p></td>
       </tr><tr><td>
           <p><code><a href="territory_by_size.html">territory_by_size()</a></code> </p>
         </td>
@@ -264,6 +320,10 @@
           <p><code><a href="days_in_month.html">days_in_month()</a></code> </p>
         </td>
         <td><p>Days in Month</p></td>
+      </tr><tr><td>
+          <p><code><a href="pretty_num.html">pretty_num()</a></code> </p>
+        </td>
+        <td><p>Pretty Number</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -277,7 +337,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

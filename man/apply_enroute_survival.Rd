@@ -16,7 +16,6 @@ apply_enroute_survival(
   ..surv_adult_enroute_int,
   .adult_en_route_migratory_temp,
   .adult_en_route_bypass_overtopped,
-  .adult_en_route_adult_harvest_rate,
   stochastic
 )
 }
@@ -43,9 +42,9 @@ apply_enroute_survival(
 
 \item{.adult_en_route_bypass_overtopped}{Parameter for adult enroute survival related to bypass overtopped.}
 
-\item{.adult_en_route_adult_harvest_rate}{Parameter for adult enroute survival related to adult harvest rate.}
-
 \item{stochastic}{Logical indicating whether to include stochastic elements in the simulation.}
+
+\item{.adult_en_route_adult_harvest_rate}{Parameter for adult enroute survival related to adult harvest rate.}
 }
 \value{
 A list containing the initial number of adults, the proportion of natural adults, and the initial number of adults by month.

@@ -20,7 +20,7 @@ and the fill_regional function is used to route fish on the mainstem, bypasses, 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -81,21 +81,32 @@ and the <code>fill_regional</code> function is used to route fish on the mainste
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fill_natal</span><span class="op">(</span>
-  <span class="va">juveniles</span>,
-  <span class="va">inchannel_habitat</span>,
-  <span class="va">floodplain_habitat</span>,
-  territory_size <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">territory_size</span>,
-  up_to_size_class <span class="op">=</span> <span class="fl">2</span>
-<span class="op">)</span>
-
-<span class="fu">fill_regional</span><span class="op">(</span>
-  <span class="va">juveniles</span>,
-  <span class="va">habitat</span>,
-  floodplain_habitat <span class="op">=</span> <span class="cn">NULL</span>,
-  territory_size <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">territory_size</span>,
-  up_to_size_class <span class="op">=</span> <span class="fl">3</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fill_natal</span><span class="op">(</span></span>
+<span>  <span class="va">juveniles</span>,</span>
+<span>  <span class="va">inchannel_habitat</span>,</span>
+<span>  <span class="va">floodplain_habitat</span>,</span>
+<span>  territory_size <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">territory_size</span>,</span>
+<span>  up_to_size_class <span class="op">=</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">fill_regional</span><span class="op">(</span></span>
+<span>  <span class="va">juveniles</span>,</span>
+<span>  <span class="va">habitat</span>,</span>
+<span>  floodplain_habitat <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  territory_size <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="params.html">params</a></span><span class="op">$</span><span class="va">territory_size</span>,</span>
+<span>  up_to_size_class <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">fill_natal_dens_depend</span><span class="op">(</span></span>
+<span>  <span class="va">juveniles</span>,</span>
+<span>  <span class="va">inchannel_habitat</span>,</span>
+<span>  <span class="va">floodplain_habitat</span>,</span>
+<span>  up_to_size_class <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  ..floodplain_capacity <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  ..habitat_capacity <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  territory_size <span class="op">=</span> <span class="va">territory_size</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="source">
@@ -106,15 +117,24 @@ and the <code>fill_regional</code> function is used to route fish on the mainste
     <h2>Arguments</h2>
     <dl><dt>juveniles</dt>
 <dd><p>An n by 4 matrix of juvenile fish size s, m, l, vl</p></dd>
+
+
 <dt>inchannel_habitat</dt>
 <dd><p>The available tributary habitat in square meters</p></dd>
+
+
 <dt>floodplain_habitat</dt>
 <dd><p>The available floodplain habitat in square meters (NULL for bypasses and delta)</p></dd>
+
+
 <dt>territory_size</dt>
 <dd><p>A length 4 array of juvenile fish territory requirements s, m, l, vl</p></dd>
+
+
 <dt>up_to_size_class</dt>
 <dd><p>Which size class and under is moved to floodplain and
 inchannel habitat (small = 1, medium = 2, large = 3, very large = 4)</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -133,7 +153,7 @@ inchannel habitat (small = 1, medium = 2, large = 3, very large = 4)</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

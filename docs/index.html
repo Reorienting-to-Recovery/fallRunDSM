@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -93,83 +93,53 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
 <div class="section level1">
-<div class="page-header"><h1 id="fall-chinook-salmon-science-integration-team-model">Fall Chinook Salmon Science Integration Team Model<a class="anchor" aria-label="anchor" href="#fall-chinook-salmon-science-integration-team-model"></a>
+<div class="page-header"><h1 id="reorienting-to-recovery-use-of-and-adaptations-to-the-fall-chinook-salmon-science-integration-team-model">Reorienting to Recovery Use of and Adaptations to the Fall Chinook Salmon Science Integration Team Model<a class="anchor" aria-label="anchor" href="#reorienting-to-recovery-use-of-and-adaptations-to-the-fall-chinook-salmon-science-integration-team-model"></a>
 </h1></div>
-<div class="section level2">
-<h2 id="primary-authors">Primary Authors:<a class="anchor" aria-label="anchor" href="#primary-authors"></a>
-</h2>
-<p>James T. Peterson<br>
-U.S. Geological Survey, Oregon Cooperative Fish and Wildlife<br>
-Research Unit, Oregon State University<br>
-Corvallis, Oregon 97331-3803, <a href="mailto:jt.peterson@oregonstate.edu">jt.peterson@oregonstate.edu</a></p>
-<p>Adam Duarte<br>
-USDA Forest Service, Pacific Northwest Research Station<br>
-Olympia, Washington 98512<br><a href="mailto:adam.duarte@usda.gov">adam.duarte@usda.gov</a></p>
 </div>
-<div class="section level2">
-<h2 id="disclaimer">Disclaimer:<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
-</h2>
-<p>Although this code has been processed successfully on a computer system at the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the code for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty. The USGS or the U.S. Government shall not be held liable for improper or incorrect use of the code described and/or contained herein.</p>
+<div class="section level1">
+<h1 id="sit-dsm-model">SIT DSM Model:<a class="anchor" aria-label="anchor" href="#sit-dsm-model"></a>
+</h1>
+<p>Please refer to <a href="https://github.com/CVPIA-OSC/fallRunDSM" class="external-link">SIT model repository</a> to see full documenation on the SIT DSM model.</p>
 </div>
-<div class="section level2">
-<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
-</h2>
-<p><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="external-link">CC BY-NC-SA 4.0</a></p>
-<p>IP-117068</p>
-</div>
+<div class="section level1">
+<h1 id="reorienting-to-recovery">Reorienting to Recovery<a class="anchor" aria-label="anchor" href="#reorienting-to-recovery"></a>
+</h1>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <div class="section level3">
 <h3 id="package-installation">Package Installation<a class="anchor" aria-label="anchor" href="#package-installation"></a>
 </h3>
-<p>The <code>fallRunDSM</code> package depends on a number of packages developed by the <a href="https://github.com/CVPIA-OSC" class="external-link">CVPIA Open Science Collaborative</a>. To install <code>fallRunDSM</code> and additional <code>CVPIA-OSC</code> packages use the <code><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">remotes::install_github()</a></code> function.</p>
+<p>The <code>fallRunDSM</code> package depends on a number of packages developed by the <a href="https://github.com/CVPIA-OSC" class="external-link">CVPIA Open Science Collaborative</a> and additional packages developed by the CVPIA SIT and adapted for the Reorienting to Recovery process. To install <code>fallRunDSM</code>, additional <code>CVPIA-OSC</code> packages, and <code>Reorienting-to-Recovery</code> packages use the <code><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">remotes::install_github()</a></code> function.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/fallRunDSM"</span><span class="op">)</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/DSMscenario"</span><span class="op">)</span>
-
-<span class="co"># optional - need if calibrating model</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/DSMCalibrationData"</span><span class="op">)</span>
-
-<span class="co"># optional - need if wanting to explore or modify flow, habitat, and temperature inputs</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/DSMflow"</span><span class="op">)</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/DSMhabitat"</span><span class="op">)</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/DSMtemperature"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Reorienting-to-Recovery/fallRunDSM"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/DSMscenario"</span><span class="op">)</span> <span class="co"># TODO update once we have a R2R scenario package</span></span>
+<span></span>
+<span><span class="co"># optional - need if calibrating model</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/DSMCalibrationData"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># optional - need if wanting to explore or modify flow, habitat, and temperature inputs</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/DSMflow"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Reorienting-to-Recovery/DSMhabitat"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CVPIA-OSC/DSMtemperature"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="run-model">Run Model<a class="anchor" aria-label="anchor" href="#run-model"></a>
 </h3>
-<p>The <code><a href="reference/fall_run_model.html">fall_run_model()</a></code> is a Fall Run Chinook life cycle model used for <a href="http://cvpia.scienceintegrationteam.com/" class="external-link">CVPIA’s Structured Decision Making Process</a>. Running the model simulates Fall Run Chinook population dynamics across 31 watersheds in California over a 20 year period.</p>
-<p>The following code runs the fall run model with SIT defined scenario 1:</p>
+<p>The <code><a href="reference/fall_run_model.html">fall_run_model()</a></code> is a Fall Run Chinook life cycle model origionally developed and used for <a href="http://cvpia.scienceintegrationteam.com/" class="external-link">CVPIA’s Structured Decision Making Process</a>. This repository is focused on using the model to model Reorienting to Recovery performance metrics. Running the model simulates Fall Run Chinook population dynamics across 31 watersheds in California over a 20 year period.</p>
+<p>The following code runs the fall run model with Reorienting to Recovery Baseline inputs:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># seed the model</span>
-<span class="va">fall_run_seeds</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fall_run_model.html">fall_run_model</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"seed"</span><span class="op">)</span>
-
-<span class="co"># run the 20 year simulation</span>
-<span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fall_run_model.html">fall_run_model</a></span><span class="op">(</span>scenario <span class="op">=</span> <span class="fu">DSMscenario</span><span class="fu">::</span><span class="va"><a href="https://CVPIA-OSC.github.io/DSMscenario//reference/scenarios.html" class="external-link">scenarios</a></span><span class="op">$</span><span class="va">ONE</span>,
-                          mode <span class="op">=</span> <span class="st">"simulate"</span>,
-                          seeds <span class="op">=</span> <span class="va">fall_run_seeds</span><span class="op">)</span></code></pre></div>
-<p>The following code runs the fall run model with a custom scenario defined in <code>scenario_df</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># define scenario</span>
-<span class="va">scenario_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>watershed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Upper Sacramento River"</span>, <span class="st">"Battle Creek"</span><span class="op">)</span>,
-                          action <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">)</span>,
-                          start_year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1980</span>, <span class="fl">1979</span><span class="op">)</span>,
-                          end_year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1989</span>, <span class="fl">1988</span><span class="op">)</span>,
-                          units_of_effort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># create scenario input</span>
-<span class="va">scenario</span> <span class="op">&lt;-</span> <span class="fu">DSMscenario</span><span class="fu">::</span><span class="fu"><a href="https://CVPIA-OSC.github.io/DSMscenario//reference/get_action_matrices.html" class="external-link">get_action_matrices</a></span><span class="op">(</span><span class="va">scenario_df</span><span class="op">)</span>
-
-<span class="co"># seed model</span>
-<span class="va">fall_run_seeds</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fall_run_model.html">fall_run_model</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"seed"</span><span class="op">)</span>
-
-<span class="co"># evaluate the impact of your scenario over the 20 year simulation</span>
-<span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fall_run_model.html">fall_run_model</a></span><span class="op">(</span>scenario <span class="op">=</span> <span class="va">scenario</span>,
-                          mode <span class="op">=</span> <span class="st">"simulate"</span>,
-                          seeds <span class="op">=</span> <span class="va">fall_run_seeds</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># seed the model</span></span>
+<span><span class="va">fall_run_seeds</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fall_run_model.html">fall_run_model</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"seed"</span>,</span>
+<span>                                 params <span class="op">=</span> <span class="va">r_to_r_baseline_params</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># run the 20 year simulation</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fall_run_model.html">fall_run_model</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"simulate"</span>,</span>
+<span>                          seeds <span class="op">=</span> <span class="va">fall_run_seeds</span>,</span>
+<span>                          params <span class="op">=</span> <span class="va">r_to_r_baseline_params</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -184,21 +154,15 @@ Olympia, Washington 98512<br><a href="mailto:adam.duarte@usda.gov">adam.duarte@u
 <div class="section level3">
 <h3 id="flow-habitat-and-temperature-data">Flow, Habitat, and Temperature Data<a class="anchor" aria-label="anchor" href="#flow-habitat-and-temperature-data"></a>
 </h3>
-<p>All data used in the <code>fallRunDSM</code> is passed in as a argument to <code><a href="reference/fall_run_model.html">fall_run_model()</a></code> from a <code><a href="reference/params.html">fallRunDSM::params</a></code> data list that is composed of data objects from the following packages:</p>
+<p>All data used in the <code>fallRunDSM</code> is passed in as a argument to <code><a href="reference/fall_run_model.html">fall_run_model()</a></code> from a params data list option that is composed of data objects from the following packages:</p>
 <ul>
 <li>
 <strong>Flow Data</strong>: View detailed documentation of flow data inputs at <a href="https://cvpia-osc.github.io/DSMflow/" class="external-link">DSMflow</a>. Flow inputs to the <code>fallRunDSM</code> are generated using CalSim 2 data.</li>
 <li>
-<strong>Habitat Data</strong>: View detailed documentation of habitat data inputs at <a href="https://cvpia-osc.github.io/DSMhabitat/" class="external-link">DSMhabitat</a>. Modeling details for each stream can be viewed <a href="https://cvpia-osc.github.io/DSMhabitat/reference/habitat_data.html#modeling-details-for-streams" class="external-link">here</a>.</li>
+<strong>Habitat Data</strong>: View detailed documentation of habitat data inputs at <a href="https://cvpia-osc.github.io/DSMhabitat/" class="external-link">DSMhabitat</a>. Modeling details for each stream can be viewed <a href="https://cvpia-osc.github.io/DSMhabitat/reference/habitat_data.html#modeling-details-for-streams" class="external-link">here</a>. Additional habitat modifications were completed as part of the Reorienting to Recovery project. See TODO - add habitat docs.</li>
 <li>
 <strong>Temperature Data</strong>: View detailed documentation of temperature data inputs at <a href="https://cvpia-osc.github.io/DSMtemperature/" class="external-link">DSMtemperature</a>. Modeling details for each stream can be viewed <a href="https://cvpia-osc.github.io/DSMtemperature/reference/stream_temperature.html#watershed-modeling-details" class="external-link">here</a>.</li>
 </ul>
-</div>
-<div class="section level3">
-<h3 id="scenario-functionality">Scenario Functionality<a class="anchor" aria-label="anchor" href="#scenario-functionality"></a>
-</h3>
-<p>Running scenarios through the <code><a href="reference/fall_run_model.html">fall_run_model()</a></code> model the impact of restoration actions on Fall Run Chinook populations. The <a href="http://cvpia.scienceintegrationteam.com/" class="external-link">CVPIA SIT (Science Integration Team)</a> has developed restoration action portfolios composed of actions preformed on watersheds over a set time period.</p>
-<p>There are seven predefined scenarios that were developed by the CVPIA SIT. Additional scenarios can be defined by creating a <code>scenario_df</code> describing watershed, action, start year, end year, and units of effort. The function <code>get_action_matrices()</code> takes a user defined <code>scenario_df</code> and returns a scenario in the correct format to be used as the <code>scenario</code> input for <code><a href="reference/fall_run_model.html">fall_run_model()</a></code>. For additional description on how to build a scenario view <code>load_scenario()</code> documentation by searching <code>?DSMscenario::load_scenario()</code></p>
 </div>
 <div class="section level3">
 <h3 id="calibration-data">Calibration Data<a class="anchor" aria-label="anchor" href="#calibration-data"></a>
@@ -212,6 +176,7 @@ Olympia, Washington 98512<br><a href="mailto:adam.duarte@usda.gov">adam.duarte@u
 </div>
 </div>
 </div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -233,6 +198,13 @@ Olympia, Washington 98512<br><a href="mailto:adam.duarte@usda.gov">adam.duarte@u
 </ul>
 </div>
 
+<div class="community">
+<h2 data-toc-skip>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CONTRIBUTING.html">Contributing guide</a></li>
+<li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
+</ul>
+</div>
 
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
@@ -264,7 +236,7 @@ Olympia, Washington 98512<br><a href="mailto:adam.duarte@usda.gov">adam.duarte@u
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

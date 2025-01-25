@@ -18,7 +18,7 @@ Sacramento River or San Joaquin River) or out migrate during a simulated month">
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fallRunDSM</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1</span>
       </span>
     </div>
 
@@ -77,19 +77,26 @@ Sacramento River or San Joaquin River) or out migrate during a simulated month</
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">route_regional</span><span class="op">(</span>
-  <span class="va">month</span>,
-  <span class="va">year</span>,
-  <span class="va">migrants</span>,
-  <span class="va">inchannel_habitat</span>,
-  <span class="va">floodplain_habitat</span>,
-  <span class="va">prop_pulse_flows</span>,
-  <span class="va">migration_survival_rate</span>,
-  <span class="va">proportion_flow_bypass</span>,
-  detour <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">territory_size</span>,
-  <span class="va">stochastic</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">route_regional</span><span class="op">(</span></span>
+<span>  <span class="va">month</span>,</span>
+<span>  <span class="va">year</span>,</span>
+<span>  <span class="va">migrants</span>,</span>
+<span>  <span class="va">inchannel_habitat</span>,</span>
+<span>  <span class="va">floodplain_habitat</span>,</span>
+<span>  <span class="va">prop_pulse_flows</span>,</span>
+<span>  <span class="va">migration_survival_rate</span>,</span>
+<span>  <span class="va">proportion_flow_bypass</span>,</span>
+<span>  filling_fn <span class="op">=</span> <span class="fu">fallRunDSM</span><span class="fu">::</span><span class="va"><a href="fill.html">fill_regional</a></span>,</span>
+<span>  filling_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  movement_fn <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  movement_months <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  movement_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  detour <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">territory_size</span>,</span>
+<span>  <span class="va">freeport_flows</span>,</span>
+<span>  <span class="va">vernalis_flows</span>,</span>
+<span>  <span class="va">stochastic</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="source">
@@ -100,26 +107,75 @@ Sacramento River or San Joaquin River) or out migrate during a simulated month</
     <h2>Arguments</h2>
     <dl><dt>month</dt>
 <dd><p>The current simulation month, 1-8</p></dd>
+
+
 <dt>year</dt>
 <dd><p>The current simulation year, 1-20</p></dd>
+
+
 <dt>migrants</dt>
 <dd><p>An n by 4 matrix of juvenile fish by watershed and size class</p></dd>
+
+
 <dt>inchannel_habitat</dt>
 <dd><p>A vector of available habitat in square meters</p></dd>
+
+
 <dt>floodplain_habitat</dt>
 <dd><p>A vector of available floodplain habitat in square meters</p></dd>
+
+
 <dt>prop_pulse_flows</dt>
 <dd><p>The proportion of pulse flows</p></dd>
+
+
 <dt>migration_survival_rate</dt>
 <dd><p>The outmigration survival rate</p></dd>
+
+
 <dt>proportion_flow_bypass</dt>
-<dd><p>Variable describing the proportion of flows routed through the bypasses, more details at <code><a href="https://cvpia-osc.github.io/DSMflow//reference/proportion_flow_bypasses.html" class="external-link">proportion_flow_bypasses</a></code></p></dd>
+<dd><p>Variable describing the proportion of flows routed through the bypasses, more details at <code><a href="https://reorienting-to-recovery.github.io/DSMflow/reference/proportion_flow_bypasses.html" class="external-link">proportion_flow_bypasses</a></code></p></dd>
+
+
+<dt>filling_fn</dt>
+<dd><p>optional filling function to use in routing procedure, by default it uses fallRunDSM::fill_regional</p></dd>
+
+
+<dt>filling_args</dt>
+<dd><p>when passing custom filling function, pass function specific arguments as a list here</p></dd>
+
+
+<dt>movement_fn</dt>
+<dd><p>optional movement function to use in routing procedure</p></dd>
+
+
+<dt>movement_months</dt>
+<dd><p>when passing custom movement function, pass movement months here</p></dd>
+
+
+<dt>movement_args</dt>
+<dd><p>when passing custom movement function, pass function specific arguments as a list here</p></dd>
+
+
 <dt>detour</dt>
 <dd><p>Values can be 'sutter' or 'yolo' if some juveniles are detoured on to that bypass, otherwise NULL</p></dd>
+
+
 <dt>territory_size</dt>
 <dd><p>Array of juvenile fish territory requirements for <code><a href="fill.html">fill_regional</a></code></p></dd>
+
+
 <dt>stochastic</dt>
 <dd><p><code>TRUE</code> <code>FALSE</code> value indicating if model is being run stochastically</p></dd>
+
+
+<dt>freeport_flow</dt>
+<dd><p>Monthly mean flow at freeport in cubic feet per second</p></dd>
+
+
+<dt>vernalis_flow</dt>
+<dd><p>Monthly mean flow at vernalis in cubic feet per second</p></dd>
+
 </dl></div>
 
   </div>
@@ -134,7 +190,7 @@ Sacramento River or San Joaquin River) or out migrate during a simulated month</
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

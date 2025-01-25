@@ -112,7 +112,7 @@ growth_rates_floodplain <- growth_floodplain()
 usethis::use_data(growth_rates_floodplain)
 
 # cache new growth rates
-bioenergetics_transitions <- read_rds("data-raw/growTPM.rds")
+bioenergetics_transitions <- read_rds("data-raw/misc/growTPM.rds")
 usethis::use_data(bioenergetics_transitions, overwrite = TRUE)
 
 
@@ -125,7 +125,7 @@ prey_density_delta <- c("med", "med")
 usethis::use_data(prey_density_delta, overwrite = TRUE)
 
 # watershed attributes
-watershed_attributes <- read_csv("data-raw/watershed-attributes.csv")
+watershed_attributes <- read_csv("data-raw/data/watershed-attributes.csv")
 usethis::use_data(watershed_attributes, overwrite = TRUE)
 
 # R2R cache data objects

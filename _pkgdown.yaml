@@ -41,7 +41,6 @@ reference:
   - adult_stray
   - apply_straying
   - hatchery_stray_betareg
-  - stray_returning_adults
   - straying_destinations
   - pulse_movement
   - fill
@@ -103,8 +102,6 @@ navbar:
     menu:
       - text: 'Calibration'
         href: 'articles/calibration-2021.html'
-      - text: 'Sensitivity Analysis'
-        href: 'articles/sensitivity-analysis.html'
       - text: 'Hatchery Analysis'
         href: 'articles/hatchery-analysis.html'
       - text: 'Temperature Modeling'

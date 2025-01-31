@@ -6,7 +6,7 @@
 \title{Prey Density
 Vector defining prey density level ("low", "med", "hi", "max") by watershed}
 \format{
-An object of class \code{character} of length 31.
+An object of class \code{matrix} (inherits from \code{array}) with 31 rows and 20 columns.
 }
 \usage{
 prey_density

@@ -30,17 +30,21 @@ reference:
   - surv_juv_outmigration_delta
   - surv_juv_outmigration_sac
   - surv_juv_outmigration_san_joaquin
+  - surv_juv_outmigration_san_joaquin_flow_based
   - surv_juv_rear
   - spawn_success
   - ocean_entry_success
+  - harvest_adults
 
 - title: Growth and Movement Sub-models
   desc: Functions that calculate growth and movement
   contents:
   - adult_stray
   - apply_straying
-  - compute_adult_stray_rates
   - stray_returning_adults
+  - hatchery_stray_betareg
+  - straying_destinations
+  - compute_adult_stray_rates
   - harvest_adults
   - juvenile_month_dynamic
   - pulse_movement
@@ -54,10 +58,15 @@ reference:
   - route_bypass
   - route_regional
   - route_to_south_delta
+  - juvenile_month_dynamic
+  - snow_globe_movement
+  - temperature_movement
+  - time_movement
   - growth
   - growth_floodplain
   - rear
   - migrate
+  - hatchery_release_proportion_bay
   - ocean_transition_month
   - bioenergetics_transitions
   - get_growth_rates
@@ -94,6 +103,10 @@ reference:
   - get_habitat
   - get_rearing_survival
   - get_migratory_survival
+  - bioenergetics_transitions
+  - compute_adult_stray_rates
+  - hatchery_to_bay_distance
+  - get_growth_rates
   - territory_by_size
   - gamma_MOM
   - days_in_month
@@ -111,8 +124,6 @@ navbar:
     menu:
       - text: 'Calibration'
         href: 'articles/calibration-2021.html'
-      - text: 'Sensitivity Analysis'
-        href: 'articles/sensitivity-analysis.html'
       - text: 'Hatchery Analysis'
         href: 'articles/hatchery-analysis.html'
       - text: 'Temperature Modeling'

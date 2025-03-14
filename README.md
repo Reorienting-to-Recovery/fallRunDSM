@@ -17,7 +17,7 @@ The `fallRunDSM` package depends on a number of packages developed by the [Reori
 ``` r
 # install.packages("remotes")
 remotes::install_github("reorienting-to-recovery/fallRunDSM")
-remotes::install_github("reorienting-to-recovery/DSMscenario")
+remotes::install_github("reorienting-to-recovery/R2Rscenarios")
 
 # optional - need if wanting to explore or modify flow, habitat, and temperature inputs
 remotes::install_github("reorienting-to-recovery/DSMflow")
@@ -52,7 +52,7 @@ The `fallRunDSM` package uses data from several other packages within the [Reori
 
 All data used in the `fallRunDSM` is passed in as a argument to `fall_run_model()` from a `fallRunDSM::r_to_r_baseline_params` data list that is composed of data objects from the following packages:
 
--   **Flow Data**: View detailed documentation of flow data inputs at [DSMflow](https://reorienting-to-recovery.github.io/DSMflow/). Flow inputs to the `fallRunDSM` are generated using CalSim 2 data.
+-   **Flow Data**: View detailed documentation of flow data inputs at [DSMflow](https://reorienting-to-recovery.github.io/DSMflow/). Flow inputs to the `fallRunDSM` are generated using CalSim II and CalSim 3 data.
 -   **Habitat Data**: View detailed documentation of habitat data inputs at [DSMhabitat](https://reorienting-to-recovery.github.io/DSMhabitat/). Modeling details for each stream can be viewed [here](https://reorienting-to-recovery.github.io/DSMhabitat/reference/habitat_data.html#modeling-details-for-streams).
 -   **Temperature Data**: View detailed documentation of temperature data inputs at [DSMtemperature](https://reorienting-to-recovery.github.io/DSMtemperature/). Modeling details for each stream can be viewed [here](https://reorienting-to-recovery.github.io/DSMtemperature/reference/stream_temperature.html#watershed-modeling-details).
 

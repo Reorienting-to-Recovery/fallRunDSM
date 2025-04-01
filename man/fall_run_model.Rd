@@ -13,7 +13,8 @@ fall_run_model(
   seeds = NULL,
   ..params = fallRunDSM::r_to_r_baseline_params,
   stochastic = FALSE,
-  delta_surv_inflation = FALSE
+  delta_surv_inflation = FALSE,
+  test_mode = FALSE
 )
 }
 \arguments{

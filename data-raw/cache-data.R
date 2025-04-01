@@ -232,3 +232,9 @@ hatchery_releases_at_chipps = matrix(0, nrow = 31, ncol = 4,
                                      dimnames = list(fallRunDSM::watershed_labels, fallRunDSM::size_class_labels))
 usethis::use_data(hatchery_releases_at_chipps,overwrite = TRUE)
 
+non_spawn_regions <- c("Upper-mid Sacramento River", "Sutter Bypass",
+                       "Lower-mid Sacramento River", "Yolo Bypass",
+                       "Lower Sacramento River", "San Joaquin River")
+
+usethis::use_data(non_spawn_regions, overwrite = TRUE)
+s

@@ -828,7 +828,7 @@ fall_run_model <- function(scenario = NULL,
   # Removed spawn change / viability info NOT USED FOR R2R Logic
 
   if (test_mode) {
-    list2env(test_results, envir = .GlobalEnv)
+    list2env(list(fall_run_test_results = test_results), envir = .GlobalEnv)
   }
   return(output)
 

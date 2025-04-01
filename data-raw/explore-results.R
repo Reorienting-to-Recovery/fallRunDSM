@@ -25,7 +25,7 @@ r2r_model_results <- fallRunDSM::fall_run_model(mode = "simulate",
                                                 #scenario = "elephant_plus",
                                                 ..params =  new_params,
                                                 seeds = r2r_seeds,
-                                                delta_surv_inflation = FALSE)
+                                                delta_surv_inflation = FALSE, test_mode = TRUE)
 
 
 

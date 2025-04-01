@@ -20,9 +20,16 @@ fall_run_model <- function(scenario = NULL,
                            seeds = NULL,
                            ..params = fallRunDSM::r_to_r_baseline_params,
                            stochastic = FALSE,
-                           delta_surv_inflation = FALSE){
+                           delta_surv_inflation = FALSE,
+                           test_mode = FALSE){
 
   mode <- match.arg(mode)
+
+  if (test_mode) {
+    test_results = list(
+      "egg_to_fry" = matrix(NA, nrow = 20, ncol = 31)
+    )
+  }
 
   if (mode == "simulate") {
     if (is.null(scenario)) {
@@ -337,6 +344,10 @@ fall_run_model <- function(scenario = NULL,
       .scour = ..params$.surv_egg_to_fry_scour,
       ..surv_egg_to_fry_int = ..params$..surv_egg_to_fry_int
     )
+
+    if (test_mode) {
+      test_results[["egg_to_fry"]][year, ] <- egg_to_fry_surv
+    }
 
     min_spawn_habitat <- apply(..params$spawning_habitat[ , 10:12, year], 1, min)
 
@@ -816,6 +827,9 @@ fall_run_model <- function(scenario = NULL,
   }
   # Removed spawn change / viability info NOT USED FOR R2R Logic
 
+  if (test_mode) {
+    list2env(test_results, envir = .GlobalEnv)
+  }
   return(output)
 
 }
